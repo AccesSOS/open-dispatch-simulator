@@ -119,6 +119,11 @@ answers produce the same protocol, determinant, and response level under every s
   Interrogation plus the M5 Chest Pain, C1 Cardiac Arrest, C6 Unconscious/Fainting, and M17
   Unknown/Man Down cards, with the source's own Code RED/YELLOW response taxonomy. See its
   [SOURCE.md](packs/us-openises-emd/SOURCE.md) for attribution and digitization decisions.
+- [`packs/us-nj-emd`](packs/us-nj-emd/pack.json) digitizes the **official State of New Jersey
+  EMD Guidecards** (nj.gov/911, updated May 2026): All Caller Interrogation + Chest Pain,
+  Cardiac Arrest/DOA, Unconscious/Fainting, and Unknown/Person Down, with New Jersey's own
+  dispatch tiers (`SIMULTANEOUS_ALS_BLS` / `BLS_DISPATCH` / `FOLLOW_LOCAL_PROTOCOL`). License
+  status: written permission pending — see [SOURCE.md](packs/us-nj-emd/SOURCE.md).
 
 ## Roadmap
 
