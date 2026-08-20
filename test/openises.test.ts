@@ -123,8 +123,8 @@ test('M5: cardiac history makes chest pain a CODE_RED (card criterion)', () => {
   assert.equal(r.response, 'CODE_RED');
 });
 
-test('M5: young patient with no critical symptoms is CODE_YELLOW', () => {
-  const r = run(CASE_OK, {
+test('M5: numeric age tiers — under 35 clean is CODE_YELLOW, over 35 clean is CODE_RED', () => {
+  const clean = {
     m5_alert: 'yes',
     m5_breathing_normal: 'yes, normally',
     m5_sweating: 'no',
@@ -133,12 +133,21 @@ test('M5: young patient with no critical symptoms is CODE_YELLOW', () => {
     m5_rapid_heart: 'no',
     m5_cardiac_history: 'no',
     m5_drugs: 'no',
-  });
-  assert.equal(r.determinantId, 'm5_yellow_no_critical');
-  assert.equal(r.response, 'CODE_YELLOW');
+  };
+  const young = run(
+    ['12 Pine St', '555-0100', 'chest pain', 'one', '28', 'yes', 'yes', 'male', 'Ana'],
+    clean,
+  );
+  assert.equal(young.numbers['age'], 28);
+  assert.equal(young.determinantId, 'm5_yellow_under_35');
+  assert.equal(young.response, 'CODE_YELLOW');
+
+  const older = run(CASE_OK, clean); // age 58 -> the card only defines YELLOW for <35
+  assert.equal(older.determinantId, 'm5_red_over_35_or_unknown');
+  assert.equal(older.response, 'CODE_RED');
 });
 
-test('All Callers: not breathing dispatches CODE_RED immediately', () => {
+test('All Callers: unconscious + not breathing jumps to the C1 card (v0.2)', () => {
   const s = new DispatchSession(pack);
   s.start();
   s.answer('12 Pine St');
@@ -147,16 +156,32 @@ test('All Callers: not breathing dispatches CODE_RED immediately', () => {
   s.answer('one');
   s.answer('58');
   s.answer('no, unconscious');
-  const out = s.answer('no'); // breathing -> immediate Code Red, per the card
-  assert.equal(out[0]!.stringId, 'dispatch_confirm');
+  const out = s.answer('no'); // conscious=no + breathing=no -> C1 takes over the call
+  assert.equal(out[0]!.stringId, 'kq_alert', 'C1 card first key question');
+  s.answer('no');
+  s.answer('no, gasping');
+  s.answer('no response at all');
+  s.answer('no, not expected');
+  assert.ok(s.isDone());
   const r = s.result();
-  assert.equal(r.determinantId, 'm5_red_not_breathing');
+  assert.equal(r.protocolId, 'c1_cardiac_arrest');
+  assert.equal(r.determinantId, 'c1_red_arrest');
+  assert.equal(r.response, 'CODE_RED');
+});
+
+test('All Callers: unconscious but breathing jumps to C6, overriding the complaint', () => {
+  const r = run(
+    ['12 Pine St', '555-0100', 'I think he is in cardiac arrest', 'one', '90', 'no', 'yes', 'male', 'Ana'],
+    {},
+  );
+  assert.equal(r.protocolId, 'c6_unconscious_fainting', 'breathing patient routes to C6 per the card flow');
+  assert.equal(r.determinantId, 'c6_red_confirmed_unconscious');
   assert.equal(r.response, 'CODE_RED');
 });
 
 test('C1: confirmed hospice expected death is the CODE_YELLOW exception', () => {
   const r = run(
-    ['12 Pine St', '555-0100', 'I think he is in cardiac arrest', 'one', '90', 'no', 'yes', 'male', 'Ana'],
+    ['12 Pine St', '555-0100', 'he stopped breathing and he is on hospice', 'one', '90', 'no', 'no', 'male', 'Ana'],
     {
       c1_alert: 'no',
       c1_breathing_normal: 'no, gasping',

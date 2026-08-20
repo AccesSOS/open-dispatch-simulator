@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Ajv2020 } from 'ajv/dist/2020.js';
-import type { ProtocolPack, Question } from './types.js';
+import type { Condition, ProtocolPack, Question } from './types.js';
 
 const schemaPath = fileURLToPath(new URL('../schema/pack.schema.json', import.meta.url));
 
@@ -44,10 +44,12 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
   // Collect every referenced stringId and slot.
   const stringIds = new Set<string>(REQUIRED_STRING_IDS);
   const slots = new Set<string>();
+  const extractNumberSlots = new Set<string>();
   const collectQuestion = (q: Question) => {
     stringIds.add(q.stringId);
     if (q.confirmStringId) stringIds.add(q.confirmStringId);
     slots.add(q.slot);
+    if (q.extract === 'number') extractNumberSlots.add(q.slot);
   };
   pack.caseEntry.forEach(collectQuestion);
   for (const p of pack.protocols) {
@@ -121,22 +123,39 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
         }
       }
       for (const edge of q.next ?? []) {
-        if (edge.goto !== '$determine' && !nodeIds.has(edge.goto)) {
+        if ((edge.goto === undefined) === (edge.gotoProtocol === undefined)) {
+          problems.push(`question "${q.id}" edge must have exactly one of goto/gotoProtocol`);
+        }
+        if (edge.goto !== undefined && edge.goto !== '$determine' && !nodeIds.has(edge.goto)) {
           problems.push(`protocol "${p.id}" question "${q.id}" edge targets unknown "${edge.goto}"`);
+        }
+        if (edge.gotoProtocol !== undefined && !protocolIds.has(edge.gotoProtocol)) {
+          problems.push(`question "${q.id}" edge jumps to unknown protocol "${edge.gotoProtocol}"`);
         }
         if (edge.whenOption && q.expect && !q.expect.options.some((o) => o.id === edge.whenOption)) {
           problems.push(`question "${q.id}" edge condition uses unknown option "${edge.whenOption}"`);
+        }
+        for (const cond of edge.when ?? []) {
+          checkCondition(cond, `question "${q.id}" edge`);
         }
       }
     }
     for (const rule of p.determinants) {
       for (const cond of rule.when ?? []) {
+        checkCondition(cond, `determinant "${rule.id}"`);
+      }
+    }
+
+    function checkCondition(cond: Condition, where: string) {
+      if ('option' in cond) {
         const options = optionIdsBySlot.get(cond.slot);
         if (!options) {
-          problems.push(`determinant "${rule.id}" references slot "${cond.slot}" with no choice question`);
+          problems.push(`${where} references slot "${cond.slot}" with no choice question`);
         } else if (!options.has(cond.option)) {
-          problems.push(`determinant "${rule.id}" references unknown option "${cond.option}" on slot "${cond.slot}"`);
+          problems.push(`${where} references unknown option "${cond.option}" on slot "${cond.slot}"`);
         }
+      } else if (!extractNumberSlots.has(cond.slot)) {
+        problems.push(`${where} has a numeric condition on slot "${cond.slot}" but no question declares extract: "number" for it`);
       }
     }
     const last = p.determinants[p.determinants.length - 1];

@@ -29,10 +29,20 @@ export interface Expectation {
   options: ChoiceOption[];
 }
 
+/** Choice condition on a slot's answered option, or numeric condition on a
+ * slot whose question declares extract: 'number'. */
+export type Condition =
+  | { slot: string; option: string }
+  | { slot: string; gt?: number; gte?: number; lt?: number; lte?: number };
+
 export interface Edge {
   whenOption?: string;
+  /** v0.2: extra conditions on previously collected slots; all must hold. */
+  when?: Condition[];
   /** A question id within the same protocol, or '$determine'. */
-  goto: string;
+  goto?: string;
+  /** v0.2: jump to another protocol's key questions ("go to the C1 card"). */
+  gotoProtocol?: string;
 }
 
 export interface Question {
@@ -42,6 +52,8 @@ export interface Question {
   selectsProtocol?: boolean;
   /** Optional read-back a persona may speak after the answer ("Okay, {address}."). */
   confirmStringId?: string;
+  /** v0.2: structurally extract the first number in the answer for numeric conditions. */
+  extract?: 'number';
   expect?: Expectation;
   next?: Edge[];
 }
@@ -51,7 +63,7 @@ export type StringTemplate = string | string[];
 
 export interface DeterminantRule {
   id: string;
-  when?: { slot: string; option: string }[];
+  when?: Condition[];
   response: string;
 }
 
@@ -117,7 +129,7 @@ export type SessionEvent =
       text: string;
       option: string | null;
     }
-  | { type: 'protocol_selected'; protocolId: string; via: 'keywords' | 'fallback' }
+  | { type: 'protocol_selected'; protocolId: string; via: 'keywords' | 'fallback' | 'jump' }
   | { type: 'edge'; from: string; to: string }
   | {
       type: 'determinant';
@@ -157,5 +169,7 @@ export interface SessionResult {
   response: string | null;
   answers: Record<string, string>;
   choices: Record<string, string>;
+  /** Numbers captured by extract: 'number' questions. */
+  numbers: Record<string, number>;
   transcript: { role: 'dispatcher' | 'caller'; text: string }[];
 }

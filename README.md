@@ -71,6 +71,14 @@ console.log(call.result());             // protocol, determinant, response level
 | `strings.<locale>` | Every utterance template, per locale — validated complete at load time |
 | `provenance` | Where the playbook came from and its redistribution license |
 
+Schema **v0.2** adds three features (v0.1 packs remain valid): `extract: "number"` on a question
+captures the first number in the answer; determinant and edge conditions may then be **numeric**
+(`{ "slot": "age", "gt": 35 }` — never matching when no number was captured, so age-unknown falls
+to whichever tier the pack lists as default); edges gain `when` (compound conditions on prior
+slots) and `gotoProtocol` — faithful **card jumps**, e.g. both bundled real packs now route an
+unconscious, non-breathing patient to their Cardiac Arrest card mid-case-entry, exactly as the
+printed flow charts direct.
+
 The loader (`loadPack`) enforces the grounding contract up front: every referenced string must
 exist in **every** declared locale, templates may only interpolate collected slots, every edge and
 determinant must reference real questions and options. A pack that loads is safe to execute.

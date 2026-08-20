@@ -1,5 +1,6 @@
 import { determineNodeId, keyQuestionNodeId } from './graph.js';
 import type {
+  Condition,
   Locale,
   Persona,
   Phase,
@@ -53,6 +54,7 @@ export class DispatchSession {
   private phase: Phase = 'idle';
   private readonly answers: Record<string, string> = {};
   private readonly choices: Record<string, string> = {};
+  private readonly numbers: Record<string, number> = {};
   private readonly transcript: { role: 'dispatcher' | 'caller'; text: string }[] = [];
   private protocol: Protocol | null = null;
   private determinantId: string | null = null;
@@ -109,6 +111,10 @@ export class DispatchSession {
     }
     this.clarifies = 0;
     this.answers[q.slot] = text;
+    if (q.extract === 'number') {
+      const m = text.match(/-?\d+(?:[.,]\d+)?/);
+      if (m) this.numbers[q.slot] = Number(m[0].replace(',', '.'));
+    }
     this.emit({
       type: 'answer',
       nodeId: this.nodeIdFor(q),
@@ -126,11 +132,33 @@ export class DispatchSession {
         : [];
     if (q.selectsProtocol) this.protocol = this.selectProtocol(text);
 
-    // Conditional edges override sequential flow.
-    const edge =
-      q.next?.find((e) => e.whenOption !== undefined && e.whenOption === this.choices[q.slot]) ??
-      q.next?.find((e) => e.whenOption === undefined);
+    // Conditional edges override sequential flow. Evaluated in pack order;
+    // an edge with neither whenOption nor when is the default.
+    const edge = q.next?.find(
+      (e) =>
+        (e.whenOption === undefined || e.whenOption === this.choices[q.slot]) &&
+        (e.when ?? []).every((c) => this.condHolds(c)),
+    );
     if (edge) {
+      if (edge.gotoProtocol) {
+        // "Go to the C1 card": the target protocol takes over the call.
+        const target = this.mustProtocol(edge.gotoProtocol);
+        this.emit({
+          type: 'edge',
+          from: this.nodeIdFor(q),
+          to: target.keyQuestions[0]
+            ? keyQuestionNodeId(target.id, target.keyQuestions[0])
+            : determineNodeId(target.id),
+        });
+        this.protocol = target;
+        this.emit({ type: 'protocol_selected', protocolId: target.id, via: 'jump' });
+        if (this.phase === 'case_entry') {
+          this.phase = 'key_questions';
+          this.emit({ type: 'phase', phase: 'key_questions' });
+        }
+        this.queue = [...target.keyQuestions];
+        return [...confirm, ...this.advance()];
+      }
       if (edge.goto === '$determine') {
         this.emit({
           type: 'edge',
@@ -169,8 +197,22 @@ export class DispatchSession {
       response: this.response,
       answers: { ...this.answers },
       choices: { ...this.choices },
+      numbers: { ...this.numbers },
       transcript: [...this.transcript],
     };
+  }
+
+  /** Evaluate a choice or numeric condition against collected state. A
+   * numeric condition never matches when no number was captured. */
+  private condHolds(c: Condition): boolean {
+    if ('option' in c) return this.choices[c.slot] === c.option;
+    const v = this.numbers[c.slot];
+    if (v === undefined) return false;
+    if (c.gt !== undefined && !(v > c.gt)) return false;
+    if (c.gte !== undefined && !(v >= c.gte)) return false;
+    if (c.lt !== undefined && !(v < c.lt)) return false;
+    if (c.lte !== undefined && !(v <= c.lte)) return false;
+    return true;
   }
 
   // --- internals ---
@@ -211,9 +253,8 @@ export class DispatchSession {
   private determine(): Utterance[] {
     const protocol = this.protocol ?? this.mustProtocol(this.pack.fallbackProtocol);
     const rule =
-      protocol.determinants.find((r) =>
-        (r.when ?? []).every((c) => this.choices[c.slot] === c.option),
-      ) ?? protocol.determinants[protocol.determinants.length - 1]!;
+      protocol.determinants.find((r) => (r.when ?? []).every((c) => this.condHolds(c))) ??
+      protocol.determinants[protocol.determinants.length - 1]!;
     this.determinantId = rule.id;
     this.response = rule.response;
     this.phase = 'done';

@@ -32,16 +32,54 @@ test('nj pack loads with NJ dispatch taxonomy and pending-permission provenance'
   );
 });
 
-test('breathing "unsure" is a first-class option that short-circuits to dispatch', () => {
-  const s = new DispatchSession(pack);
+test('unconscious + breathing "unsure" jumps to the CARDIAC ARREST/DOA card (v0.2)', () => {
+  const events: string[] = [];
+  const s = new DispatchSession(pack, {
+    onEvent: (e) => {
+      if (e.type === 'protocol_selected') events.push(`${e.via}:${e.protocolId}`);
+    },
+  });
   s.start();
   for (const a of ['12 Grove St', '609-555-0100', 'chest pain', 'Ana', '58', 'male', 'no']) s.answer(a);
-  const out = s.answer("I'm not sure, maybe"); // breathing: unsure -> immediate dispatch
+  const out = s.answer("I'm not sure, maybe"); // conscious=no + breathing unsure -> jump
+  assert.equal(out[0]!.stringId, 'kq_ca_responds', 'C1 card takes over');
+  assert.deepEqual(events, ['keywords:chest_pain_heart_problems', 'jump:cardiac_arrest_doa']);
+  s.answer('no');
+  s.answer('no, gasping');
+  s.answer('an hour ago');
+  s.answer('no');
+  assert.ok(s.isDone());
+  const r = s.result();
+  assert.equal(r.protocolId, 'cardiac_arrest_doa');
+  assert.equal(r.determinantId, 'ca_als_arrest');
+});
+
+test('conscious + breathing "unsure" stays on the complaint card and dispatches', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of ['12 Grove St', '609-555-0100', 'chest pain', 'Ana', '58', 'male', 'yes']) s.answer(a);
+  const out = s.answer("I'm not sure, maybe");
   assert.equal(out[0]!.stringId, 'dispatch_confirm');
   const r = s.result();
-  assert.equal(r.choices['breathing_normally'], 'unsure');
   assert.equal(r.determinantId, 'cp_als_breathing_unsure');
   assert.equal(r.response, 'SIMULTANEOUS_ALS_BLS');
+});
+
+test('numeric age tiers: under-35 chest pain reaches BLS_DISPATCH, unknown age stays ALS', () => {
+  const young = run(
+    ['12 Grove St', '609-555-0100', 'chest pain', 'Ana', 'he is 28 years old', 'male', 'yes', 'yes, normally'],
+    { cp_sweating: 'no', cp_nausea: 'no', cp_weak: 'no', cp_pain_moves: 'no', cp_heart_history: 'no, never', cp_rapid_heart: 'no' },
+  );
+  assert.equal(young.numbers['age'], 28);
+  assert.equal(young.determinantId, 'cp_bls_under_35');
+  assert.equal(young.response, 'BLS_DISPATCH');
+
+  const unknown = run(
+    ['12 Grove St', '609-555-0100', 'chest pain', 'Ana', 'I have no idea', 'male', 'yes', 'yes, normally'],
+    { cp_sweating: 'no', cp_nausea: 'no', cp_weak: 'no', cp_pain_moves: 'no', cp_heart_history: 'no, never', cp_rapid_heart: 'no' },
+  );
+  assert.equal(unknown.numbers['age'], undefined);
+  assert.equal(unknown.determinantId, 'cp_als_default_age_unknown', 'age unknown -> higher tier');
 });
 
 test('chest pain with no critical symptoms still defaults to ALS (age-unknown, safety-first)', () => {

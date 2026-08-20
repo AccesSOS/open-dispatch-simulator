@@ -19,7 +19,7 @@
   ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": { "const": "0.1" },
+    "schemaVersion": { "enum": ["0.1", "0.2"] },
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "name": { "$ref": "#/$defs/localizedText" },
     "jurisdiction": {
@@ -113,6 +113,10 @@
           "type": "string",
           "description": "Optional read-back template (interpolating this question's slot) that a persona may speak after the answer, e.g. \"Okay, {address}.\""
         },
+        "extract": {
+          "const": "number",
+          "description": "v0.2: structurally extract the first number in the answer as this slot's numeric value, enabling numeric determinant/edge conditions (e.g. age > 35)."
+        },
         "expect": { "$ref": "#/$defs/expectation" },
         "next": {
           "type": "array",
@@ -144,18 +148,54 @@
     },
     "edge": {
       "type": "object",
-      "required": ["goto"],
       "additionalProperties": false,
+      "oneOf": [{ "required": ["goto"] }, { "required": ["gotoProtocol"] }],
       "properties": {
         "whenOption": {
           "type": "string",
-          "description": "Take this edge when the answered option id matches. An edge without whenOption is the default."
+          "description": "Take this edge when this question's answered option id matches. An edge with neither whenOption nor when is the default."
+        },
+        "when": {
+          "type": "array",
+          "description": "v0.2: additional conditions on previously collected slots (choice options or numeric comparisons); all must hold. Edges are evaluated in order.",
+          "items": { "$ref": "#/$defs/condition" },
+          "minItems": 1
         },
         "goto": {
           "type": "string",
           "description": "A question id within the same protocol, or the sentinel '$determine' to proceed to determinant selection."
+        },
+        "gotoProtocol": {
+          "type": "string",
+          "description": "v0.2: jump to another protocol's key questions ('go to the C1 card'). The target protocol takes over the rest of the call, including determinants."
         }
       }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slot"],
+      "oneOf": [
+        { "required": ["option"] },
+        {
+          "anyOf": [
+            { "required": ["gt"] },
+            { "required": ["gte"] },
+            { "required": ["lt"] },
+            { "required": ["lte"] }
+          ],
+          "not": { "required": ["option"] }
+        }
+      ],
+      "properties": {
+        "slot": { "type": "string" },
+        "option": { "type": "string", "description": "Matches when the slot's answered option id equals this." },
+        "gt": { "type": "number" },
+        "gte": { "type": "number" },
+        "lt": { "type": "number" },
+        "lte": { "type": "number" }
+      },
+      "description": "Choice condition ({slot, option}) or numeric condition ({slot, gt/gte/lt/lte}) on a slot whose question declares extract: 'number'. A numeric condition never matches when no number was captured."
     },
     "protocol": {
       "type": "object",
@@ -181,15 +221,7 @@
               "id": { "type": "string" },
               "when": {
                 "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": ["slot", "option"],
-                  "additionalProperties": false,
-                  "properties": {
-                    "slot": { "type": "string" },
-                    "option": { "type": "string" }
-                  }
-                }
+                "items": { "$ref": "#/$defs/condition" }
               },
               "response": {
                 "type": "string",

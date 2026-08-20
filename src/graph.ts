@@ -19,6 +19,19 @@ export function packGraph(pack: ProtocolPack): PackGraph {
   const nodes: GraphNode[] = [];
   const edges: GraphEdge[] = [];
 
+  const protocolRootId = (protocolId: string): string => {
+    const p = pack.protocols.find((x) => x.id === protocolId);
+    return p?.keyQuestions[0] ? keyQuestionNodeId(p.id, p.keyQuestions[0]) : determineNodeId(protocolId);
+  };
+
+  const edgeLabel = (e: Question['next'] extends (infer E)[] | undefined ? E : never): string | undefined => {
+    const parts = [
+      ...(e.whenOption !== undefined ? [e.whenOption] : []),
+      ...(e.when ?? []).map((c) => ('option' in c ? `${c.slot}=${c.option}` : c.slot)),
+    ];
+    return parts.length ? parts.join(' & ') : undefined;
+  };
+
   const questionEdges = (
     q: Question,
     selfId: string,
@@ -27,9 +40,11 @@ export function packGraph(pack: ProtocolPack): PackGraph {
   ) => {
     const conditional = q.next ?? [];
     for (const e of conditional) {
-      edges.push({ from: selfId, to: resolveGoto(e.goto), ...(e.whenOption !== undefined && { label: e.whenOption }) });
+      const to = e.gotoProtocol !== undefined ? protocolRootId(e.gotoProtocol) : resolveGoto(e.goto!);
+      const label = edgeLabel(e);
+      edges.push({ from: selfId, to, ...(label !== undefined && { label }) });
     }
-    const hasDefault = conditional.some((e) => e.whenOption === undefined);
+    const hasDefault = conditional.some((e) => e.whenOption === undefined && !e.when?.length);
     if (!hasDefault && seqTargetId) edges.push({ from: selfId, to: seqTargetId });
   };
 

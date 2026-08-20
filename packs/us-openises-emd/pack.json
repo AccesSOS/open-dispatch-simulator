@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.1",
+  "schemaVersion": "0.2",
   "id": "us-openises-emd",
   "name": {
     "en": "US — Open ISES EMD Guide Cards v0.26.2 (subset)",
@@ -16,7 +16,7 @@
     "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
     "license": "GFDL-1.2-or-later",
     "digitizedDate": "2026-08-20",
-    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first)."
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized."
   },
   "locales": [
     "en",
@@ -51,7 +51,8 @@
     {
       "id": "q_age",
       "slot": "age",
-      "stringId": "q_age"
+      "stringId": "q_age",
+      "extract": "number"
     },
     {
       "id": "q_conscious",
@@ -156,6 +157,32 @@
         ]
       },
       "next": [
+        {
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            },
+            {
+              "slot": "breathing",
+              "option": "no"
+            }
+          ],
+          "gotoProtocol": "c1_cardiac_arrest"
+        },
+        {
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            },
+            {
+              "slot": "breathing",
+              "option": "yes"
+            }
+          ],
+          "gotoProtocol": "c6_unconscious_fainting"
+        },
         {
           "whenOption": "no",
           "goto": "$determine"
@@ -740,8 +767,18 @@
           "response": "CODE_RED"
         },
         {
-          "id": "m5_yellow_no_critical",
+          "id": "m5_yellow_under_35",
+          "when": [
+            {
+              "slot": "age",
+              "lt": 35
+            }
+          ],
           "response": "CODE_YELLOW"
+        },
+        {
+          "id": "m5_red_over_35_or_unknown",
+          "response": "CODE_RED"
         }
       ],
       "postDispatch": [
@@ -1336,6 +1373,16 @@
           "response": "CODE_RED"
         },
         {
+          "id": "c6_red_confirmed_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
           "id": "c6_red_breathing_abnormal",
           "when": [
             {
@@ -1351,6 +1398,20 @@
             {
               "slot": "c6_drugs_alcohol",
               "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "c6_red_single_faint_over_50",
+          "when": [
+            {
+              "slot": "c6_first_time",
+              "option": "yes"
+            },
+            {
+              "slot": "age",
+              "gt": 50
             }
           ],
           "response": "CODE_RED"
