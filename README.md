@@ -114,6 +114,9 @@ answers produce the same protocol, determinant, and response level under every s
 
 ## Content policy
 
+The hunt for sources — what shipped, what's pending, verified dead ends, and open leads — is
+recorded in [docs/PROTOCOL-SOURCES.md](docs/PROTOCOL-SOURCES.md).
+
 - **Only openly licensed playbooks ship here** — public-domain sources (e.g. the NHTSA EMD
   National Standard Curriculum), state-published protocols, and public-records SOPs, each with
   provenance declared in the pack. Proprietary systems (e.g. MPDS®/ProQA®) are **not** included
