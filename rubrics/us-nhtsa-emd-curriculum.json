@@ -1,0 +1,247 @@
+{
+  "schemaVersion": "0.1",
+  "id": "us-nhtsa-emd-curriculum",
+  "name": "NHTSA EMD National Standard Curriculum — EMDPRS elements",
+  "scope": "emd",
+  "authority": {
+    "jurisdiction": "US",
+    "instrument": "Emergency Medical Dispatch: National Standard Curriculum (NHTSA, DOT HS 808 559)",
+    "adopted": "1996"
+  },
+  "provenance": {
+    "source": "NHTSA Emergency Medical Dispatch National Standard Curriculum, Instructor Guide + Trainee Guide (ERIC ED425308)",
+    "url": "https://files.eric.ed.gov/fulltext/ED425308.pdf",
+    "license": "public-domain",
+    "retrieved": "2026-08-20",
+    "notes": "US federal government work, public domain. The curriculum describes what an EMDPRS must contain — three protocol types, four design components per chief-complaint card, the initial-survey contents, and the 32 chief complaint types — but deliberately ships no filled-in cards; the sample pages are marked 'not approved for use'. Requirement wording here is condensed from the curriculum's own section headings, each cited to its module and unit."
+  },
+  "taxonomies": {
+    "chief-complaints-32": {
+      "name": "NHTSA 32 chief complaint types",
+      "citation": "Module 3, IG Note #1 — 'Present the Chief Complaints in the Following Order'; 11 traumatic incident types, 14 medical chief complaint types, 7 time/life-critical events",
+      "entries": [
+        { "id": "animal-bites", "group": "traumatic", "name": "Animal Bites", "patterns": ["animal bite", "dog bite", "snake bite", "\\bbitten\\b", "mordedura", "mordido", "morsure"] },
+        { "id": "assault", "group": "traumatic", "name": "Assault", "patterns": ["assault", "agresi", "agression", "domestic violence", "violence conjugale"] },
+        { "id": "burns", "group": "traumatic", "name": "Burns", "patterns": ["\\bburns?\\b", "quemadura", "br[uû]lure"] },
+        { "id": "eye-problems", "group": "traumatic", "name": "Eye Problems", "patterns": ["eye (injur|problem)", "\\bojo\\b", "[œo]eil", "\\bœil\\b"] },
+        { "id": "fall-victim", "group": "traumatic", "name": "Fall Victim", "patterns": ["\\bfalls?\\b", "\\bfell\\b", "ca[ií]das\\b", "se cay[óo]", "\\bchutes?\\b", "est tomb"] },
+        { "id": "heat-cold-exposure", "group": "traumatic", "name": "Heat/Cold Exposure", "patterns": ["heat ?stroke", "cold exposure", "hypothermia", "frostbite", "exposici[óo]n al calor", "chaleur"] },
+        { "id": "hemorrhage-laceration", "group": "traumatic", "name": "Hemorrhage/Laceration", "patterns": ["bleeding", "h[ae]morrhage", "laceration", "hemorragia", "sangrando", "h[ée]morragie"] },
+        { "id": "industrial-accidents", "group": "traumatic", "name": "Industrial Accidents", "patterns": ["industrial", "f[áa]brica", "\\busine\\b", "forklift"] },
+        { "id": "stab-gunshot", "group": "traumatic", "name": "Stab/Gunshot Wound", "patterns": ["stabbing", "stabbed", "gunshot", "arma de fuego", "apu[ñn]al", "arme (blanche|à feu)"] },
+        { "id": "traffic-accident", "group": "traumatic", "name": "Traffic Accident", "patterns": ["motor vehicle", "traffic accident", "collision", "car (accident|crash)", "accidente veh", "choque"] },
+        { "id": "traumatic-injury", "group": "traumatic", "name": "Traumatic Injury", "patterns": ["traumatic injur", "lesi[óo]n traum[áa]tica", "blessure traumatique"] },
+
+        { "id": "abdominal-pain", "group": "medical", "name": "Abdominal Pain", "patterns": ["abdominal", "stomach", "dolor de est[óo]mago", "mal au ventre"] },
+        { "id": "allergies", "group": "medical", "name": "Allergies", "patterns": ["allerg", "\\bsting", "picadura", "piq[ûu]re"] },
+        { "id": "back-pain", "group": "medical", "name": "Back Pain", "patterns": ["back pain", "dolor de espalda", "mal de dos"] },
+        { "id": "chest-pain", "group": "medical", "name": "Chest Pain", "patterns": ["chest pain", "dolor de pecho", "douleur [àa] la poitrine"] },
+        { "id": "breathing-problems", "group": "medical", "name": "Breathing Problems", "patterns": ["breathing problem", "trouble breathing", "difficulty breathing", "dificultad (para )?respirar", "problemas respiratorios", "probl[èe]mes respiratoires"] },
+        { "id": "convulsions-seizures", "group": "medical", "name": "Convulsions/Seizures", "patterns": ["seizure", "convuls", "epilep", "[ée]pilep"] },
+        { "id": "diabetic-problems", "group": "medical", "name": "Diabetic Problems", "patterns": ["diabet"] },
+        { "id": "headache", "group": "medical", "name": "Headache", "patterns": ["headache", "dolor de cabeza", "mal de t[êe]te", "migra"] },
+        { "id": "heart-problems", "group": "medical", "name": "Heart Problems", "patterns": ["heart (problem|attack)", "cardiac", "infarto", "card[íi]ac", "cardiaque"] },
+        { "id": "ingestions-poisonings", "group": "medical", "name": "Ingestions/Poisonings", "patterns": ["poison", "overdose", "ingestion", "sobredosis", "envenen", "surdose", "empoisonn"] },
+        { "id": "psychiatric-problems", "group": "medical", "name": "Psychiatric Problems", "patterns": ["psychiatric", "behavioral", "suicid", "mental health", "psiqui[áa]tric", "psychiatriqu"] },
+        { "id": "sick-person", "group": "medical", "name": "Sick Person", "patterns": ["sick person", "persona enferma", "personne malade", "\\bsick\\b", "enferm[oa]\\b"] },
+        { "id": "stroke-cva", "group": "medical", "name": "Stroke/CVA", "patterns": ["stroke", "\\bcva\\b", "derrame", "embolia", "\\bavc\\b"] },
+        { "id": "unknown-man-down", "group": "medical", "name": "Unknown Problem/Man Down", "patterns": ["man down", "person(a)? down", "unknown", "persona en el suelo", "personne au sol", "inconnu"] },
+
+        { "id": "co-hazmat", "group": "time-life-critical", "name": "CO Poisoning/HAZMAT", "patterns": ["carbon monoxide", "mon[óo]xido", "monoxyde", "hazmat", "inhalation", "inhalaci[óo]n", "mati[èe]res dangereuses"] },
+        { "id": "cardiac-arrest", "group": "time-life-critical", "name": "Cardiac Arrest", "patterns": ["cardiac arrest", "paro cardi", "arr[êe]t cardiaque", "respiratory arrest"] },
+        { "id": "choking", "group": "time-life-critical", "name": "Choking", "patterns": ["chok(ing|ed)", "atragant", "[ée]touff"] },
+        { "id": "drowning", "group": "time-life-critical", "name": "Drowning", "patterns": ["drown", "ahogamiento", "noyade"] },
+        { "id": "electrocution", "group": "time-life-critical", "name": "Electrocution", "patterns": ["electrocut", "electric shock", "descarga el[ée]ctrica", "[ée]lectrocution"] },
+        { "id": "pregnancy-childbirth", "group": "time-life-critical", "name": "Pregnancy/Children (childbirth)", "patterns": ["pregnan", "childbirth", "\\blabor\\b", "embarazo", "\\bparto\\b", "accouchement", "grossesse"] },
+        { "id": "unconscious-fainting", "group": "time-life-critical", "name": "Unconscious/Fainting", "patterns": ["unconscious", "faint", "inconsciente", "desmayo", "inconscient", "[ée]vanouissement"] }
+      ]
+    },
+    "high-priority-symptoms": {
+      "name": "high-priority symptoms named by the curriculum",
+      "citation": "Module 3, Unit 2 — 'The most common high-priority symptoms included in the majority of EMDPRS are chest pain, breathing problems, altered levels of consciousness and, in some cases, severe hemorrhage.'",
+      "entries": [
+        { "id": "chest-pain", "name": "Chest pain", "patterns": ["chest pain", "dolor de pecho", "douleur [àa] la poitrine"] },
+        { "id": "breathing-problems", "name": "Breathing problems", "patterns": ["breathing problem", "difficulty breathing", "dificultad (para )?respirar", "problemas respiratorios", "probl[èe]mes respiratoires"] },
+        { "id": "altered-loc", "name": "Altered level of consciousness", "patterns": ["unconscious", "faint", "inconsciente", "desmayo", "inconscient"] },
+        { "id": "severe-hemorrhage", "name": "Severe hemorrhage", "patterns": ["bleeding", "h[ae]morrhage", "hemorragia", "h[ée]morragie"] }
+      ]
+    }
+  },
+  "requirements": [
+    {
+      "id": "NHTSA-TYPE-1",
+      "citation": "Module 3, Unit 1 — Descriptions of Three Protocol Types (1)",
+      "text": "An Initial Survey / All-Caller Interrogation protocol: the questions asked of every caller, used to gather location (including telephone number) and patient status, and to point the EMD at the proper chief-complaint card.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "min": 4 }
+    },
+    {
+      "id": "NHTSA-TYPE-2",
+      "citation": "Module 3, Unit 1 — Descriptions of Three Protocol Types (2)",
+      "text": "Individual 'chief complaint' protocols, used to establish the type and severity of the emergency being reported and to verify what the all-caller interrogation gathered.",
+      "appliesTo": "pack",
+      "check": { "kind": "keyQuestions", "minProtocols": "all" }
+    },
+    {
+      "id": "NHTSA-TYPE-3",
+      "citation": "Module 3, Unit 1 — Descriptions of Three Protocol Types (3)",
+      "text": "Scripted medical protocols: telephone instructions in script format, read to the caller word-for-word (the curriculum's examples are CPR, choking, childbirth, airway management).",
+      "appliesTo": "pack",
+      "notes": "Checked as: at least one protocol carries an ordered instruction sequence of four or more steps.",
+      "check": { "kind": "postDispatch", "minSteps": 4 }
+    },
+    {
+      "id": "NHTSA-CARD-A",
+      "citation": "Module 3, Unit 1 — four major design components (a)",
+      "text": "Key Questions / Inquire of Caller: the additional, specific questions that gather the medical information the initial survey did not.",
+      "appliesTo": "pack",
+      "check": { "kind": "keyQuestions", "minProtocols": "all" }
+    },
+    {
+      "id": "NHTSA-CARD-B",
+      "citation": "Module 3, Unit 1 — four major design components (b)",
+      "text": "Dispatch Priorities (Medical Dispatch Criteria): the response allocations appropriate to the situation, dispatchable from the Key Questions alone.",
+      "appliesTo": "pack",
+      "check": { "kind": "responseLevels", "min": 2 }
+    },
+    {
+      "id": "NHTSA-CARD-C",
+      "citation": "Module 3, Unit 1 — four major design components (c)",
+      "text": "Pre-Arrival Instructions: what to tell callers to prepare them and the patient for the arrival of the responders.",
+      "appliesTo": "pack",
+      "check": { "kind": "postDispatch", "minProtocols": "all" }
+    },
+    {
+      "id": "NHTSA-CARD-D",
+      "citation": "Module 3, Unit 1 — four major design components (d)",
+      "text": "Useful Information: background, insights and possible complications for the EMD — explicitly not shared with the caller.",
+      "appliesTo": "pack",
+      "notes": "A real structural gap, not a content gap: every string in a pack is caller-facing by construction (the grounding contract), so there is nowhere to put EMD-facing background. A candidate for a future schema revision.",
+      "check": {
+        "kind": "notRepresentable",
+        "note": "the pack schema has no EMD-facing (non-spoken) field"
+      }
+    },
+    {
+      "id": "NHTSA-SURVEY-LOCATION",
+      "citation": "Module 3, Unit 1; Module 2, Unit 1 — 'Where?'",
+      "text": "The initial survey gathers and verifies the incident location, even when E9-1-1/CAD supplies it.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "location|address|ubicaci|direcci|adresse|lieu|domicilio" }
+    },
+    {
+      "id": "NHTSA-SURVEY-CALLBACK",
+      "citation": "Module 2, Unit 1 — 'Get the phone number (aka call-back number)'",
+      "text": "The initial survey gathers a call-back number, so contact can be re-established if the call drops.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "callback|call_back|phone|telefono|tel[ée]fono|num(ero|éro)|rappel" }
+    },
+    {
+      "id": "NHTSA-SURVEY-COMPLAINT",
+      "citation": "Module 2, Unit 1 — 'What?'; Module 3, Unit 2 — the survey directs the EMD to the proper card",
+      "text": "The initial survey establishes the chief complaint, and the answer selects the chief-complaint protocol.",
+      "appliesTo": "pack",
+      "check": { "kind": "protocolSelector" }
+    },
+    {
+      "id": "NHTSA-SURVEY-AGE",
+      "citation": "Module 3, Unit 1 — initial survey patient status; Module 3, Unit 2",
+      "text": "The initial survey gathers the patient's age.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "\\bage\\b|edad|[âa]ge" }
+    },
+    {
+      "id": "NHTSA-SURVEY-CONSCIOUS",
+      "citation": "Module 3, Unit 1 — initial survey patient status",
+      "text": "The initial survey gathers the patient's level of consciousness.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "conscious|conscien|awake|[ée]veill" }
+    },
+    {
+      "id": "NHTSA-SURVEY-BREATHING",
+      "citation": "Module 3, Unit 1 — initial survey patient status",
+      "text": "The initial survey gathers the patient's breathing status.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "breath|respir" }
+    },
+    {
+      "id": "NHTSA-ORDER-WHERE-FIRST",
+      "citation": "Module 2, Unit 1 — 'The proper order that information should be gathered is Where, What, How, Who and When. This order is very important.'",
+      "text": "Location is asked before the nature of the problem, so that some help can be sent if contact is lost.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "caseEntryOrder",
+        "firstSlot": "location|address|ubicaci|direcci|adresse|lieu|domicilio",
+        "thenSlot": "complaint|emergency|what_happened|que_sucede|problem"
+      }
+    },
+    {
+      "id": "NHTSA-ARREST-JUMP",
+      "citation": "Module 3, Unit 2 — 'If the patient is unconscious and not breathing … turn immediately to the appropriate protocol for the provision of CPR.'",
+      "text": "The initial survey routes an unconscious, non-breathing patient straight to the cardiac-arrest/CPR protocol.",
+      "appliesTo": "pack",
+      "check": { "kind": "cardJump" }
+    },
+    {
+      "id": "NHTSA-TCPR",
+      "citation": "Module 3, Unit 2 — 6.1.2 'Describe the role of the EMD in providing telephone CPR'",
+      "text": "The pack can deliver telephone CPR: patient positioning, hand placement, and compressions.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": [
+          "flat on (their|his|her) back|on the floor|boca arriba|sur le dos",
+          "heel of your hand|center of (their|his|her) chest|centro del pecho|centre de (sa|la) poitrine",
+          "push (hard|down)|compress|empuj|pousse"
+        ]
+      }
+    },
+    {
+      "id": "NHTSA-CHOKING",
+      "citation": "Module 3, Unit 2 — 'If the patient has merely choked and is not in cardiac arrest, you need to provide the instructions for choking intervention rather than CPR.'",
+      "text": "Choking is handled by its own instruction path, distinct from CPR.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["chok|atragant|[ée]touff"]
+      }
+    },
+    {
+      "id": "NHTSA-32-COMPLAINTS",
+      "citation": "Module 3, Unit 2 — 4.1 'Identify the thirty-two chief complaint types'",
+      "text": "The protocol set covers the thirty-two chief complaint types (11 traumatic, 14 medical, 7 time/life-critical).",
+      "appliesTo": "pack",
+      "notes": "The curriculum itself notes that agencies group these differently — 'some have more while others may have less and … it is a locally decided issue'. Partial coverage is a scope statement, not a defect.",
+      "check": { "kind": "complaints", "taxonomy": "us-nhtsa-emd-curriculum#chief-complaints-32" }
+    },
+    {
+      "id": "NHTSA-HIGH-PRIORITY",
+      "citation": "Module 3, Unit 2 — the most common high-priority symptoms",
+      "text": "The protocol set covers the high-priority symptoms the curriculum names: chest pain, breathing problems, altered level of consciousness, and severe hemorrhage.",
+      "appliesTo": "pack",
+      "check": { "kind": "complaints", "taxonomy": "us-nhtsa-emd-curriculum#high-priority-symptoms" }
+    },
+    {
+      "id": "NHTSA-PROG-MEDICAL-DIRECTOR",
+      "citation": "Module 3, Unit 1 — 'the cards you use back at your site must be approved by the medical director of your EMS system'",
+      "text": "The EMDPRS in use is approved by the EMS system's medical director.",
+      "appliesTo": "program",
+      "check": {
+        "kind": "manual",
+        "note": "a property of the agency that adopts a pack, not of the pack"
+      }
+    },
+    {
+      "id": "NHTSA-PROG-TRAINING",
+      "citation": "Course Description — 24-hour minimum course; Module 4 — Final Examination",
+      "text": "Dispatchers complete the 24-hour minimum EMD course and its examination before using the EMDPRS.",
+      "appliesTo": "program",
+      "check": {
+        "kind": "manual",
+        "note": "a training-program requirement; nothing in a pack can satisfy it"
+      }
+    }
+  ]
+}

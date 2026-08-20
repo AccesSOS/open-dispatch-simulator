@@ -28,3 +28,6 @@ the work under the project license (https://developercertificate.org/).
 - Schema changes bump `schemaVersion` and must keep the reference pack loading.
 - New packs live in `packs/<jurisdiction-slug>/pack.json` and validate against
   `schema/pack.schema.json`.
+- `npm run coverage` scores packs against the published requirements rubrics in `rubrics/`.
+  Requirements rubrics carry the same licensing bar as packs — see
+  [rubrics/README.md](rubrics/README.md).

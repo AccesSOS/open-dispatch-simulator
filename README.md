@@ -31,8 +31,9 @@ schema keeps those concerns apart so both can grow independently.
 
 ```bash
 npm install
-npm test        # engine + simulator suites (keyless)
-npm run sim     # branch-sweep every pack in every locale, enforce invariants
+npm test         # engine + simulator suites (keyless)
+npm run sim      # branch-sweep every pack in every locale, enforce invariants
+npm run coverage # score every pack against the published requirements rubrics
 ```
 
 ### Live decision-tree demo
@@ -111,6 +112,44 @@ new DispatchSession(pack, { persona: { seed: 7, confirmRate: 1, clarifyAttempts:
 
 Personas change phrasing and pacing, never the clinical outcome — a pinned test asserts the same
 answers produce the same protocol, determinant, and response level under every seed.
+
+## Requirements coverage
+
+There has never been an open way to answer *"is this protocol set complete?"* without comparing it
+against someone's proprietary cardset. So instead we measure the corpus against **published
+requirements** — a state's administrative rule, a national curriculum — encoded as machine-readable
+rubrics in [`rubrics/`](rubrics/README.md), citation by citation:
+
+```bash
+npm run coverage                              # every pack against every rubric
+npm run coverage -- --pack us-openises-emd    # one pack, with its evidence
+npm run coverage -- --json                    # machine-readable
+```
+
+```
+us-openises-emd [en/es/fr]  vs  Maine EMDPRS §II.2 — Protocol Requirements
+  31 met · 2 partial · 4 unmet of 37 scored (84%); 3 program-scope requirements not scored
+
+  ✓ ME-II-2-A-3  Verification of the call-back number.
+      §II.2.A.3
+      · caseEntry:q_callback (slot callback)
+  ~ ME-II-2-A-23a  Medical management: cardio-pulmonary resuscitation (CPR) and AED.
+      §II.2.A.23.a
+      · /push (hard|down)|compress|…/ → pd_cpr_push (en) +2 more
+      ! no match for /\baed\b|defibrillat|…/
+```
+
+Two rubrics ship today: **Maine's EMDPRS §II.2** protocol-requirements list (public law — Maine
+adopts MPDS® statewide, but the requirements list is Maine's own, and no proprietary content is
+encoded) and the **NHTSA EMD National Standard Curriculum's** EMDPRS structural elements plus its
+32 chief complaint types (US federal, public domain).
+
+Every finding prints the question, string, or protocol it came from, so a reader with the pack open
+can check the tool's work. Requirements that belong to the *agency* rather than the protocol —
+QA/QI case review, dispatcher training, record-keeping — are marked program-scope and never scored
+against a pack. This is deliberately the **only** comparison we publish; see
+[docs/PRIVATE-PACKS.md](docs/PRIVATE-PACKS.md) for why we never publish similarity claims against
+proprietary systems.
 
 ## Content policy
 

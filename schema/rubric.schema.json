@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AccesSOS/open-dispatch-simulator/schema/rubric.schema.json",
+  "title": "Requirements Rubric",
+  "description": "A published, openly licensed list of requirements for emergency call-taking protocols (a state administrative rule, a national curriculum), encoded so packs can be measured against it. Each requirement carries its citation and a deterministic check evaluated against a loaded pack. Rubrics are the project's safe comparison story: we measure the open corpus against public requirements, never against proprietary protocols (docs/PRIVATE-PACKS.md).",
+  "type": "object",
+  "required": ["schemaVersion", "id", "name", "authority", "provenance", "requirements"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "enum": ["0.1"] },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "name": { "type": "string" },
+    "scope": {
+      "type": "string",
+      "description": "Discipline the rubric governs, e.g. 'emd' (emergency medical dispatch). Packs outside the scope are reported but not scored."
+    },
+    "authority": {
+      "type": "object",
+      "required": ["instrument"],
+      "additionalProperties": false,
+      "properties": {
+        "jurisdiction": { "type": "string", "description": "e.g. US-ME, or US for national" },
+        "instrument": { "type": "string", "description": "The document that imposes the requirements" },
+        "adopted": { "type": "string", "description": "Adoption/revision date as printed" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "license"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "url": { "type": "string" },
+        "license": { "type": "string" },
+        "retrieved": { "type": "string", "format": "date" },
+        "notes": { "type": "string" }
+      }
+    },
+    "taxonomies": {
+      "type": "object",
+      "description": "Named classification lists the rubric's requirements refer to (e.g. the NHTSA 32 chief complaint types). Referenced as '<rubricId>#<key>' by complaints checks.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "entries"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "citation": { "type": "string" },
+          "entries": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "name", "patterns"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "group": { "type": "string" },
+                "patterns": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "type": "string" },
+                  "description": "Case-insensitive regexes matched against protocol names and keywords in every declared locale."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "citation", "text", "appliesTo", "check"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "citation": { "type": "string", "description": "Where in the instrument this requirement appears" },
+          "text": { "type": "string", "description": "The requirement, in the instrument's own terms" },
+          "appliesTo": {
+            "enum": ["pack", "program"],
+            "description": "'pack' — a property of the protocol content itself, and therefore scored. 'program' — a property of the agency's programme (QA/QI, training, record-keeping, mass-casualty plans); reported for completeness, never scored against a pack."
+          },
+          "notes": { "type": "string" },
+          "check": { "$ref": "#/$defs/check" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "caseEntry",
+            "caseEntryOrder",
+            "protocolSelector",
+            "keyQuestions",
+            "postDispatch",
+            "responseLevels",
+            "text",
+            "cardJump",
+            "complaints",
+            "notRepresentable",
+            "manual"
+          ]
+        },
+        "slot": { "type": "string", "description": "caseEntry: regex matched against question slot and id" },
+        "firstSlot": { "type": "string", "description": "caseEntryOrder: regex for the question that must come first" },
+        "thenSlot": { "type": "string", "description": "caseEntryOrder: regex for the question that must come after" },
+        "min": { "type": "integer", "minimum": 1, "description": "caseEntry/responseLevels/complaints: minimum count for a full pass" },
+        "minProtocols": {
+          "oneOf": [{ "const": "all" }, { "type": "integer", "minimum": 1 }],
+          "description": "keyQuestions/postDispatch: how many protocols must carry the section"
+        },
+        "minSteps": { "type": "integer", "minimum": 1, "description": "postDispatch: minimum ordered steps in at least one protocol (a scripted instruction sequence)" },
+        "patterns": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "text: case-insensitive regexes; met when all match, partial when some do"
+        },
+        "textScope": {
+          "enum": ["postDispatch", "questions", "all"],
+          "description": "text: which of the pack's utterances to search (default 'all')"
+        },
+        "taxonomy": { "type": "string", "description": "complaints: '<rubricId>#<taxonomyKey>'" },
+        "note": { "type": "string", "description": "notRepresentable/manual: why the check cannot be automated" }
+      }
+    }
+  }
+}

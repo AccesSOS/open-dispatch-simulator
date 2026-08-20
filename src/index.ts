@@ -9,5 +9,15 @@ export {
 } from './graph.js';
 export { loadPack, loadPackFromFile, PackValidationError, REQUIRED_STRING_IDS } from './loader.js';
 export { runCall, runBatch, sweepScripts } from './sim.js';
+export { coverage, loadRubric, loadRubricFromFile, RubricValidationError } from './coverage.js';
+export type {
+  Rubric,
+  Requirement,
+  RequirementResult,
+  CoverageReport,
+  Taxonomy,
+  Check,
+  Status,
+} from './coverage.js';
 export type { CallerScript, CallMetrics, BatchReport, RunOptions } from './sim.js';
 export type * from './types.js';

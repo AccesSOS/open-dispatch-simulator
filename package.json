@@ -10,6 +10,7 @@
     "dist",
     "schema",
     "packs",
+    "rubrics",
     "TRADEMARKS.md"
   ],
   "scripts": {
@@ -19,6 +20,7 @@
     "test": "node --import tsx --test test/*.test.ts",
     "validate:packs": "node --import tsx scripts/validate-packs.ts",
     "sim": "node --import tsx scripts/sim.ts",
+    "coverage": "node --import tsx scripts/coverage.ts",
     "demo": "npm run build && npx http-server . -p 4179 -c-1"
   },
   "repository": {

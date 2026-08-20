@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "0.1",
+  "id": "us-me-emdprs",
+  "name": "Maine EMDPRS §II.2 — Protocol Requirements",
+  "scope": "emd",
+  "authority": {
+    "jurisdiction": "US-ME",
+    "instrument": "Maine Emergency Medical Dispatch Priority Reference System (Maine Board of EMS / Emergency Services Communication Bureau), §II.2 Protocol Requirements",
+    "adopted": "2014-06-12 (2nd revision; originally approved 2009-06-11)"
+  },
+  "provenance": {
+    "source": "Maine Board of Emergency Medical Services / Maine Emergency Services Communications Bureau, 'Emergency Medical Dispatch Priority Reference System', §II.2, pp. 1–3",
+    "license": "government-edict",
+    "retrieved": "2026-08-20",
+    "notes": "Maine adopts MPDS® as its statewide protocol (§II.1.A) — none of that proprietary content is reproduced here or anywhere in this project. What is encoded is only §II.2, Maine's own public-law list of what an approved protocol must contain, issued by a state board under 32 M.R.S.A. §85-A. Requirement wording is condensed from the rule's own numbered items and cited item by item. The direct document URL was not recorded at retrieval; re-verify against Maine EMS's published EMD documents before citing publicly."
+  },
+  "requirements": [
+    {
+      "id": "ME-II-2-A",
+      "citation": "§II.2.A",
+      "text": "Dispatch Life Support Protocols: physician-reviewed and approved, up to date, with proven validity and reliability.",
+      "appliesTo": "program",
+      "check": { "kind": "manual", "note": "medical review and approval is a property of the adopting agency" }
+    },
+    {
+      "id": "ME-II-2-A-1",
+      "citation": "§II.2.A.1",
+      "text": "Categorical questioning of all callers.",
+      "appliesTo": "pack",
+      "notes": "Checked as: a case-entry sequence asked on every call, before any protocol is selected.",
+      "check": { "kind": "caseEntry", "min": 4 }
+    },
+    {
+      "id": "ME-II-2-A-2",
+      "citation": "§II.2.A.2",
+      "text": "Verification of the incident location.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "location|address|ubicaci|direcci|adresse|lieu|domicilio" }
+    },
+    {
+      "id": "ME-II-2-A-3",
+      "citation": "§II.2.A.3",
+      "text": "Verification of the call-back number.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "callback|call_back|phone|telefono|tel[ée]fono|num(ero|éro)|rappel" }
+    },
+    {
+      "id": "ME-II-2-A-4",
+      "citation": "§II.2.A.4",
+      "text": "Nature of the call.",
+      "appliesTo": "pack",
+      "notes": "Checked as: a case-entry question whose answer selects the protocol.",
+      "check": { "kind": "protocolSelector" }
+    },
+    {
+      "id": "ME-II-2-A-5",
+      "citation": "§II.2.A.5",
+      "text": "Consciousness of the patient(s) (Yes / No).",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "conscious|conscien|awake|[ée]veill" }
+    },
+    {
+      "id": "ME-II-2-A-6",
+      "citation": "§II.2.A.6",
+      "text": "Breathing status of the patient(s).",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "breath|respir" }
+    },
+    {
+      "id": "ME-II-2-A-7a",
+      "citation": "§II.2.A.7",
+      "text": "Approximate age of patient(s).",
+      "appliesTo": "pack",
+      "notes": "The rule's item 7 runs age and gender together on one line; they are scored separately here.",
+      "check": { "kind": "caseEntry", "slot": "\\bage\\b|edad|[âa]ge" }
+    },
+    {
+      "id": "ME-II-2-A-7b",
+      "citation": "§II.2.A.7",
+      "text": "Gender of patient.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "\\bsex\\b|gender|g[ée]nero|sexe|sexo" }
+    },
+    {
+      "id": "ME-II-2-A-8",
+      "citation": "§II.2.A.8",
+      "text": "Proximity of caller to patient.",
+      "appliesTo": "pack",
+      "check": { "kind": "caseEntry", "slot": "proximity|with_patient|near_patient|caller_location|beside|junto|cerca|aupr[èe]s" }
+    },
+    {
+      "id": "ME-II-2-A-9",
+      "citation": "§II.2.A.9",
+      "text": "Additional, complaint-specific questions as indicated by the nature of the call and as directed by the protocol.",
+      "appliesTo": "pack",
+      "check": { "kind": "keyQuestions", "minProtocols": "all" }
+    },
+    {
+      "id": "ME-II-2-A-10",
+      "citation": "§II.2.A.10",
+      "text": "Medical case questions that emphasize symptoms.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "questions",
+        "patterns": [
+          "\\bpain\\b|dolor|douleur",
+          "breath|respir",
+          "bleed|sangr|saign|blood|sangre"
+        ]
+      }
+    },
+    {
+      "id": "ME-II-2-A-11",
+      "citation": "§II.2.A.11",
+      "text": "Differentiation of agonal respirations, with questions that maximize the EMD's ability to decipher whether breathing is compatible with life.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "questions",
+        "patterns": [
+          "breathing normally|normal breathing|respira normal|respire normalement|agonal|gasp|barely breathing"
+        ]
+      }
+    },
+    {
+      "id": "ME-II-2-A-12",
+      "citation": "§II.2.A.12",
+      "text": "Trauma case questions that emphasize mechanism.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "questions",
+        "patterns": [
+          "how (did|far)|what happened|c[óo]mo|qu[ée] pas[óo]|comment|que s'est",
+          "\\bfell\\b|\\bfall\\b|cay[óo]|chute|tomb"
+        ]
+      }
+    },
+    {
+      "id": "ME-II-2-A-13",
+      "citation": "§II.2.A.13",
+      "text": "Trauma criteria clearly defined and in accordance with approved and national guidelines, including mechanisms of injury such as long falls.",
+      "appliesTo": "pack",
+      "notes": "Checked as: the pack asks about fall height or distance, the rule's own example of a defined trauma criterion.",
+      "check": {
+        "kind": "text",
+        "textScope": "questions",
+        "patterns": [
+          "how far|how high|feet|stories|metros|altura|hauteur|m[èe]tres"
+        ]
+      }
+    },
+    {
+      "id": "ME-II-2-A-14",
+      "citation": "§II.2.A.14",
+      "text": "The protocol identifies circumstances that necessitate special rescue.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "patterns": [
+          "trapped|pinned|caught in|atrapad|coinc|machinery|m[áa]quina",
+          "power line|electric|water|el[ée]ctric|agua|\\beau\\b"
+        ]
+      }
+    },
+    {
+      "id": "ME-II-2-A-15",
+      "citation": "§II.2.A.15",
+      "text": "Method for assigning relative priority to calls that may affect level of response.",
+      "appliesTo": "pack",
+      "check": { "kind": "responseLevels", "min": 2 }
+    },
+    {
+      "id": "ME-II-2-A-16",
+      "citation": "§II.2.A.16",
+      "text": "Capacity to select the appropriate number, nature, and mode of responding units.",
+      "appliesTo": "pack",
+      "notes": "A pack expresses this through its response taxonomy; whether those levels map onto an agency's actual apparatus is a local configuration question outside the pack.",
+      "check": { "kind": "responseLevels", "min": 2 }
+    },
+    {
+      "id": "ME-II-2-A-17",
+      "citation": "§II.2.A.17",
+      "text": "Scripted and systematic pre-arrival instructions as necessary, including directing bystanders to provide medical aid as indicated.",
+      "appliesTo": "pack",
+      "check": { "kind": "postDispatch", "minProtocols": "all" }
+    },
+    {
+      "id": "ME-II-2-A-18",
+      "citation": "§II.2.A.18",
+      "text": "Prevention of further injury to patient(s), bystander(s), and responders.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["if it is safe|stay safe|safe location|do not (attempt|touch)|no (intente|toque)|en s[ée]curit|ne (touchez|tentez)"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-19",
+      "citation": "§II.2.A.19",
+      "text": "Typically do not move the patient.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["do not move|not to move|no (lo |la )?mueva|no mover|ne (le |la )?d[ée]placez|ne pas d[ée]placer"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-20",
+      "citation": "§II.2.A.20",
+      "text": "Evacuate the patient, the caller, and anyone else in immediate danger, case by case (e.g. carbon monoxide poisoning).",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["get out of the (house|building)|evacuate|leave the scene|salga|sal(ir|gan) de|[ée]vacu|quittez"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-21",
+      "citation": "§II.2.A.21",
+      "text": "Assess for hazards on or around the scene.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "patterns": ["hazard|power line|chemical|detector|peligro|qu[íi]mic|danger|produit chimique"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-22",
+      "citation": "§II.2.A.22",
+      "text": "Ongoing assessment of patient status.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["call me back|condition changes|watch (the|for)|llame(me)? de nuevo|si cambia|rappelez|surveillez"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23a",
+      "citation": "§II.2.A.23.a",
+      "text": "Medical management: cardio-pulmonary resuscitation (CPR) and automatic external defibrillator (AED).",
+      "appliesTo": "pack",
+      "notes": "Scored as two patterns — CPR instructions and AED instructions — so a pack with telephone CPR but no AED script reads as partial, which is the honest result.",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": [
+          "push (hard|down)|compress|pump(ing)? the chest|empuj|comprim",
+          "\\baed\\b|defibrillat|desfibrilad|d[ée]fibrillat"
+        ]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23b",
+      "citation": "§II.2.A.23.b",
+      "text": "Medical management: foreign-body airway obstruction (FBAO) removal.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["chok|airway|atragant|v[íi]a a[ée]rea|[ée]touff|voies respiratoires"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23c",
+      "citation": "§II.2.A.23.c",
+      "text": "Medical management: bleeding control via direct pressure and elevation.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["(apply|applying) pressure|pressure directly|presi[óo]n|appuyez|pression"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23d",
+      "citation": "§II.2.A.23.d",
+      "text": "Medical management: keep the patient warm.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["keep .* warm|blanket|abrigad|manta|cobija|couverture|au chaud"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23e",
+      "citation": "§II.2.A.23.e",
+      "text": "Medical management: childbirth instructions.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["childbirth|contraction|deliver the baby|\\bin labor\\b|\\bparto\\b|dar a luz|accouch"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23f",
+      "citation": "§II.2.A.23.f",
+      "text": "Medical management: medication administration instructions (e.g. Epi-Pen).",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["epi-?pen|nitroglycerin|inhaler|as prescribed|nitroglicerina|seg[úu]n .*(receta|prescri)|prescrit"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-23g",
+      "citation": "§II.2.A.23.g",
+      "text": "Particular phrases available for use in repetitive persistence.",
+      "appliesTo": "pack",
+      "notes": "Repetitive persistence is a technique — the same reassurance re-read until the caller acts. The engine's nearest facility is the persona's clarify-and-re-ask, which re-reads the pack's own clarify string; a pack cannot today carry a dedicated persistence phrase set.",
+      "check": {
+        "kind": "notRepresentable",
+        "note": "no per-instruction persistence phrasing in the pack schema; the engine re-reads the clarify string instead"
+      }
+    },
+    {
+      "id": "ME-II-2-A-24a",
+      "citation": "§II.2.A.24.a",
+      "text": "Post-dispatch instructions: identification of the incident location (e.g. turning on outside lights).",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["outside light|porch light|turn on .*light|watch for the (emergency )?unit|flag|prenda .*luz|allumez"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-24b",
+      "citation": "§II.2.A.24.b",
+      "text": "Post-dispatch instructions: locking up pets.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["\\bpets?\\b|\\bdogs?\\b|mascota|perro|animaux|chien"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-24c",
+      "citation": "§II.2.A.24.c",
+      "text": "Post-dispatch instructions: unlocking doors and/or providing key holder information.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["unlock|open the door|key holder|abra la puerta|d[ée]verrouill|ouvrez la porte"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-24d",
+      "citation": "§II.2.A.24.d",
+      "text": "Post-dispatch instructions: gathering medications.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["gather .*medic|medications for|medicament|medicina|m[ée]dicament"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-24e",
+      "citation": "§II.2.A.24.e",
+      "text": "Post-dispatch instructions: scene preservation.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "textScope": "postDispatch",
+        "patterns": ["do not (disturb|move) (the )?(scene|anything)|disturb the scene|no (toque|mueva) (nada|la escena)|ne (touchez|d[ée]placez) (rien|pas la sc[èe]ne)"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-24f",
+      "citation": "§II.2.A.24.f",
+      "text": "Post-dispatch instructions: asking whether the patient is under a doctor's care, or whether there are doctor's instructions for the condition.",
+      "appliesTo": "pack",
+      "check": {
+        "kind": "text",
+        "patterns": ["doctor|physician|under .*care|m[ée]dico|medic[óo]|m[ée]decin"]
+      }
+    },
+    {
+      "id": "ME-II-2-A-25",
+      "citation": "§II.2.A.25.a",
+      "text": "Per ASTM guidelines, the EMD system includes access to mass casualty plans, a directory of emergency response resources, and a description of the communications system configuration.",
+      "appliesTo": "program",
+      "check": { "kind": "manual", "note": "centre-level reference material, not protocol content" }
+    },
+    {
+      "id": "ME-II-2-A-26",
+      "citation": "§II.2.A.26",
+      "text": "Record-keeping system, in accordance with the approved Quality Assurance program.",
+      "appliesTo": "program",
+      "check": { "kind": "manual", "note": "a centre system requirement; see §III for the QA/QI program it serves" }
+    },
+    {
+      "id": "ME-II-2-A-27",
+      "citation": "§II.2.A.27",
+      "text": "Must meet or exceed the NHTSA-defined thirty-two chief complaint types.",
+      "appliesTo": "pack",
+      "check": { "kind": "complaints", "taxonomy": "us-nhtsa-emd-curriculum#chief-complaints-32" }
+    }
+  ]
+}

@@ -55,9 +55,14 @@ both are problems that belong to lawyers, not READMEs.
 
 What we do instead:
 
-- Measure the open corpus against **public requirements** — e.g. a state's administrative-rule
-  requirements for EMD protocols, or the NHTSA EMD curriculum elements (see
-  [PROTOCOL-SOURCES.md](PROTOCOL-SOURCES.md)).
+- Measure the open corpus against **public requirements** — a state's administrative-rule
+  requirements for EMD protocols, or the NHTSA EMD curriculum elements. That is built and
+  shipping: `npm run coverage` scores every pack against the rubrics in
+  [`rubrics/`](../rubrics/README.md), citation by citation, printing the evidence behind every
+  finding. "Covers every element Maine requires of an approved protocol" is a claim about public
+  law and our own content — nobody else's.
 - Let licensed agencies compare **privately**: load your own system as a private pack and diff it
   against an open pack on your own machines. The result is yours; publishing it is your call
-  under your license, not ours.
+  under your license, not ours. The coverage tool works the same way on a private pack —
+  `npm run coverage -- --pack <your-pack-id>` after dropping it in place — and nothing it reports
+  leaves your machine.

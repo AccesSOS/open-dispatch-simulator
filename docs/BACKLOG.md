@@ -4,13 +4,18 @@ Priority order. One item per unit of work; each completed item is checked off wi
 result note and its commit hash. `[BLOCKED: reason]` marks an item that cannot proceed without
 external input (a permission reply, a decision from Kevin, a records request).
 
-- [ ] **Requirements-coverage report.** Encode Maine's EMD administrative rule §2
+- [x] **Requirements-coverage report.** Encode Maine's EMD administrative rule §2
       protocol-requirements list (see [PROTOCOL-SOURCES.md](PROTOCOL-SOURCES.md) — Maine adopts
       MPDS, but the requirements list itself is public law) and the NHTSA EMD curriculum's
       EMDPRS elements as machine-readable rubrics with citations, plus `npm run coverage`
       producing a per-pack requirements-coverage report. This is the public, safe comparison
       story — "covers every element the state requires" — per
       [PRIVATE-PACKS.md](PRIVATE-PACKS.md).
+      → *Done.* `schema/rubric.schema.json` + `rubrics/us-me-emdprs.json` (40 requirements) and
+      `rubrics/us-nhtsa-emd-curriculum.json` (21, plus the 32-chief-complaint taxonomy Maine
+      §II.2.A.27 cites); `npm run coverage` scores every pack with per-finding evidence. Flagship
+      pack: 31/37 Maine, 17/19 NHTSA. Two gaps are schema gaps (`notRepresentable`), which feeds
+      the v0.3 item below.
 - [ ] **Pack-diff tool.** Check `scripts/diff.ts` first — this may already exist from a separate
       task. If absent: structural diff of two packs (complaint coverage, slots, tier mapping,
       jumps — NOT text similarity), `npm run diff -- a/pack.json b/pack.json`, human + `--json`

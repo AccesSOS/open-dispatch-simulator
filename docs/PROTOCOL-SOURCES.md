@@ -28,8 +28,9 @@ license, or written permission — with provenance recorded in the pack and enfo
   training sites are not licenses.
 - **PowerPhone Total Response** — commercial.
 - **Maine** — its "EMD Priority Reference System" is the administrative rule adopting MPDS
-  statewide (no cards). Useful side-product: its §2 protocol-requirements list is a good external
-  rubric for what a complete pack must contain.
+  statewide (no cards). The side-product paid off: its §II.2 protocol-requirements list is now
+  encoded as the `us-me-emdprs` **rubric** (see *Requirements rubrics* below), so packs can be
+  measured against public law instead of against anyone's cardset.
 - **Rhode Island** — adopted ProQA (2022). **Virginia** — locally approved cards, none published.
 - **Ontario DPCI II** — provincially authored but not publicly published, and Ontario is
   migrating to MPDS. BC / Québec / Nova Scotia run MPDS.
@@ -80,6 +81,29 @@ license, or written permission — with provenance recorded in the pack and enfo
   guidecards/SOPs before filing new requests.
 - **988 / crisis lines** — SAMHSA publications are federal PD; the Lifeline's clinical safety
   assessment is not. Treat as future work with clinical review, not a quick pack.
+
+## Requirements rubrics (in `rubrics/`)
+
+Not protocol content — the *requirements* published bodies impose on protocol content. Encoded so
+`npm run coverage` can score every pack against them with a citation per line
+([rubrics/README.md](../rubrics/README.md)). Same licensing bar as packs.
+
+| Source | License | Rubric | Notes |
+| --- | --- | --- | --- |
+| Maine EMDPRS §II.2 Protocol Requirements (Maine Board of EMS / ESCB, rev. June 2014) | government edict (state board rule under 32 M.R.S.A. §85-A) | `us-me-emdprs` | 40 requirements, 37 pack-scope. Maine adopts MPDS® in §II.1 — **none of that content is encoded**; only §II.2's own list. The direct document URL was not recorded at retrieval — re-verify against Maine EMS's published EMD documents before citing publicly. |
+| NHTSA EMD National Standard Curriculum (1996), Modules 2–3 | public domain (US federal; ERIC ED425308) | `us-nhtsa-emd-curriculum` | EMDPRS structural elements (three protocol types, the four card design components, initial-survey contents, Where→What order) plus the **32 chief complaint types** as a reusable taxonomy that Maine §II.2.A.27 cites. |
+
+What the first run found, and what it is worth: the flagship OpenISES pack meets 31/37 Maine
+pack-scope requirements and 17/19 NHTSA ones. The gaps are real and each points at existing work —
+no AED script and no childbirth delivery script (the deliberately skipped OpenISES I-cards), no
+electrocution card, no caller-proximity question, and two things the *schema* cannot express at
+all: EMD-facing "Useful Information" and repetitive-persistence phrasing. Rubric findings of kind
+`notRepresentable` are the cleanest signal we have for what a schema revision should add.
+
+Leads for more rubrics: other states' EMD administrative rules (the NJ, Virginia and Rhode Island
+regs were read for cards, not for requirements — worth a second pass); ASTM F 1258 (cited by
+Maine, but ASTM standards are copyrighted and sold — **not** shippable); NFPA 1221 (same posture);
+the APCO/NENA ANS standards (member-licensed, not open).
 
 ## Posture patterns (precedents)
 
