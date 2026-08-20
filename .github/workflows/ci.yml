@@ -41,7 +41,10 @@ jobs:
               # until it lands). Remove once the NJ reply updates the pack's provenance.
               # Libre-Uso-MX: Mexico's gob.mx open-use terms (datos.gob.mx/libreusomx),
               # redistribution with attribution — used by the CNIE pack.
-              public-domain|CC0-1.0|CC-BY-4.0|GFDL-1.2-or-later|OGL-*|Libre-Uso-MX|state-published-permission-pending) echo "OK: $f ($lic)" ;;
+              # city-published-permission-pending: deliberate exception, same posture as the
+              # NJ pack — municipal government work published on the city's own site, written
+              # permission requested (see AccesSOS/infra); repo private until it lands.
+              public-domain|CC0-1.0|CC-BY-4.0|GFDL-1.2-or-later|OGL-*|Libre-Uso-MX|state-published-permission-pending|city-published-permission-pending) echo "OK: $f ($lic)" ;;
               *) echo "::error file=$f::Pack license '$lic' is not on the open allowlist"; exit 1 ;;
             esac
           done

@@ -132,6 +132,12 @@ answers produce the same protocol, determinant, and response level under every s
   Cardiac Arrest/DOA, Unconscious/Fainting, and Unknown/Person Down, with New Jersey's own
   dispatch tiers (`SIMULTANEOUS_ALS_BLS` / `BLS_DISPATCH` / `FOLLOW_LOCAL_PROTOCOL`). License
   status: written permission pending — see [SOURCE.md](packs/us-nj-emd/SOURCE.md).
+- [`packs/us-alameda-police`](packs/us-alameda-police/pack.json) is the corpus's first **police
+  call-taking** pack, grounded on the City of Alameda PD's published Dispatcher Training Manual:
+  the What/When/Where/Who/Weapons interrogation, top-down suspect descriptions, and the manual's
+  own `PRIORITY_1`/`PRIORITY_2`/`PRIORITY_3` classifications plus 30-second fire/medical
+  screen-and-transfer (`TRANSFER_FIRE_EMS`). License: written permission pending — see
+  [SOURCE.md](packs/us-alameda-police/SOURCE.md).
 - [`packs/mx-cnie-911`](packs/mx-cnie-911/pack.json) grounds a Spanish-language Mexico pack on
   the **Catálogo Nacional de Incidentes de Emergencia v3.0** (SESNSP, official June 2024 — the
   normative classification for every Mexican 9-1-1 center): verbatim incident codes,

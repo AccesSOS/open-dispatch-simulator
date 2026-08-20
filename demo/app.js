@@ -3,7 +3,7 @@
 import { DispatchSession } from '../dist/engine.js';
 import { packGraph, DISPATCH_NODE_ID } from '../dist/graph.js';
 
-const PACKS = ['us-nhtsa-emd', 'us-openises-emd', 'us-nj-emd', 'mx-cnie-911'];
+const PACKS = ['us-nhtsa-emd', 'us-openises-emd', 'us-nj-emd', 'us-alameda-police', 'mx-cnie-911'];
 
 const RESPONSE_LABELS = {
   ALS_HOT: '🚑 Advanced Life Support — lights & siren',
@@ -17,6 +17,10 @@ const RESPONSE_LABELS = {
   ALTA: '🚨 Prioridad ALTA',
   MEDIA: '🚑 Prioridad MEDIA',
   BAJA: '🚗 Prioridad BAJA',
+  PRIORITY_1: '🚨 Priority 1 — immediate dispatch',
+  PRIORITY_2: '🚓 Priority 2 — prompt service',
+  PRIORITY_3: '📋 Priority 3 — report call',
+  TRANSFER_FIRE_EMS: '📞 Transferring to fire/medical dispatch',
 };
 
 const SLOT_LABELS = {
