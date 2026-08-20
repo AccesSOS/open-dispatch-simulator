@@ -42,7 +42,7 @@ external input (a permission reply, a decision from Kevin, a records request).
       *Was also a routing concern:* C1/C2 pick the infant, child or adult instruction deck from
       the age slot, and "six months old" extracted as 6, so an infant described that way took the
       child deck.
-      → *Done.* Schema v0.4: `extract` widened to `number` / `age` / `count` / `address` /
+      → *Done* (8559d25). Schema v0.4: `extract` widened to `number` / `age` / `count` / `address` /
       `phone`, plus a per-locale `lexicon`. Read-backs now echo the value ("I have 12 Pine
       Street"), `age` is unit-aware so six months routes to the infant deck, and extraction that
       recognises nothing leaves the caller's own words in place. Applied to `us-openises-emd`
