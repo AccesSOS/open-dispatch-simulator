@@ -20,7 +20,7 @@ external input (a permission reply, a decision from Kevin, a records request).
       task. If absent: structural diff of two packs (complaint coverage, slots, tier mapping,
       jumps — NOT text similarity), `npm run diff -- a/pack.json b/pack.json`, human + `--json`
       output, tested on the bundled packs.
-      → *Done.* `scripts/diff.ts` did not exist. `src/diff.ts` + `npm run diff`: case-entry slots
+      → *Done* (613f3e9). `scripts/diff.ts` did not exist. `src/diff.ts` + `npm run diff`: case-entry slots
       and ordering, complaint coverage, per-card slot/decision-slot/response-level/jump diffs,
       `--json`. Cards align by id, then through the coverage taxonomy — so NJ `chest_pain` lines
       up with MX `inc10314_infarto` across languages. Response level names are never mapped.
