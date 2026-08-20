@@ -40,9 +40,14 @@ export interface Question {
   slot: string;
   stringId: string;
   selectsProtocol?: boolean;
+  /** Optional read-back a persona may speak after the answer ("Okay, {address}."). */
+  confirmStringId?: string;
   expect?: Expectation;
   next?: Edge[];
 }
+
+/** A catalog entry: one template, or equivalent variants a persona picks from. */
+export type StringTemplate = string | string[];
 
 export interface DeterminantRule {
   id: string;
@@ -70,7 +75,22 @@ export interface ProtocolPack {
   caseEntry: Question[];
   protocols: Protocol[];
   fallbackProtocol: string;
-  strings: Record<Locale, Record<string, string>>;
+  strings: Record<Locale, Record<string, StringTemplate>>;
+}
+
+/**
+ * A dispatcher's behavioral profile. Real PSAPs vary; personas let one pack
+ * simulate that range. Fully deterministic given the same seed, so eval runs
+ * are reproducible.
+ */
+export interface Persona {
+  /** Seeds phrasing-variant and confirmation choices (default 1). */
+  seed?: number;
+  /** Clarify-and-re-ask attempts for unparsed choice answers (default 1). */
+  clarifyAttempts?: number;
+  /** Probability (0..1) that a question with confirmStringId gets its answer
+   * read back to the caller (default 0). */
+  confirmRate?: number;
 }
 
 export interface Utterance {

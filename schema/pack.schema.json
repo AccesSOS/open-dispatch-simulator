@@ -69,10 +69,15 @@
     },
     "strings": {
       "type": "object",
-      "description": "Per-locale catalogs: stringId -> template. Templates may interpolate collected slots as {slotName}. The catalogs 'greeting', 'closing', and 'dispatch_confirm' ids are required by the engine.",
+      "description": "Per-locale catalogs: stringId -> template, or an array of equivalent template variants (a persona picks one, seeded). Templates may interpolate collected slots as {slotName}. The 'greeting', 'closing', 'dispatch_confirm', and 'clarify' ids are required by the engine.",
       "additionalProperties": {
         "type": "object",
-        "additionalProperties": { "type": "string" }
+        "additionalProperties": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+          ]
+        }
       }
     }
   },
@@ -103,6 +108,10 @@
         "selectsProtocol": {
           "type": "boolean",
           "description": "This answer is matched against protocol keywords to choose the protocol."
+        },
+        "confirmStringId": {
+          "type": "string",
+          "description": "Optional read-back template (interpolating this question's slot) that a persona may speak after the answer, e.g. \"Okay, {address}.\""
         },
         "expect": { "$ref": "#/$defs/expectation" },
         "next": {

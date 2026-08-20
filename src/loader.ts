@@ -46,6 +46,7 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
   const slots = new Set<string>();
   const collectQuestion = (q: Question) => {
     stringIds.add(q.stringId);
+    if (q.confirmStringId) stringIds.add(q.confirmStringId);
     slots.add(q.slot);
   };
   pack.caseEntry.forEach(collectQuestion);
@@ -67,11 +68,15 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
         problems.push(`locale "${locale}" is missing string "${id}"`);
       }
     }
-    // Templates may only interpolate declared slots.
+    // Templates (every variant) may only interpolate declared slots.
     for (const [id, template] of Object.entries(catalog)) {
-      for (const m of template.matchAll(/\{([a-zA-Z][a-zA-Z0-9_]*)\}/g)) {
-        if (!slots.has(m[1]!)) {
-          problems.push(`locale "${locale}" string "${id}" interpolates unknown slot "{${m[1]}}"`);
+      const variants = Array.isArray(template) ? template : [template];
+      if (variants.length === 0) problems.push(`locale "${locale}" string "${id}" has no variants`);
+      for (const variant of variants) {
+        for (const m of variant.matchAll(/\{([a-zA-Z][a-zA-Z0-9_]*)\}/g)) {
+          if (!slots.has(m[1]!)) {
+            problems.push(`locale "${locale}" string "${id}" interpolates unknown slot "{${m[1]}}"`);
+          }
         }
       }
     }

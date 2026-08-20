@@ -1,5 +1,5 @@
 import { DispatchSession } from './engine.js';
-import type { Locale, ProtocolPack, Question, SessionResult } from './types.js';
+import type { Locale, Persona, ProtocolPack, Question, SessionResult } from './types.js';
 
 /**
  * Caller simulation: run scripted callers through a pack at scale and score
@@ -40,10 +40,18 @@ export interface BatchReport {
   clarifyRate: number;
 }
 
-export function runCall(pack: ProtocolPack, script: CallerScript, maxTurns = 100): CallMetrics {
+export interface RunOptions {
+  maxTurns?: number;
+  /** Dispatcher profile to run this call against (seeded, reproducible). */
+  persona?: Persona;
+}
+
+export function runCall(pack: ProtocolPack, script: CallerScript, options: RunOptions = {}): CallMetrics {
+  const maxTurns = options.maxTurns ?? 100;
   let clarifies = 0;
   const session = new DispatchSession(pack, {
     locale: script.locale,
+    ...(options.persona && { persona: options.persona }),
     onEvent: (e) => {
       if (e.type === 'clarify') clarifies++;
     },
@@ -66,8 +74,12 @@ export function runCall(pack: ProtocolPack, script: CallerScript, maxTurns = 100
   };
 }
 
-export function runBatch(pack: ProtocolPack, scripts: CallerScript[]): BatchReport {
-  const calls = scripts.map((s) => runCall(pack, s));
+export function runBatch(
+  pack: ProtocolPack,
+  scripts: CallerScript[],
+  options: RunOptions = {},
+): BatchReport {
+  const calls = scripts.map((s) => runCall(pack, s, options));
   const count = (keyOf: (m: CallMetrics) => string | null) => {
     const acc: Record<string, number> = {};
     for (const m of calls) {

@@ -1,6 +1,7 @@
 import { determineNodeId, keyQuestionNodeId } from './graph.js';
 import type {
   Locale,
+  Persona,
   Phase,
   Protocol,
   ProtocolPack,
@@ -18,14 +19,25 @@ const normalize = (s: string): string =>
 const containsKeyword = (text: string, keyword: string): boolean =>
   normalize(text).includes(normalize(keyword));
 
+/** Small deterministic PRNG (mulberry32) so persona behavior is reproducible. */
+const mulberry32 = (seed: number) => (): number => {
+  seed = (seed + 0x6d2b79f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
 export interface SessionOptions {
   locale?: Locale;
   /** Live narration of the session's walk through the decision tree —
    * nodeIds match packGraph(), so visualizers can animate the call. */
   onEvent?: (event: SessionEvent) => void;
   /** How many times an unmatched answer to a choice question is met with a
-   * clarify-and-re-ask before the dispatcher moves on (default 1). */
+   * clarify-and-re-ask before the dispatcher moves on (default 1).
+   * persona.clarifyAttempts takes precedence when both are set. */
   clarifyAttempts?: number;
+  /** Behavioral profile of this dispatcher (seeded, reproducible). */
+  persona?: Persona;
 }
 
 /**
@@ -50,12 +62,16 @@ export class DispatchSession {
 
   private readonly onEvent: ((event: SessionEvent) => void) | undefined;
   private readonly clarifyAttempts: number;
+  private readonly confirmRate: number;
+  private readonly rng: () => number;
   private clarifies = 0;
 
   constructor(private readonly pack: ProtocolPack, options: SessionOptions = {}) {
     this.locale = options.locale ?? pack.defaultLocale;
     this.onEvent = options.onEvent;
-    this.clarifyAttempts = options.clarifyAttempts ?? 1;
+    this.clarifyAttempts = options.persona?.clarifyAttempts ?? options.clarifyAttempts ?? 1;
+    this.confirmRate = options.persona?.confirmRate ?? 0;
+    this.rng = mulberry32(options.persona?.seed ?? 1);
     if (!pack.locales.includes(this.locale)) {
       throw new Error(`Pack "${pack.id}" does not support locale "${this.locale}"`);
     }
@@ -101,6 +117,13 @@ export class DispatchSession {
       text,
       option: this.choices[q.slot] ?? null,
     });
+    // Persona read-back: "Okay, {address}." Only consumes randomness when the
+    // question offers a confirm and the persona ever confirms, so default
+    // sessions stay bit-identical across persona-less runs.
+    const confirm =
+      q.confirmStringId && this.confirmRate > 0 && this.rng() < this.confirmRate
+        ? [this.say(q.confirmStringId)]
+        : [];
     if (q.selectsProtocol) this.protocol = this.selectProtocol(text);
 
     // Conditional edges override sequential flow.
@@ -114,14 +137,14 @@ export class DispatchSession {
           from: this.nodeIdFor(q),
           to: this.protocol ? determineNodeId(this.protocol.id) : '$dispatch',
         });
-        return this.determine();
+        return [...confirm, ...this.determine()];
       }
       const target = this.protocol?.keyQuestions.find((n) => n.id === edge.goto);
       if (!target) throw new Error(`Edge target "${edge.goto}" not found`); // loader prevents this
       this.emit({ type: 'edge', from: this.nodeIdFor(q), to: this.nodeIdFor(target) });
       this.queue = this.queueFrom(target);
     }
-    return this.advance();
+    return [...confirm, ...this.advance()];
   }
 
   isDone(): boolean {
@@ -213,10 +236,17 @@ export class DispatchSession {
   /** Render a template from the active locale's catalog. Grounding guard:
    * unknown ids and unfilled slots throw rather than improvise. */
   private say(stringId: string): Utterance {
-    const template = this.pack.strings[this.locale]?.[stringId];
-    if (template === undefined) {
+    const entry = this.pack.strings[this.locale]?.[stringId];
+    if (entry === undefined) {
       throw new Error(`String "${stringId}" missing for locale "${this.locale}"`);
     }
+    // Variant catalogs stay grounded: the persona only ever picks among the
+    // pack's own equivalent phrasings.
+    const template = Array.isArray(entry)
+      ? entry.length > 1
+        ? entry[Math.floor(this.rng() * entry.length)]!
+        : entry[0]!
+      : entry;
     const text = template.replace(/\{([a-zA-Z][a-zA-Z0-9_]*)\}/g, (_, slot: string) => {
       const value = this.answers[slot];
       if (value === undefined) throw new Error(`Slot "{${slot}}" not yet collected for "${stringId}"`);

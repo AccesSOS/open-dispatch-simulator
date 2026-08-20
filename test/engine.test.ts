@@ -16,10 +16,12 @@ const freshPack = (): ProtocolPack => loadPackFromFile(packPath);
 /** Recompute an utterance's text straight from the pack catalog; proves the
  * engine can only speak catalog strings (the grounding property). */
 function expectGrounded(pack: ProtocolPack, locale: string, u: Utterance, answers: Record<string, string>) {
-  const template = pack.strings[locale]![u.stringId];
-  assert.ok(template !== undefined, `stringId ${u.stringId} not in ${locale} catalog`);
-  const expected = template.replace(/\{([a-zA-Z][a-zA-Z0-9_]*)\}/g, (_, s: string) => answers[s]!);
-  assert.equal(u.text, expected);
+  const entry = pack.strings[locale]![u.stringId];
+  assert.ok(entry !== undefined, `stringId ${u.stringId} not in ${locale} catalog`);
+  const rendered = (Array.isArray(entry) ? entry : [entry]).map((t) =>
+    t.replace(/\{([a-zA-Z][a-zA-Z0-9_]*)\}/g, (_, s: string) => answers[s]!),
+  );
+  assert.ok(rendered.includes(u.text), `"${u.text}" is not a catalog rendering of ${u.stringId}`);
 }
 
 test('reference pack loads and validates', () => {

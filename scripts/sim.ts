@@ -11,12 +11,22 @@ import { runBatch, sweepScripts } from '../src/sim.js';
 const packsDir = new URL('../packs', import.meta.url).pathname;
 let failed = false;
 
+// Sweep under multiple dispatcher personas: the default profile, plus a
+// chatty/patient one and a different phrasing seed — invariants must hold
+// for all of them.
+const PERSONAS = [
+  { label: 'default', persona: undefined },
+  { label: 'chatty seed=7', persona: { seed: 7, confirmRate: 1, clarifyAttempts: 2 } },
+  { label: 'terse seed=2029', persona: { seed: 2029, confirmRate: 0 } },
+];
+
 for (const dir of readdirSync(packsDir)) {
   const pack = loadPackFromFile(join(packsDir, dir, 'pack.json'));
   for (const locale of pack.locales) {
-    const report = runBatch(pack, sweepScripts(pack, locale));
+    for (const { label, persona } of PERSONAS) {
+    const report = runBatch(pack, sweepScripts(pack, locale), persona ? { persona } : {});
     const noResponse = report.calls.filter((m) => m.completed && !m.result.response);
-    console.log(`\n${pack.id} [${locale}] — ${report.total} calls swept`);
+    console.log(`\n${pack.id} [${locale}] persona=${label} — ${report.total} calls swept`);
     console.log(`  completed: ${report.completed}/${report.total}  avg turns: ${report.avgTurns.toFixed(1)}  clarify rate: ${(report.clarifyRate * 100).toFixed(0)}%`);
     console.log(`  responses: ${Object.entries(report.byResponse).map(([k, v]) => `${k}×${v}`).join('  ')}`);
     console.log(`  determinants: ${Object.entries(report.byDeterminant).map(([k, v]) => `${k}×${v}`).join('  ')}`);
@@ -27,6 +37,7 @@ for (const dir of readdirSync(packsDir)) {
     if (noResponse.length) {
       failed = true;
       console.error(`  ✗ NO RESPONSE LEVEL: ${noResponse.map((m) => m.scriptId).join(', ')}`);
+    }
     }
   }
 }

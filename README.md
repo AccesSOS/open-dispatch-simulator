@@ -85,6 +85,25 @@ invariant: *every call reaches dispatch with a response level*, in every locale.
 clarify-and-re-ask when a choice answer doesn't parse (`clarifyAttempts`, default 1), and keyword
 matching is Unicode word-boundary aware — "I do not know" is not a "no".
 
+## Dispatcher personas
+
+Real PSAPs don't all sound the same, so sessions accept a `persona` — deterministic given its
+`seed`, so eval runs reproduce exactly:
+
+```ts
+new DispatchSession(pack, { persona: { seed: 7, confirmRate: 1, clarifyAttempts: 2 } });
+```
+
+- **Phrasing variants**: a catalog entry may be an array of equivalent wordings; the persona picks
+  one (still only ever the pack's own strings — grounding is preserved).
+- **Read-backs**: questions may declare a `confirmStringId` ("Okay, {address}.") that the persona
+  speaks after the answer with probability `confirmRate`.
+- **Patience**: `clarifyAttempts` controls how often an unparsed answer is met with
+  clarify-and-re-ask.
+
+Personas change phrasing and pacing, never the clinical outcome — a pinned test asserts the same
+answers produce the same protocol, determinant, and response level under every seed.
+
 ## Content policy
 
 - **Only openly licensed playbooks ship here** — public-domain sources (e.g. the NHTSA EMD
