@@ -16,10 +16,14 @@ external input (a permission reply, a decision from Kevin, a records request).
       §II.2.A.27 cites); `npm run coverage` scores every pack with per-finding evidence. Flagship
       pack: 31/37 Maine, 17/19 NHTSA. Two gaps are schema gaps (`notRepresentable`), which feeds
       the v0.3 item below.
-- [ ] **Pack-diff tool.** Check `scripts/diff.ts` first — this may already exist from a separate
+- [x] **Pack-diff tool.** Check `scripts/diff.ts` first — this may already exist from a separate
       task. If absent: structural diff of two packs (complaint coverage, slots, tier mapping,
       jumps — NOT text similarity), `npm run diff -- a/pack.json b/pack.json`, human + `--json`
       output, tested on the bundled packs.
+      → *Done.* `scripts/diff.ts` did not exist. `src/diff.ts` + `npm run diff`: case-entry slots
+      and ordering, complaint coverage, per-card slot/decision-slot/response-level/jump diffs,
+      `--json`. Cards align by id, then through the coverage taxonomy — so NJ `chest_pain` lines
+      up with MX `inc10314_infarto` across languages. Response level names are never mapped.
 - [ ] **Schema v0.3 — interactive scripting.** Minimal design to support the OpenISES procedure
       cards (H1/H3/H4) and instruction scripts (I1, I3–I8) that were skipped by design (C1
       already embeds the I2 CPR script; use that as the fidelity bar). v0.1/0.2 packs must remain

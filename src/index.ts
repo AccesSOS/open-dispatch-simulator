@@ -9,7 +9,9 @@ export {
 } from './graph.js';
 export { loadPack, loadPackFromFile, PackValidationError, REQUIRED_STRING_IDS } from './loader.js';
 export { runCall, runBatch, sweepScripts } from './sim.js';
-export { coverage, loadRubric, loadRubricFromFile, RubricValidationError } from './coverage.js';
+export { coverage, loadRubric, loadRubricFromFile, matchTaxonomy, RubricValidationError } from './coverage.js';
+export { diffPacks } from './diff.js';
+export type { PackDiffResult, ProtocolPairDiff, CaseEntryDiff, SetDiff, DiffOptions } from './diff.js';
 export type {
   Rubric,
   Requirement,

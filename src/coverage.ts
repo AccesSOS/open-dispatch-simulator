@@ -187,6 +187,35 @@ function utterances(pack: ProtocolPack): Utterance[] {
 
 const rx = (p: string) => new RegExp(p, 'i');
 
+/**
+ * Classify a pack's protocols against a taxonomy of complaint types — the
+ * shared vocabulary that lets two packs from different jurisdictions be lined
+ * up card for card. Each entry keeps the protocol matching the most of its
+ * patterns (ties broken by pack order), so the answer is the card a reader
+ * would name, and is stable across runs.
+ */
+export function matchTaxonomy(
+  pack: ProtocolPack,
+  tax: Taxonomy,
+): { covered: Map<string, string>; gaps: string[] } {
+  const haystacks = pack.protocols.map((p) => ({
+    id: p.id,
+    text: [...Object.values(p.name), ...Object.values(p.keywords).flat()].join(' | '),
+  }));
+  const covered = new Map<string, string>();
+  const gaps: string[] = [];
+  for (const entry of tax.entries) {
+    let best: { id: string; score: number } | null = null;
+    for (const h of haystacks) {
+      const score = entry.patterns.filter((p) => rx(p).test(h.text)).length;
+      if (score > (best?.score ?? 0)) best = { id: h.id, score };
+    }
+    if (best) covered.set(entry.id, best.id);
+    else gaps.push(entry.id);
+  }
+  return { covered, gaps };
+}
+
 interface CheckOutcome {
   status: Status;
   evidence: string[];
@@ -343,31 +372,12 @@ function evaluateCheck(
       if (!tax) {
         return { status: 'unmet', evidence: [], detail: `taxonomy ${check.taxonomy} not loaded` };
       }
-      const haystacks = pack.protocols.map((p) => ({
-        id: p.id,
-        text: [
-          ...Object.values(p.name),
-          ...Object.values(p.keywords).flat(),
-        ].join(' | '),
-      }));
-      const covered: string[] = [];
-      const gaps: string[] = [];
-      for (const entry of tax.entries) {
-        // Score every protocol and keep the strongest match, so the evidence
-        // names the card a reader would name — not merely the first protocol
-        // in file order that happened to trip one pattern.
-        let best: { id: string; score: number } | null = null;
-        for (const h of haystacks) {
-          const score = entry.patterns.filter((p: string) => rx(p).test(h.text)).length;
-          if (score > (best?.score ?? 0)) best = { id: h.id, score };
-        }
-        if (best) covered.push(`${entry.id} → ${best.id}`);
-        else gaps.push(entry.id);
-      }
+      const { covered, gaps } = matchTaxonomy(pack, tax);
       const min = check.min ?? tax.entries.length;
+      const lines = [...covered].map(([entryId, protocolId]) => `${entryId} → ${protocolId}`);
       return {
-        status: covered.length >= min ? 'met' : covered.length ? 'partial' : 'unmet',
-        evidence: [`${covered.length}/${tax.entries.length} ${tax.name}`, ...covered],
+        status: covered.size >= min ? 'met' : covered.size ? 'partial' : 'unmet',
+        evidence: [`${covered.size}/${tax.entries.length} ${tax.name}`, ...lines],
         detail: gaps.length ? `not covered: ${gaps.join(', ')}` : undefined,
       };
     }

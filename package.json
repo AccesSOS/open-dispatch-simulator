@@ -21,6 +21,7 @@
     "validate:packs": "node --import tsx scripts/validate-packs.ts",
     "sim": "node --import tsx scripts/sim.ts",
     "coverage": "node --import tsx scripts/coverage.ts",
+    "diff": "node --import tsx scripts/diff.ts",
     "demo": "npm run build && npx http-server . -p 4179 -c-1"
   },
   "repository": {

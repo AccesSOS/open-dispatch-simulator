@@ -151,6 +151,25 @@ against a pack. This is deliberately the **only** comparison we publish; see
 [docs/PRIVATE-PACKS.md](docs/PRIVATE-PACKS.md) for why we never publish similarity claims against
 proprietary systems.
 
+## Comparing two packs
+
+```bash
+npm run diff -- packs/us-openises-emd/pack.json packs/us-nj-emd/pack.json
+npm run diff -- a/pack.json b/pack.json --json
+```
+
+Structural, never textual: what each pack asks, what its determinants can branch on, which
+response levels each card can reach, where it jumps — not how closely two packs' wordings
+resemble each other. (A similarity metric that exists gets quoted, and the one comparison this
+project refuses to publish is similarity against a proprietary system.)
+
+Two packs from different jurisdictions share no ids, so cards are lined up first by id and then
+through the **shared complaint taxonomy** the coverage rubrics already use — which is why New
+Jersey's `chest_pain_heart_problems` and Mexico's `inc10314_infarto` align despite being in
+different languages. Response level names are never mapped: `CODE_RED` and
+`SIMULTANEOUS_ALS_BLS` are two jurisdictions' words, and asserting they mean the same thing
+would be a clinical claim, not a diff.
+
 ## Content policy
 
 The hunt for sources — what shipped, what's pending, verified dead ends, and open leads — is
