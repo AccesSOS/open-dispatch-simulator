@@ -52,7 +52,7 @@ external input (a permission reply, a decision from Kevin, a records request).
       obxairwaves stray cards — verify authorship/license before touching, could be an APCO
       copy). Ship a pack ONLY if license-clean; otherwise record findings and mark this item done
       with a summary. Do not loop on hunting.
-      → *Done.* No pack shipped — nothing was licence-clean. Verified and closed: the obxairwaves
+      → *Done* (254ff65). No pack shipped — nothing was licence-clean. Verified and closed: the obxairwaves
       PDF (33 scanned bitmaps, no text layer, no author/copyright anywhere, host has no standing
       to license it), the PowerDMS "PGPD" fire dispatch procedure (Punta Gorda, dispatch-side),
       Butler County KS (mandates ProQA by name), state admin codes (nothing embedded), MuckRock
