@@ -121,7 +121,8 @@ recorded in [docs/PROTOCOL-SOURCES.md](docs/PROTOCOL-SOURCES.md).
   National Standard Curriculum), state-published protocols, and public-records SOPs, each with
   provenance declared in the pack. Proprietary systems (e.g. MPDS®/ProQA®) are **not** included
   and must not be contributed; agencies that license them may encode them as *private* packs and
-  load them locally.
+  load them locally — see [docs/PRIVATE-PACKS.md](docs/PRIVATE-PACKS.md) for the mechanics and
+  the permissions you need first.
 - **Synthetic data only.** No real emergency calls, transcripts, or personal data — ever.
 - The bundled [`packs/us-nhtsa-emd`](packs/us-nhtsa-emd/pack.json) is a heavily simplified
   reference subset that exists to exercise the engine, not a usable medical protocol.

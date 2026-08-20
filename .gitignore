@@ -1,5 +1,7 @@
 node_modules/
 dist/
+# Licensed/proprietary packs loaded locally — never committed. See docs/PRIVATE-PACKS.md.
+packs-private/
 *.log
 .env
 .DS_Store

@@ -21,7 +21,9 @@ license, or written permission — with provenance recorded in the pack and enfo
 ## Verified dead ends — do not re-litigate
 
 - **MPDS® / ProQA® (IAED / Priority Dispatch Corp)** — trademarked, patented, sold per seat.
-  Never ship or accept contributions of it. Licensees may load *private* packs locally.
+  Never ship or accept contributions of it. Licensees may load *private* packs locally
+  ([PRIVATE-PACKS.md](PRIVATE-PACKS.md)) — with the rights holder's written authorization, since
+  an operational license does not cover re-encoding the content into a third-party tool.
 - **APCO guidecards (EMD / Fire / Law Enforcement)** — commercial product. Copies floating on
   training sites are not licenses.
 - **PowerPhone Total Response** — commercial.
