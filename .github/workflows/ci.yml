@@ -36,7 +36,7 @@ jobs:
           for f in packs/*/pack.json; do
             lic=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$f')).provenance.license)")
             case "$lic" in
-              public-domain|CC0-1.0|CC-BY-4.0|OGL-*) echo "OK: $f ($lic)" ;;
+              public-domain|CC0-1.0|CC-BY-4.0|GFDL-1.2-or-later|OGL-*) echo "OK: $f ($lic)" ;;
               *) echo "::error file=$f::Pack license '$lic' is not on the open allowlist"; exit 1 ;;
             esac
           done

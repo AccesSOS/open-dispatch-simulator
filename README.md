@@ -114,6 +114,11 @@ answers produce the same protocol, determinant, and response level under every s
 - **Synthetic data only.** No real emergency calls, transcripts, or personal data — ever.
 - The bundled [`packs/us-nhtsa-emd`](packs/us-nhtsa-emd/pack.json) is a heavily simplified
   reference subset that exists to exercise the engine, not a usable medical protocol.
+- [`packs/us-openises-emd`](packs/us-openises-emd/pack.json) is the first **source-faithful**
+  pack: the Open ISES Project's freely licensed (GFDL-1.2+) EMD guide cards — All Callers
+  Interrogation plus the M5 Chest Pain, C1 Cardiac Arrest, C6 Unconscious/Fainting, and M17
+  Unknown/Man Down cards, with the source's own Code RED/YELLOW response taxonomy. See its
+  [SOURCE.md](packs/us-openises-emd/SOURCE.md) for attribution and digitization decisions.
 
 ## Roadmap
 

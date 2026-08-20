@@ -1,0 +1,335 @@
+{
+  "schemaVersion": "0.1",
+  "id": "us-openises-emd",
+  "name": {
+    "en": "US — Open ISES EMD Guide Cards v0.26.2 (subset)"
+  },
+  "jurisdiction": {
+    "country": "US",
+    "region": "Generic (model guidecards for local adoption; require local medical-director approval)",
+    "emergencyNumber": "911"
+  },
+  "provenance": {
+    "source": "The Open ISES Project — Emergency Medical Dispatch Guide Cards, Draft Version 0.26.2 (Cards 911 Project), Copyright (c) 2008 The Open ISES Process. GNU Free Documentation License 1.2 or later; no Invariant Sections, no Cover Texts.",
+    "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
+    "license": "GFDL-1.2-or-later",
+    "digitizedDate": "2026-08-20",
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use."
+  },
+  "locales": ["en"],
+  "defaultLocale": "en",
+  "caseEntry": [
+    { "id": "q_location", "slot": "location", "stringId": "q_location", "confirmStringId": "confirm_location" },
+    { "id": "q_callback", "slot": "callback", "stringId": "q_callback", "confirmStringId": "confirm_callback" },
+    { "id": "q_emergency", "slot": "emergency", "stringId": "q_emergency", "selectsProtocol": true },
+    { "id": "q_num_hurt", "slot": "num_hurt", "stringId": "q_num_hurt" },
+    { "id": "q_age", "slot": "age", "stringId": "q_age" },
+    {
+      "id": "q_conscious",
+      "slot": "conscious",
+      "stringId": "q_conscious",
+      "expect": {
+        "type": "choice",
+        "options": [
+          { "id": "no", "keywords": { "en": ["no", "not", "unconscious", "passed out"] } },
+          { "id": "yes", "keywords": { "en": ["yes", "yeah", "awake", "conscious"] } }
+        ]
+      }
+    },
+    {
+      "id": "q_breathing",
+      "slot": "breathing",
+      "stringId": "q_breathing",
+      "expect": {
+        "type": "choice",
+        "options": [
+          { "id": "no", "keywords": { "en": ["no", "not"] } },
+          { "id": "yes", "keywords": { "en": ["yes", "yeah", "breathing"] } }
+        ]
+      },
+      "next": [{ "whenOption": "no", "goto": "$determine" }]
+    },
+    { "id": "q_sex", "slot": "sex", "stringId": "q_sex" },
+    { "id": "q_caller_name", "slot": "caller_name", "stringId": "q_caller_name" }
+  ],
+  "protocols": [
+    {
+      "id": "m5_chest_pain",
+      "name": { "en": "M5: Chest Pain/Heart Problems" },
+      "keywords": { "en": ["chest pain", "chest", "heart attack", "heart problem", "heart problems", "heart hurts", "chest pressure"] },
+      "keyQuestions": [
+        {
+          "id": "kq_m5_alert", "slot": "m5_alert", "stringId": "kq_alert",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not", "out of it", "confused"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "alert"] } }
+          ] },
+          "next": [ { "whenOption": "no", "goto": "$determine" }, { "goto": "kq_m5_breathing_normal" } ]
+        },
+        {
+          "id": "kq_m5_breathing_normal", "slot": "m5_breathing_normal", "stringId": "kq_breathing_normal",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "normal", "normally"] } }
+          ] },
+          "next": [ { "whenOption": "no", "goto": "$determine" }, { "goto": "kq_m5_sweating" } ]
+        },
+        {
+          "id": "kq_m5_sweating", "slot": "m5_sweating", "stringId": "kq_m5_sweating",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "sweating", "sweaty"] } }
+          ] }
+        },
+        {
+          "id": "kq_m5_nausea", "slot": "m5_nausea", "stringId": "kq_m5_nausea",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "nauseated", "vomiting", "throwing up"] } }
+          ] }
+        },
+        {
+          "id": "kq_m5_weak", "slot": "m5_weak", "stringId": "kq_m5_weak",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "weak", "dizzy", "faint"] } }
+          ] }
+        },
+        { "id": "kq_m5_pain_location", "slot": "m5_pain_location", "stringId": "kq_m5_pain_location" },
+        {
+          "id": "kq_m5_rapid_heart", "slot": "m5_rapid_heart", "stringId": "kq_m5_rapid_heart",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "racing", "rapid"] } }
+          ] }
+        },
+        { "id": "kq_m5_pain_elsewhere", "slot": "m5_pain_elsewhere", "stringId": "kq_m5_pain_elsewhere" },
+        { "id": "kq_m5_duration", "slot": "m5_duration", "stringId": "kq_m5_duration" },
+        {
+          "id": "kq_m5_cardiac_history", "slot": "m5_cardiac_history", "stringId": "kq_m5_cardiac_history",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "heart attack", "cardiac"] } }
+          ] }
+        },
+        {
+          "id": "kq_m5_drugs", "slot": "m5_drugs", "stringId": "kq_m5_drugs",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "cocaine", "crack"] } }
+          ] }
+        }
+      ],
+      "determinants": [
+        { "id": "m5_red_not_breathing", "when": [{ "slot": "breathing", "option": "no" }], "response": "CODE_RED" },
+        { "id": "m5_red_not_alert", "when": [{ "slot": "m5_alert", "option": "no" }], "response": "CODE_RED" },
+        { "id": "m5_red_breathing_abnormal", "when": [{ "slot": "m5_breathing_normal", "option": "no" }], "response": "CODE_RED" },
+        { "id": "m5_red_nausea", "when": [{ "slot": "m5_nausea", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "m5_red_cardiac_history", "when": [{ "slot": "m5_cardiac_history", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "m5_red_diaphoretic", "when": [{ "slot": "m5_sweating", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "m5_red_rapid_heart", "when": [{ "slot": "m5_rapid_heart", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "m5_red_syncope", "when": [{ "slot": "m5_weak", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "m5_red_drug_use", "when": [{ "slot": "m5_drugs", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "m5_yellow_no_critical", "response": "CODE_YELLOW" }
+      ],
+      "postDispatch": ["pd_m5_position", "pd_m5_no_exertion", "pd_m5_loosen", "pd_m5_nitro", "pd_gather_meds", "pd_lock_pets", "pd_callback_changes"]
+    },
+    {
+      "id": "c1_cardiac_arrest",
+      "name": { "en": "C1: Cardiac/Respiratory Arrest" },
+      "keywords": { "en": ["cardiac arrest", "not breathing", "stopped breathing", "no pulse", "cpr", "respiratory arrest", "heart stopped"] },
+      "keyQuestions": [
+        {
+          "id": "kq_c1_alert", "slot": "c1_alert", "stringId": "kq_alert",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "alert"] } }
+          ] }
+        },
+        {
+          "id": "kq_c1_breathing_normal", "slot": "c1_breathing_normal", "stringId": "kq_c1_breathing_normal",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not", "gasping", "snoring", "gurgling", "barely"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "normal", "normally"] } }
+          ] }
+        },
+        {
+          "id": "kq_c1_responds", "slot": "c1_responds", "stringId": "kq_c1_responds",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "moving", "responds"] } }
+          ] }
+        },
+        {
+          "id": "kq_c1_expected", "slot": "c1_expected", "stringId": "kq_c1_expected",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "hospice", "expected"] } }
+          ] }
+        }
+      ],
+      "determinants": [
+        { "id": "c1_yellow_hospice", "when": [{ "slot": "c1_expected", "option": "yes" }], "response": "CODE_YELLOW" },
+        { "id": "c1_red_arrest", "response": "CODE_RED" }
+      ],
+      "postDispatch": ["pd_c1_cpr", "pd_gather_meds", "pd_lock_pets", "pd_c1_callback"]
+    },
+    {
+      "id": "c6_unconscious_fainting",
+      "name": { "en": "C6: Unconscious/Fainting" },
+      "keywords": { "en": ["unconscious", "fainted", "fainting", "passed out", "slumped over", "won't wake", "not waking"] },
+      "keyQuestions": [
+        {
+          "id": "kq_c6_alert", "slot": "c6_alert", "stringId": "kq_alert",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "alert", "awake"] } }
+          ] }
+        },
+        {
+          "id": "kq_c6_breathing_normal", "slot": "c6_breathing_normal", "stringId": "kq_breathing_normal",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "normal", "normally"] } }
+          ] },
+          "next": [ { "whenOption": "no", "goto": "$determine" }, { "goto": "kq_c6_first_time" } ]
+        },
+        {
+          "id": "kq_c6_first_time", "slot": "c6_first_time", "stringId": "kq_c6_first_time",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "first"] } }
+          ] }
+        },
+        {
+          "id": "kq_c6_tried_wake", "slot": "c6_tried_wake", "stringId": "kq_c6_tried_wake",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "tried"] } }
+          ] }
+        },
+        {
+          "id": "kq_c6_drugs_alcohol", "slot": "c6_drugs_alcohol", "stringId": "kq_c6_drugs_alcohol",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "drinking", "drugs", "alcohol"] } }
+          ] }
+        },
+        { "id": "kq_c6_doing_before", "slot": "c6_doing_before", "stringId": "kq_c6_doing_before" },
+        { "id": "kq_c6_complaints_before", "slot": "c6_complaints_before", "stringId": "kq_c6_complaints_before" },
+        { "id": "kq_c6_medic_alert", "slot": "c6_medic_alert", "stringId": "kq_c6_medic_alert" }
+      ],
+      "determinants": [
+        { "id": "c6_red_not_breathing", "when": [{ "slot": "breathing", "option": "no" }], "response": "CODE_RED" },
+        { "id": "c6_red_unconscious", "when": [{ "slot": "c6_alert", "option": "no" }], "response": "CODE_RED" },
+        { "id": "c6_red_breathing_abnormal", "when": [{ "slot": "c6_breathing_normal", "option": "no" }], "response": "CODE_RED" },
+        { "id": "c6_red_od_combo", "when": [{ "slot": "c6_drugs_alcohol", "option": "yes" }], "response": "CODE_RED" },
+        { "id": "c6_yellow_recovered", "response": "CODE_YELLOW" }
+      ],
+      "postDispatch": ["pd_c6_lie_down", "pd_c6_side_vomit", "pd_c6_stay", "pd_gather_meds", "pd_lock_pets", "pd_callback_changes"]
+    },
+    {
+      "id": "m17_unknown_man_down",
+      "name": { "en": "M17: Unknown/Man Down" },
+      "keywords": { "en": ["man down", "someone down", "person down", "unknown"] },
+      "keyQuestions": [
+        {
+          "id": "kq_m17_alert", "slot": "m17_alert", "stringId": "kq_alert",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "alert"] } }
+          ] }
+        },
+        {
+          "id": "kq_m17_breathing_normal", "slot": "m17_breathing_normal", "stringId": "kq_breathing_normal",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "normal", "normally"] } }
+          ] },
+          "next": [ { "whenOption": "no", "goto": "$determine" }, { "goto": "kq_m17_why_down" } ]
+        },
+        { "id": "kq_m17_why_down", "slot": "m17_why_down", "stringId": "kq_m17_why_down" },
+        {
+          "id": "kq_m17_able_talk", "slot": "m17_able_talk", "stringId": "kq_m17_able_talk",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "talking"] } }
+          ] }
+        },
+        {
+          "id": "kq_m17_able_move", "slot": "m17_able_move", "stringId": "kq_m17_able_move",
+          "expect": { "type": "choice", "options": [
+            { "id": "no", "keywords": { "en": ["no", "not"] } },
+            { "id": "yes", "keywords": { "en": ["yes", "yeah", "moving"] } }
+          ] }
+        },
+        { "id": "kq_m17_where_exactly", "slot": "m17_where_exactly", "stringId": "kq_m17_where_exactly" }
+      ],
+      "determinants": [
+        { "id": "m17_red_not_breathing", "when": [{ "slot": "breathing", "option": "no" }], "response": "CODE_RED" },
+        { "id": "m17_red_unconscious", "when": [{ "slot": "m17_alert", "option": "no" }], "response": "CODE_RED" },
+        { "id": "m17_red_breathing_abnormal", "when": [{ "slot": "m17_breathing_normal", "option": "no" }], "response": "CODE_RED" },
+        { "id": "m17_yellow_talking_moving", "response": "CODE_YELLOW" }
+      ],
+      "postDispatch": ["pd_m17_go_check", "pd_m17_flag_unit", "pd_callback_changes"]
+    }
+  ],
+  "fallbackProtocol": "m17_unknown_man_down",
+  "strings": {
+    "en": {
+      "greeting": "Nine-one-one.",
+      "q_location": "Where is your emergency — what is the address or location?",
+      "confirm_location": "I have {location} — is that correct?",
+      "q_callback": "What is the phone number you are calling from?",
+      "confirm_callback": "I have {callback} — is that correct?",
+      "q_emergency": "What is the emergency?",
+      "q_num_hurt": "How many people are hurt?",
+      "q_age": "How old is the person?",
+      "q_conscious": "Is the person conscious?",
+      "q_breathing": "Is the person breathing?",
+      "q_sex": "Is the person male or female?",
+      "q_caller_name": "What is your name?",
+      "clarify": "I need a yes or no answer.",
+      "dispatch_confirm": "Help has been dispatched to {location}. Stay on the line with me.",
+      "closing": "Emergency responders are on the way. Call back immediately if anything changes.",
+      "kq_alert": "Is the person alert?",
+      "kq_breathing_normal": "Is the person breathing normally?",
+      "kq_m5_sweating": "Is the person sweating profusely?",
+      "kq_m5_nausea": "Is the person nauseated or vomiting?",
+      "kq_m5_weak": "Is the person weak, dizzy or faint?",
+      "kq_m5_pain_location": "Where is the pain located?",
+      "kq_m5_rapid_heart": "Does the person experience a rapid heart rate with the chest pain?",
+      "kq_m5_pain_elsewhere": "Does the person feel pain anywhere else?",
+      "kq_m5_duration": "How long has the pain been present?",
+      "kq_m5_cardiac_history": "Does the person have a history of a heart attack or cardiac problems?",
+      "kq_m5_drugs": "Has the person taken any drugs in the past 24 hours?",
+      "pd_m5_position": "Place the person in the most comfortable position, probably sitting up.",
+      "pd_m5_no_exertion": "Advise the person not to exert themselves.",
+      "pd_m5_loosen": "Loosen any tight clothing.",
+      "pd_m5_nitro": "If the person is prescribed nitroglycerin and has it, make sure they are sitting down, then have them take it as prescribed by their doctor.",
+      "kq_c1_breathing_normal": "Is the person breathing normally? Gasping, snoring, gurgling, or barely breathing is not normal breathing.",
+      "kq_c1_responds": "Does the person respond to you? Does the person move?",
+      "kq_c1_expected": "Is this an expected death — is the person in hospice care?",
+      "pd_c1_cpr": "I am going to give you CPR instructions appropriate for the person's age. Follow them until responders arrive.",
+      "pd_c1_callback": "If the person's condition changes, or you decide to provide CPR, call me back immediately.",
+      "kq_c6_first_time": "Is this the first time today that the person has been unconscious?",
+      "kq_c6_tried_wake": "Have you tried to wake the person up?",
+      "kq_c6_drugs_alcohol": "Do you know if the person is taking any drugs, or drinking alcohol — alone or with the drugs?",
+      "kq_c6_doing_before": "What was the person doing before they became unconscious?",
+      "kq_c6_complaints_before": "Did the person have any complaints before they went unconscious?",
+      "kq_c6_medic_alert": "Does the person have a Medic Alert tag? If so, what does it say?",
+      "pd_c6_lie_down": "Have the person lie down.",
+      "pd_c6_side_vomit": "If the person is vomiting, place them on their side.",
+      "pd_c6_stay": "Do not leave the person, and be prepared to perform CPR.",
+      "kq_m17_why_down": "Do you know why the person is down?",
+      "kq_m17_able_talk": "Is the person able to talk?",
+      "kq_m17_able_move": "Is the person able to move?",
+      "kq_m17_where_exactly": "Where exactly is the person?",
+      "pd_m17_go_check": "If it is safe to do so, go to the person and see if they are awake, breathing normally, or moving at all — then return to the phone and let me know.",
+      "pd_m17_flag_unit": "Watch for the emergency unit and direct them to the person.",
+      "pd_gather_meds": "Gather any of the person's medications for the paramedics.",
+      "pd_lock_pets": "Lock away any pets.",
+      "pd_callback_changes": "If the person's condition changes, call me back immediately."
+    }
+  }
+}
