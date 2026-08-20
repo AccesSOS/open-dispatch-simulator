@@ -1,15 +1,20 @@
+import { determineNodeId, keyQuestionNodeId } from './graph.js';
 import type {
   Locale,
   Phase,
   Protocol,
   ProtocolPack,
   Question,
+  SessionEvent,
   SessionResult,
   Utterance,
 } from './types.js';
 
 export interface SessionOptions {
   locale?: Locale;
+  /** Live narration of the session's walk through the decision tree —
+   * nodeIds match packGraph(), so visualizers can animate the call. */
+  onEvent?: (event: SessionEvent) => void;
 }
 
 /**
@@ -32,8 +37,11 @@ export class DispatchSession {
   private queue: Question[] = [];
   private current: Question | null = null;
 
+  private readonly onEvent: ((event: SessionEvent) => void) | undefined;
+
   constructor(private readonly pack: ProtocolPack, options: SessionOptions = {}) {
     this.locale = options.locale ?? pack.defaultLocale;
+    this.onEvent = options.onEvent;
     if (!pack.locales.includes(this.locale)) {
       throw new Error(`Pack "${pack.id}" does not support locale "${this.locale}"`);
     }
@@ -43,6 +51,7 @@ export class DispatchSession {
   start(): Utterance[] {
     if (this.phase !== 'idle') throw new Error('Session already started');
     this.phase = 'case_entry';
+    this.emit({ type: 'phase', phase: 'case_entry' });
     this.queue = [...this.pack.caseEntry];
     const out = [this.say('greeting')];
     out.push(...this.advance());
@@ -62,6 +71,14 @@ export class DispatchSession {
       const matched = this.matchOption(q, text);
       if (matched) this.choices[q.slot] = matched;
     }
+    this.emit({
+      type: 'answer',
+      nodeId: this.nodeIdFor(q),
+      questionId: q.id,
+      slot: q.slot,
+      text,
+      option: this.choices[q.slot] ?? null,
+    });
     if (q.selectsProtocol) this.protocol = this.selectProtocol(text);
 
     // Conditional edges override sequential flow.
@@ -69,9 +86,17 @@ export class DispatchSession {
       q.next?.find((e) => e.whenOption !== undefined && e.whenOption === this.choices[q.slot]) ??
       q.next?.find((e) => e.whenOption === undefined);
     if (edge) {
-      if (edge.goto === '$determine') return this.determine();
+      if (edge.goto === '$determine') {
+        this.emit({
+          type: 'edge',
+          from: this.nodeIdFor(q),
+          to: this.protocol ? determineNodeId(this.protocol.id) : '$dispatch',
+        });
+        return this.determine();
+      }
       const target = this.protocol?.keyQuestions.find((n) => n.id === edge.goto);
       if (!target) throw new Error(`Edge target "${edge.goto}" not found`); // loader prevents this
+      this.emit({ type: 'edge', from: this.nodeIdFor(q), to: this.nodeIdFor(target) });
       this.queue = this.queueFrom(target);
     }
     return this.advance();
@@ -105,11 +130,20 @@ export class DispatchSession {
     const next = this.queue.shift();
     if (next) {
       this.current = next;
-      return [this.say(next.stringId)];
+      const out = [this.say(next.stringId)];
+      this.emit({
+        type: 'ask',
+        nodeId: this.nodeIdFor(next),
+        questionId: next.id,
+        slot: next.slot,
+        protocolId: this.phase === 'key_questions' ? this.protocol?.id ?? null : null,
+      });
+      return out;
     }
     this.current = null;
     if (this.phase === 'case_entry') {
       this.phase = 'key_questions';
+      this.emit({ type: 'phase', phase: 'key_questions' });
       this.protocol ??= this.mustProtocol(this.pack.fallbackProtocol);
       this.queue = [...this.protocol.keyQuestions];
       return this.advance();
@@ -128,6 +162,14 @@ export class DispatchSession {
     this.response = rule.response;
     this.phase = 'done';
     this.current = null;
+    this.emit({
+      type: 'determinant',
+      nodeId: determineNodeId(protocol.id),
+      protocolId: protocol.id,
+      determinantId: rule.id,
+      response: rule.response,
+    });
+    this.emit({ type: 'phase', phase: 'done' });
     return [
       this.say('dispatch_confirm'),
       ...protocol.postDispatch.map((id) => this.say(id)),
@@ -149,7 +191,19 @@ export class DispatchSession {
     });
     const utterance: Utterance = { role: 'dispatcher', stringId, text };
     this.transcript.push({ role: 'dispatcher', text });
+    this.emit({ type: 'utterance', stringId, text });
     return utterance;
+  }
+
+  private emit(event: SessionEvent): void {
+    this.onEvent?.(event);
+  }
+
+  /** Graph node id for a question in the current phase (matches packGraph). */
+  private nodeIdFor(q: Question): string {
+    return this.phase === 'case_entry' || !this.protocol
+      ? q.id
+      : keyQuestionNodeId(this.protocol.id, q);
   }
 
   private matchOption(q: Question, text: string): string | undefined {
@@ -165,9 +219,14 @@ export class DispatchSession {
     const normalized = complaint.toLowerCase();
     for (const p of this.pack.protocols) {
       const keywords = p.keywords[this.locale] ?? [];
-      if (keywords.some((k) => normalized.includes(k.toLowerCase()))) return p;
+      if (keywords.some((k) => normalized.includes(k.toLowerCase()))) {
+        this.emit({ type: 'protocol_selected', protocolId: p.id, via: 'keywords' });
+        return p;
+      }
     }
-    return this.mustProtocol(this.pack.fallbackProtocol);
+    const fallback = this.mustProtocol(this.pack.fallbackProtocol);
+    this.emit({ type: 'protocol_selected', protocolId: fallback.id, via: 'fallback' });
+    return fallback;
   }
 
   private mustProtocol(id: string): Protocol {

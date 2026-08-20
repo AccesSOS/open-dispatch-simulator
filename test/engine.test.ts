@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { DispatchSession, loadPack, loadPackFromFile, PackValidationError } from '../src/index.js';
-import type { ProtocolPack, Utterance } from '../src/index.js';
+import {
+  DispatchSession,
+  loadPack,
+  loadPackFromFile,
+  packGraph,
+  PackValidationError,
+} from '../src/index.js';
+import type { ProtocolPack, SessionEvent, Utterance } from '../src/index.js';
 
 const packPath = fileURLToPath(new URL('../packs/us-nhtsa-emd/pack.json', import.meta.url));
 const freshPack = (): ProtocolPack => loadPackFromFile(packPath);
@@ -152,6 +158,79 @@ test('spanish call speaks only from the es catalog', () => {
   assert.equal(r.response, 'ALS_COLD');
   for (const u of all) expectGrounded(pack, 'es', u, { address });
   assert.ok(all.some((u) => u.text.includes('La ayuda va en camino a Calle Reforma 10')));
+});
+
+test('session narrates its decision-tree walk via events', () => {
+  const events: SessionEvent[] = [];
+  const s = new DispatchSession(freshPack(), { onEvent: (e) => events.push(e) });
+  s.start();
+  s.answer('9 Elm Ave');
+  s.answer('555-0111');
+  s.answer('chest pressure');
+  s.answer('50');
+  s.answer('yes');
+  s.answer('yes');
+  s.answer('no, he seems confused'); // not alert -> straight to determinant
+
+  const of = <T extends SessionEvent['type']>(type: T) =>
+    events.filter((e): e is Extract<SessionEvent, { type: T }> => e.type === type);
+
+  assert.deepEqual(of('protocol_selected'), [
+    { type: 'protocol_selected', protocolId: 'chest_pain', via: 'keywords' },
+  ]);
+  assert.deepEqual(of('ask').map((e) => e.nodeId), [
+    'q_address',
+    'q_callback',
+    'q_complaint',
+    'q_age',
+    'q_conscious',
+    'q_breathing',
+    'chest_pain:kq_cp_alert',
+  ]);
+  assert.deepEqual(of('edge'), [
+    { type: 'edge', from: 'chest_pain:kq_cp_alert', to: 'chest_pain:$determine' },
+  ]);
+  assert.deepEqual(of('determinant'), [
+    {
+      type: 'determinant',
+      nodeId: 'chest_pain:$determine',
+      protocolId: 'chest_pain',
+      determinantId: 'cp_not_alert',
+      response: 'ALS_HOT',
+    },
+  ]);
+  assert.deepEqual(of('phase').map((e) => e.phase), ['case_entry', 'key_questions', 'done']);
+  const answered = of('answer').find((e) => e.nodeId === 'chest_pain:kq_cp_alert');
+  assert.equal(answered?.option, 'no');
+});
+
+test('packGraph covers every question and converges on the dispatch node', () => {
+  const pack = freshPack();
+  const g = packGraph(pack);
+  const ids = new Set(g.nodes.map((n) => n.id));
+  assert.equal(ids.size, g.nodes.length, 'node ids are unique');
+  // 6 case entry + 3 key questions + 3 determine + 1 dispatch
+  assert.equal(g.nodes.length, 13);
+  for (const e of g.edges) {
+    assert.ok(ids.has(e.from), `edge from unknown node ${e.from}`);
+    assert.ok(ids.has(e.to), `edge to unknown node ${e.to}`);
+  }
+  // Complaint routing: last case-entry node links into every protocol.
+  const selectionTargets = g.edges
+    .filter((e) => e.from === 'q_breathing' && e.label && e.label !== 'no')
+    .map((e) => e.to)
+    .sort();
+  assert.deepEqual(selectionTargets, [
+    'chest_pain:kq_cp_alert',
+    'general_medical:$determine',
+    'unconscious_fainting:kq_unc_breathing',
+  ]);
+  // Every determine node feeds the shared dispatch terminal.
+  for (const p of pack.protocols) {
+    assert.ok(g.edges.some((e) => e.from === `${p.id}:$determine` && e.to === '$dispatch'));
+  }
+  // The case-entry breathing shortcut also reaches dispatch.
+  assert.ok(g.edges.some((e) => e.from === 'q_breathing' && e.label === 'no' && e.to === '$dispatch'));
 });
 
 test('unsupported locale is rejected up front', () => {

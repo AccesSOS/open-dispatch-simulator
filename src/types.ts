@@ -81,6 +81,55 @@ export interface Utterance {
 
 export type Phase = 'idle' | 'case_entry' | 'key_questions' | 'done';
 
+/**
+ * Live narration of a session's walk through the decision tree, for
+ * visualizers, eval harnesses, and (later) voice bridges. `nodeId` values
+ * match the ids produced by packGraph().
+ */
+export type SessionEvent =
+  | { type: 'phase'; phase: Phase }
+  | { type: 'ask'; nodeId: string; questionId: string; slot: string; protocolId: string | null }
+  | {
+      type: 'answer';
+      nodeId: string;
+      questionId: string;
+      slot: string;
+      text: string;
+      option: string | null;
+    }
+  | { type: 'protocol_selected'; protocolId: string; via: 'keywords' | 'fallback' }
+  | { type: 'edge'; from: string; to: string }
+  | {
+      type: 'determinant';
+      nodeId: string;
+      protocolId: string;
+      determinantId: string;
+      response: string;
+    }
+  | { type: 'utterance'; stringId: string; text: string };
+
+/** A pack rendered as a graph for visualization. */
+export interface GraphNode {
+  id: string;
+  kind: 'case_entry' | 'key_question' | 'determine' | 'dispatch';
+  protocolId?: string;
+  questionId?: string;
+  slot?: string;
+  stringId?: string;
+}
+
+export interface GraphEdge {
+  from: string;
+  to: string;
+  /** Option id for conditional edges, or a protocol name for selection edges. */
+  label?: string;
+}
+
+export interface PackGraph {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
 export interface SessionResult {
   protocolId: string | null;
   determinantId: string | null;

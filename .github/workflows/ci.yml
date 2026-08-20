@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run validate:packs
+      - run: npm run build
+
+  # The whole point of this project is that packs are grounded and licensed.
+  # Fail loudly if a pack sneaks in without open-license provenance.
+  provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check pack provenance licenses
+        run: |
+          set -e
+          for f in packs/*/pack.json; do
+            lic=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$f')).provenance.license)")
+            case "$lic" in
+              public-domain|CC0-1.0|CC-BY-4.0|OGL-*) echo "OK: $f ($lic)" ;;
+              *) echo "::error file=$f::Pack license '$lic' is not on the open allowlist"; exit 1 ;;
+            esac
+          done

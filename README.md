@@ -34,6 +34,18 @@ npm install
 npm test
 ```
 
+### Live decision-tree demo
+
+```bash
+npm run demo   # then open http://localhost:4179/demo/
+```
+
+Runs a call in the browser and animates the dispatcher's "brain" in real time over the pack's
+decision tree: the path taken, the active node, what is being assessed next, and milestones —
+protocol selected, and what resources were deployed at what response level. Built on the engine's
+`onEvent` stream and `packGraph()` export, which any richer UI (e.g. React Flow) can consume the
+same way.
+
 ```ts
 import { DispatchSession, loadPackFromFile } from 'open-dispatch-simulator';
 
@@ -81,6 +93,13 @@ determinant must reference real questions and options. A pack that loads is safe
   persona traits (patience, interruption handling, interpreter-relay simulation), and
   call-scoring for automated evaluation.
 - A practice-call web UI so anyone can safely rehearse calling 911 in their own language.
+
+## Governance
+
+CI runs typecheck, tests, pack validation, and a provenance-license allowlist on every push and
+PR (`.github/workflows/ci.yml`). Contributions require a DCO sign-off — see
+[CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and
+[SECURITY.md](SECURITY.md).
 
 ## License
 

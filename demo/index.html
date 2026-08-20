@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Dispatch Simulator — Live Decision Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --jet: #333333; --amaranth: #DF4154; --ash: #D8D8D8; --smoke: #F5F5F5;
+    --police: #0084FF; --success: #27AE60;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: 'Mulish', sans-serif; color: var(--jet); background: var(--smoke); height: 100vh; display: flex; flex-direction: column; }
+  header { background: #fff; border-bottom: 2px solid var(--ash); padding: 10px 18px; display: flex; align-items: center; gap: 14px; }
+  header h1 { font-size: 15px; font-weight: 900; }
+  header h1 span { color: var(--amaranth); }
+  .banner { background: var(--amaranth); color: #fff; font-size: 11.5px; font-weight: 700; text-align: center; padding: 4px 10px; }
+  .controls { margin-left: auto; display: flex; gap: 8px; }
+  button, select { font: inherit; font-weight: 700; font-size: 12.5px; border: 1.5px solid var(--jet); background: #fff; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+  button.primary { background: var(--jet); color: #fff; }
+  main { flex: 1; display: flex; min-height: 0; }
+  .call { width: 340px; background: #fff; border-right: 2px solid var(--ash); display: flex; flex-direction: column; }
+  .transcript { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 85%; padding: 8px 11px; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+  .msg.dispatcher { background: var(--smoke); border: 1px solid var(--ash); align-self: flex-start; }
+  .msg.caller { background: var(--police); color: #fff; align-self: flex-end; }
+  form { display: flex; gap: 8px; padding: 12px; border-top: 1.5px solid var(--ash); }
+  input { flex: 1; font: inherit; font-size: 13px; border: 1.5px solid var(--ash); border-radius: 6px; padding: 7px 10px; }
+  .viz { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .milestones { display: flex; gap: 10px; padding: 10px 14px; flex-wrap: wrap; }
+  .mile { background: #fff; border: 1.5px solid var(--ash); border-radius: 8px; padding: 7px 12px; font-size: 12px; min-width: 150px; }
+  .mile b { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #888; }
+  .mile.hit { border-color: var(--success); }
+  .mile.hit b { color: var(--success); }
+  .mile.active { border-color: var(--amaranth); }
+  .mile.active b { color: var(--amaranth); }
+  .tree { flex: 1; overflow: auto; padding: 6px 14px 14px; }
+  svg text { font-family: 'Mulish', sans-serif; }
+  .node rect { fill: #fff; stroke: var(--ash); stroke-width: 1.5; rx: 8; }
+  .node text { font-size: 11.5px; font-weight: 700; fill: var(--jet); }
+  .node .sub { font-size: 9px; font-weight: 500; fill: #999; }
+  .node.visited rect { stroke: var(--jet); }
+  .node.active rect { stroke: var(--amaranth); stroke-width: 3; }
+  .node.active { animation: pulse 1.2s ease-in-out infinite; }
+  .node.dim { opacity: 0.35; }
+  @keyframes pulse { 50% { opacity: 0.55; } }
+  .edge { stroke: var(--ash); stroke-width: 1.5; fill: none; }
+  .edge.taken { stroke: var(--amaranth); stroke-width: 2.5; }
+  .edge-label { font-size: 9px; fill: #999; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="banner">SIMULATION ONLY — this is not 911. In a real emergency, call your local emergency number.</div>
+<header>
+  <h1>Open Dispatch Simulator <span>· live decision tree</span></h1>
+  <div class="controls">
+    <select id="locale"><option value="en">English</option><option value="es">Español</option></select>
+    <button id="restart" class="primary">New call</button>
+  </div>
+</header>
+<main>
+  <section class="call">
+    <div class="transcript" id="transcript"></div>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Answer the dispatcher…" aria-label="Your answer">
+      <button class="primary">Send</button>
+    </form>
+  </section>
+  <section class="viz">
+    <div class="milestones">
+      <div class="mile" id="m-phase"><b>Phase</b><span>—</span></div>
+      <div class="mile" id="m-assess"><b>Now assessing</b><span>—</span></div>
+      <div class="mile" id="m-protocol"><b>Protocol</b><span>—</span></div>
+      <div class="mile" id="m-dispatch"><b>Resources deployed</b><span>—</span></div>
+    </div>
+    <div class="tree" id="tree"></div>
+  </section>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

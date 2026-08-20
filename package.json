@@ -15,7 +15,9 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test test/*.test.ts"
+    "test": "node --import tsx --test test/*.test.ts",
+    "validate:packs": "node --import tsx scripts/validate-packs.ts",
+    "demo": "npm run build && npx http-server . -p 4179 -c-1"
   },
   "repository": {
     "type": "git",
