@@ -207,8 +207,8 @@ recorded in [docs/PROTOCOL-SOURCES.md](docs/PROTOCOL-SOURCES.md).
 - [`packs/us-openises-emd`](packs/us-openises-emd/pack.json) is the flagship **source-faithful**
   pack: the Open ISES Project's freely licensed (GFDL-1.2+) EMD guide cards — the All Callers
   Interrogation plus all 34 complaint cards, trilingual, with the source's own Code RED/YELLOW
-  response taxonomy, and the I1 (AED), I2 (Adult CPR) and I5 (Choking Adult) instruction cards as
-  interactive scripts. See its [SOURCE.md](packs/us-openises-emd/SOURCE.md) for attribution,
+  response taxonomy, and the I1 (AED), I2/I3/I4 (adult, child and infant CPR) and I5/I6/I7
+  (adult, child and infant choking) instruction cards as interactive scripts, routed by age. See its [SOURCE.md](packs/us-openises-emd/SOURCE.md) for attribution,
   digitization decisions, and which cards are still to come.
 - [`packs/us-nj-emd`](packs/us-nj-emd/pack.json) digitizes the **official State of New Jersey
   EMD Guidecards** (nj.gov/911, updated May 2026): All Caller Interrogation + Chest Pain,

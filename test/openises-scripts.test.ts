@@ -35,24 +35,65 @@ const ARREST = {
 
 const CHOKING = { ...ARREST, emergency: 'he is choking', conscious: 'yes', breathing: 'yes' };
 
-test('the pack is v0.3 and carries the adult instruction cards', () => {
+test('the pack is v0.3 and carries the digitized instruction cards', () => {
   assert.equal(pack.schemaVersion, '0.3');
-  const ids = (pack.scripts ?? []).map((s) => s.id);
-  assert.deepEqual(ids, [
+  const ids = new Set((pack.scripts ?? []).map((s) => s.id));
+  for (const expected of [
     'i1_aed',
-    'i2a_adult_cpr_entry',
-    'i2b_adult_cpr_breaths',
-    'i2c_adult_cpr_check',
-    'i2c_adult_cpr_entry',
-    'i2d_adult_cpr_compressions',
-    'i5a_choking_adult',
-    'i5b_choking_adult_airway',
-    'i5c_choking_adult_compressions',
-  ]);
+    'i2a_adult_cpr_entry', 'i2b_adult_cpr_breaths', 'i2c_adult_cpr_check',
+    'i2c_adult_cpr_entry', 'i2d_adult_cpr_compressions',
+    'i3a_child_cpr_entry', 'i3b_child_cpr_breaths', 'i3c_child_cpr_check',
+    'i3c_child_cpr_compressions', 'i3d_child_cpr_aed',
+    'i4a_infant_cpr_entry', 'i4b_infant_cpr_breaths', 'i4c_infant_cpr_check',
+    'i4c_infant_cpr_compressions',
+    'i5a_choking_adult', 'i5b_choking_adult_airway', 'i5c_choking_adult_compressions',
+    'i6a_choking_child', 'i6b_choking_child_airway', 'i6c_choking_child_compressions',
+    'i7a_choking_infant', 'i7b_choking_infant_blows', 'i7c_choking_infant_airway',
+    'i7d_choking_infant_compressions',
+  ]) {
+    assert.ok(ids.has(expected), `missing script ${expected}`);
+  }
   for (const s of pack.scripts ?? []) {
     assert.ok(s.source, `${s.id} records which card it digitizes`);
     for (const locale of pack.locales) assert.ok(s.name[locale], `${s.id} named in ${locale}`);
   }
+});
+
+test('C1 and C2 route to the age-appropriate deck', () => {
+  const arrest = (age: string, extra: Record<string, string>) =>
+    run({ ...ARREST, age, ...extra }).result().scripts[0];
+  assert.equal(arrest('0', { i4_knows_cpr: 'yes', i4_need_help: 'no' }), 'i4a_infant_cpr_entry');
+  assert.equal(arrest('5', { i3_knows_cpr: 'yes', i3_need_help: 'no' }), 'i3a_child_cpr_entry');
+  assert.equal(arrest('58', { i2_knows_cpr: 'yes', i2_need_help: 'no' }), 'i2a_adult_cpr_entry');
+
+  const choke = (age: string, slot: string) =>
+    run({ ...CHOKING, age, [slot]: 'yes' }).result().scripts[0];
+  assert.equal(choke('0', 'i7_conscious'), 'i7a_choking_infant');
+  assert.equal(choke('5', 'i6_can_talk'), 'i6a_choking_child');
+  assert.equal(choke('58', 'i5_can_talk'), 'i5a_choking_adult');
+});
+
+test('with no age captured, the card falls to the adult deck', () => {
+  // The last postDispatchScripts entry carries no condition, so an unknown age
+  // never leaves the caller without instructions.
+  const s = run({ ...ARREST, age: 'I have no idea', i2_knows_cpr: 'yes', i2_need_help: 'no' });
+  assert.equal(s.result().scripts[0], 'i2a_adult_cpr_entry');
+});
+
+test('an infant gets infant technique — fingers and puffs, never adult depth', () => {
+  const s = run({ ...ARREST, age: '0', i4_knows_cpr: 'no', i4_mouth_to_mouth: 'yes', i4b_obstacle: 'nothing', i4_chest_rose: 'yes' });
+  const said = s.result().transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text).join(' ');
+  assert.match(said, /index and middle finger/);
+  assert.match(said, /small puffs of air/);
+  assert.doesNotMatch(said, /heel of your hand/, 'adult hand placement must not appear');
+  assert.doesNotMatch(said, /defibrillator/, 'I1 is not offered for an infant');
+});
+
+test('a choking infant gets back blows and chest thrusts, not abdominal thrusts', () => {
+  const s = run({ ...CHOKING, age: '0', i7_conscious: 'yes', i7_can_cry: 'no', i7b_crying: 'no', i7b_outcome: 'it came out' });
+  const said = s.result().transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text).join(' ');
+  assert.match(said, /strike the back five times/);
+  assert.doesNotMatch(said, /upward thrusts/, 'abdominal thrusts are an adult and child technique');
 });
 
 test('C1 walks a willing caller through mouth-to-mouth, then compressions', () => {

@@ -29,13 +29,21 @@ branch on what the caller answers and hand off to one another. They needed schem
 | --- | --- |
 | I1 Automated External Defibrillator | digitized |
 | I2 Adult CPR (sections A–D) | digitized |
+| I3 Child CPR (sections A–D) | digitized |
+| I4 Infant CPR (sections A–C) | digitized |
 | I5 Choking Adult (sections A–C) | digitized |
+| I6 Choking Child (sections A–C) | digitized |
+| I7 Choking Infant (sections A–D) | digitized |
 | I11 Bleeding Control | digitized (as flat post-dispatch lines — the card has no branches) |
-| I3 Child CPR, I4 Infant CPR | not yet |
-| I6 Choking Child, I7 Choking Infant | not yet |
 | I8 Childbirth | not yet |
 | I9/I10 Medical & Traumatic Airway Control | not yet |
 | H1 Aircraft/Terrorism, H3 HazMat, H4 Helicopter | not yet |
+
+C1 (Cardiac/Respiratory Arrest) and C2 (Choking) route to the age-appropriate deck — under 1 to
+the infant cards, under 9 to the child cards, otherwise adult — as the source's own card titles
+direct. The last route carries no condition, so a caller who never gives an age still gets
+instructions. Age routing depends on a number being read out of the caller's answer, and
+"six months old" currently reads as 6, so an infant described that way takes the child deck.
 
 Each card *section* is digitized as its own script, because the source itself names sections as
 jump targets ("Jump to I5: Choking Adult Instructions, Section B"). I2 §C is split further, into
@@ -51,6 +59,9 @@ Two deliberate departures, both forced by the medium:
   asked question whose options are the card's own branch labels.
 - I1's step 1 age gate ("if the person is not at least one year of age, jump to I4") is enforced
   upstream instead, by the calling card's age routing.
+- I7 §B's "still conscious & choking, repeat sequence" is a loop on the printed card. It is
+  digitized as a terminal instruction to repeat the sequence and report back, because a script
+  that can re-enter itself is rejected at load.
 
 **Not digitized on purpose:** H1's list of Air Defense Sector telephone numbers. The source itself
 says "The numbers above should be verified before their use becomes necessary. These numbers can
