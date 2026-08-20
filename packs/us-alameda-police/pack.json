@@ -14,12 +14,19 @@
     "url": "https://www.alamedaca.gov/files/assets/public/v/1/departments/alameda/police/dispatch-training-manual-060820.pdf",
     "license": "city-published-permission-pending",
     "digitizedDate": "2026-08-20",
-    "notes": "First police call-taking pack. Grounded on the manual's emergency-line procedure ('911, what is the emergency?' -> What happened / When (in progress, just occurred, or cold) / Where (verify; house or apartment) / Who (suspects described top-down) / Weapons (kind; never assume)), its always-ask questions (suspect there now? weapon? vehicle - including the burglary-in-progress driveway-vehicle question), and its dispatch priorities quoted from the manual: PRIORITY 1 = immediate danger to life or property, all felonies in progress or just occurred (within 10 minutes); PRIORITY 2 = serious trouble may exist, no immediate emergency (examples: misdemeanor in progress, suspicious person 912P, disturbance 415, alarms); PRIORITY 3 = cold reports, no danger to life or property. Injury accidents (901A) are among the problem codes 'automatically a priority one' per the manual (its PRIORITY 2 example list also shows 901A; the automatic-P1 rule is the more specific statement and is used here), and fire/medical emergencies are screened and transferred within 30 seconds - modeled as an immediate-transfer protocol. Editorial: question phrasings are condensed from the manual's prose (it is a training manual, not a card set); the domestic-violence questions (physical or verbal? can you speak freely?) come from its DV section. Keep-caller-on-line, reassure-units-on-the-way, and caller-safety post-dispatch lines are from the manual's call-handling rules. License: City of Alameda government work published on the city site; written-permission request tracked in AccesSOS/infra (same posture as the NJ pack). SIMULATION ONLY - never for live call-taking. Digitized from pages 42-44 (call-taking), 55-59 (incident mask samples), and 176-178 (dispatch priorities) of the manual."
+    "notes": "First police call-taking pack. Grounded on the manual's emergency-line procedure ('911, what is the emergency?' -> What happened / When (in progress, just occurred, or cold) / Where (verify; house or apartment) / Who (suspects described top-down) / Weapons (kind; never assume)), its always-ask questions (suspect there now? weapon? vehicle - including the burglary-in-progress driveway-vehicle question), and its dispatch priorities quoted from the manual: PRIORITY 1 = immediate danger to life or property, all felonies in progress or just occurred (within 10 minutes); PRIORITY 2 = serious trouble may exist, no immediate emergency (examples: misdemeanor in progress, suspicious person 912P, disturbance 415, alarms); PRIORITY 3 = cold reports, no danger to life or property. Injury accidents (901A) are among the problem codes 'automatically a priority one' per the manual (its PRIORITY 2 example list also shows 901A; the automatic-P1 rule is the more specific statement and is used here), and fire/medical emergencies are screened and transferred within 30 seconds - modeled as an immediate-transfer protocol. Editorial: question phrasings are condensed from the manual's prose (it is a training manual, not a card set); the domestic-violence questions (physical or verbal? can you speak freely?) come from its DV section. Keep-caller-on-line, reassure-units-on-the-way, and caller-safety post-dispatch lines are from the manual's call-handling rules. License: City of Alameda government work published on the city site; written-permission request tracked in AccesSOS/infra (same posture as the NJ pack). SIMULATION ONLY - never for live call-taking. Digitized from pages 42-44 (call-taking), 55-59 (incident mask samples), and 176-178 (dispatch priorities) of the manual. Safety-first default: for felony calls (burglary, robbery) PRIORITY_3 requires an explicitly cold timeframe; an unparsed timeframe defaults to PRIORITY_1, consistent with the corpus convention that unknown always falls to the safer tier."
   },
-  "locales": ["en"],
+  "locales": [
+    "en"
+  ],
   "defaultLocale": "en",
   "caseEntry": [
-    { "id": "q_what", "slot": "what_happened", "stringId": "q_what", "selectsProtocol": true },
+    {
+      "id": "q_what",
+      "slot": "what_happened",
+      "stringId": "q_what",
+      "selectsProtocol": true
+    },
     {
       "id": "q_when",
       "slot": "timeframe",
@@ -27,16 +34,72 @@
       "expect": {
         "type": "choice",
         "options": [
-          { "id": "in_progress", "keywords": { "en": ["right now", "happening now", "in progress", "still here", "still there", "still going on", "as we speak"] } },
-          { "id": "just_occurred", "keywords": { "en": ["just", "minutes ago", "a minute ago", "just now", "just left", "just happened"] } },
-          { "id": "cold", "keywords": { "en": ["yesterday", "last night", "this morning", "hours ago", "earlier today", "last week", "cold"] } }
+          {
+            "id": "in_progress",
+            "keywords": {
+              "en": [
+                "right now",
+                "happening now",
+                "in progress",
+                "still here",
+                "still there",
+                "still going on",
+                "as we speak"
+              ]
+            }
+          },
+          {
+            "id": "just_occurred",
+            "keywords": {
+              "en": [
+                "just",
+                "minutes ago",
+                "a minute ago",
+                "just now",
+                "just left",
+                "just happened"
+              ]
+            }
+          },
+          {
+            "id": "cold",
+            "keywords": {
+              "en": [
+                "yesterday",
+                "last night",
+                "this morning",
+                "hours ago",
+                "earlier today",
+                "last week",
+                "cold"
+              ]
+            }
+          }
         ]
       }
     },
-    { "id": "q_where", "slot": "location", "stringId": "q_where", "confirmStringId": "confirm_where" },
-    { "id": "q_dwelling", "slot": "dwelling", "stringId": "q_dwelling" },
-    { "id": "q_caller_name", "slot": "caller_name", "stringId": "q_caller_name" },
-    { "id": "q_callback", "slot": "callback", "stringId": "q_callback", "confirmStringId": "confirm_callback" },
+    {
+      "id": "q_where",
+      "slot": "location",
+      "stringId": "q_where",
+      "confirmStringId": "confirm_where"
+    },
+    {
+      "id": "q_dwelling",
+      "slot": "dwelling",
+      "stringId": "q_dwelling"
+    },
+    {
+      "id": "q_caller_name",
+      "slot": "caller_name",
+      "stringId": "q_caller_name"
+    },
+    {
+      "id": "q_callback",
+      "slot": "callback",
+      "stringId": "q_callback",
+      "confirmStringId": "confirm_callback"
+    },
     {
       "id": "q_suspect_there",
       "slot": "suspect_there",
@@ -44,8 +107,32 @@
       "expect": {
         "type": "choice",
         "options": [
-          { "id": "no", "keywords": { "en": ["no", "not", "gone", "left", "ran off", "fled"] } },
-          { "id": "yes", "keywords": { "en": ["yes", "yeah", "still", "here", "there now", "inside"] } }
+          {
+            "id": "no",
+            "keywords": {
+              "en": [
+                "no",
+                "not",
+                "gone",
+                "left",
+                "ran off",
+                "fled"
+              ]
+            }
+          },
+          {
+            "id": "yes",
+            "keywords": {
+              "en": [
+                "yes",
+                "yeah",
+                "still",
+                "here",
+                "there now",
+                "inside"
+              ]
+            }
+          }
         ]
       }
     },
@@ -56,8 +143,33 @@
       "expect": {
         "type": "choice",
         "options": [
-          { "id": "no", "keywords": { "en": ["no", "not", "none", "unarmed"] } },
-          { "id": "yes", "keywords": { "en": ["yes", "yeah", "gun", "knife", "bat", "armed", "weapon", "pistol", "rifle"] } }
+          {
+            "id": "no",
+            "keywords": {
+              "en": [
+                "no",
+                "not",
+                "none",
+                "unarmed"
+              ]
+            }
+          },
+          {
+            "id": "yes",
+            "keywords": {
+              "en": [
+                "yes",
+                "yeah",
+                "gun",
+                "knife",
+                "bat",
+                "armed",
+                "weapon",
+                "pistol",
+                "rifle"
+              ]
+            }
+          }
         ]
       }
     }
@@ -65,131 +177,560 @@
   "protocols": [
     {
       "id": "burglary_459",
-      "name": { "en": "Burglary (459)" },
-      "keywords": { "en": ["break into", "breaking into", "breaking in", "broke into", "burglar", "burglary", "intruder", "prowler", "someone in my house", "someone in the house", "someone in my home"] },
-      "keyQuestions": [
-        { "id": "kq_burg_vehicle", "slot": "burg_vehicle", "stringId": "kq_burg_vehicle" },
-        { "id": "kq_burg_desc", "slot": "burg_desc", "stringId": "kq_suspect_desc" },
-        { "id": "kq_burg_caller_safe", "slot": "burg_caller_safe", "stringId": "kq_caller_safe" }
-      ],
-      "determinants": [
-        { "id": "burg_p1_in_progress", "when": [{ "slot": "timeframe", "option": "in_progress" }], "response": "PRIORITY_1" },
-        { "id": "burg_p1_just_occurred", "when": [{ "slot": "timeframe", "option": "just_occurred" }], "response": "PRIORITY_1" },
-        { "id": "burg_p1_weapons", "when": [{ "slot": "weapons", "option": "yes" }], "response": "PRIORITY_1" },
-        { "id": "burg_p3_cold", "response": "PRIORITY_3" }
-      ],
-      "postDispatch": ["pd_units_coming", "pd_stay_safe", "pd_updates"]
-    },
-    {
-      "id": "robbery_211",
-      "name": { "en": "Robbery (211)" },
-      "keywords": { "en": ["robbed", "robbery", "held up", "holdup", "mugged", "at gunpoint", "took my purse", "took my wallet"] },
-      "keyQuestions": [
-        { "id": "kq_rob_desc", "slot": "rob_desc", "stringId": "kq_suspect_desc" },
-        { "id": "kq_rob_weapon_kind", "slot": "rob_weapon_kind", "stringId": "kq_weapon_kind" },
-        { "id": "kq_rob_vehicle", "slot": "rob_vehicle", "stringId": "kq_vehicle" },
-        { "id": "kq_rob_direction", "slot": "rob_direction", "stringId": "kq_direction" }
-      ],
-      "determinants": [
-        { "id": "rob_p1_in_progress", "when": [{ "slot": "timeframe", "option": "in_progress" }], "response": "PRIORITY_1" },
-        { "id": "rob_p1_just_occurred", "when": [{ "slot": "timeframe", "option": "just_occurred" }], "response": "PRIORITY_1" },
-        { "id": "rob_p1_weapons", "when": [{ "slot": "weapons", "option": "yes" }], "response": "PRIORITY_1" },
-        { "id": "rob_p3_cold", "response": "PRIORITY_3" }
-      ],
-      "postDispatch": ["pd_units_coming", "pd_stay_safe", "pd_updates"]
-    },
-    {
-      "id": "domestic_violence",
-      "name": { "en": "Domestic Violence / Disturbance" },
-      "keywords": { "en": ["domestic", "my husband is hitting", "my wife is hitting", "boyfriend hit", "girlfriend hit", "hitting me", "beating", "fighting", "people fighting", "screaming at each other"] },
+      "name": {
+        "en": "Burglary (459)"
+      },
+      "keywords": {
+        "en": [
+          "break into",
+          "breaking into",
+          "breaking in",
+          "broke into",
+          "burglar",
+          "burglary",
+          "intruder",
+          "prowler",
+          "someone in my house",
+          "someone in the house",
+          "someone in my home"
+        ]
+      },
       "keyQuestions": [
         {
-          "id": "kq_dv_physical", "slot": "dv_physical", "stringId": "kq_dv_physical",
-          "expect": { "type": "choice", "options": [
-            { "id": "verbal", "keywords": { "en": ["verbal", "yelling", "screaming", "arguing", "shouting"] } },
-            { "id": "physical", "keywords": { "en": ["physical", "hitting", "hit", "punched", "beating", "pushed", "choked"] } }
-          ] }
+          "id": "kq_burg_vehicle",
+          "slot": "burg_vehicle",
+          "stringId": "kq_burg_vehicle"
         },
         {
-          "id": "kq_dv_speak_freely", "slot": "dv_speak_freely", "stringId": "kq_dv_speak_freely",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "en": ["no", "not", "can't", "cannot"] } },
-            { "id": "yes", "keywords": { "en": ["yes", "yeah", "i can"] } }
-          ] }
+          "id": "kq_burg_desc",
+          "slot": "burg_desc",
+          "stringId": "kq_suspect_desc"
         },
-        { "id": "kq_dv_desc", "slot": "dv_desc", "stringId": "kq_suspect_desc" }
-      ],
-      "determinants": [
-        { "id": "dv_p1_physical", "when": [{ "slot": "dv_physical", "option": "physical" }], "response": "PRIORITY_1" },
-        { "id": "dv_p1_weapons", "when": [{ "slot": "weapons", "option": "yes" }], "response": "PRIORITY_1" },
-        { "id": "dv_p2_disturbance", "response": "PRIORITY_2" }
-      ],
-      "postDispatch": ["pd_units_coming", "pd_dv_code", "pd_updates"]
-    },
-    {
-      "id": "suspicious_person_912p",
-      "name": { "en": "Suspicious Person (912P)" },
-      "keywords": { "en": ["suspicious person", "suspicious man", "suspicious woman", "lurking", "casing", "acting suspicious", "hanging around", "looking into cars", "looking in windows"] },
-      "keyQuestions": [
-        { "id": "kq_susp_desc", "slot": "susp_desc", "stringId": "kq_suspect_desc" },
-        { "id": "kq_susp_doing", "slot": "susp_doing", "stringId": "kq_susp_doing" },
-        { "id": "kq_susp_vehicle", "slot": "susp_vehicle", "stringId": "kq_vehicle" }
-      ],
-      "determinants": [
-        { "id": "susp_p1_weapons", "when": [{ "slot": "weapons", "option": "yes" }], "response": "PRIORITY_1" },
-        { "id": "susp_p2", "response": "PRIORITY_2" }
-      ],
-      "postDispatch": ["pd_units_coming", "pd_no_confront", "pd_updates"]
-    },
-    {
-      "id": "injury_accident_901a",
-      "name": { "en": "Injury Accident (901A)" },
-      "keywords": { "en": ["car accident", "car crash", "crashed", "collision", "hit by a car", "hit and run", "accident with injuries"] },
-      "keyQuestions": [
         {
-          "id": "kq_acc_injuries", "slot": "acc_injuries", "stringId": "kq_acc_injuries",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "en": ["no", "not", "nobody hurt", "no one hurt"] } },
-            { "id": "yes", "keywords": { "en": ["yes", "yeah", "hurt", "injured", "bleeding", "trapped"] } }
-          ] }
-        },
-        { "id": "kq_acc_vehicles", "slot": "acc_vehicles", "stringId": "kq_acc_vehicles" },
-        {
-          "id": "kq_acc_blocking", "slot": "acc_blocking", "stringId": "kq_acc_blocking",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "en": ["no", "not", "pulled off", "parking lot"] } },
-            { "id": "yes", "keywords": { "en": ["yes", "yeah", "blocking", "in the road", "in the intersection"] } }
-          ] }
+          "id": "kq_burg_caller_safe",
+          "slot": "burg_caller_safe",
+          "stringId": "kq_caller_safe"
         }
       ],
       "determinants": [
-        { "id": "acc_p1_injury", "when": [{ "slot": "acc_injuries", "option": "yes" }], "response": "PRIORITY_1" },
-        { "id": "acc_p3_non_injury", "response": "PRIORITY_3" }
+        {
+          "id": "burg_p1_in_progress",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "in_progress"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "burg_p1_just_occurred",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "just_occurred"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "burg_p1_weapons",
+          "when": [
+            {
+              "slot": "weapons",
+              "option": "yes"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "burg_p3_cold",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "cold"
+            }
+          ],
+          "response": "PRIORITY_3"
+        },
+        {
+          "id": "burg_p1_timeframe_unknown",
+          "response": "PRIORITY_1"
+        }
       ],
-      "postDispatch": ["pd_ems_transfer", "pd_units_coming", "pd_updates"]
+      "postDispatch": [
+        "pd_units_coming",
+        "pd_stay_safe",
+        "pd_updates"
+      ]
+    },
+    {
+      "id": "robbery_211",
+      "name": {
+        "en": "Robbery (211)"
+      },
+      "keywords": {
+        "en": [
+          "robbed",
+          "robbery",
+          "held up",
+          "holdup",
+          "mugged",
+          "at gunpoint",
+          "took my purse",
+          "took my wallet"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_rob_desc",
+          "slot": "rob_desc",
+          "stringId": "kq_suspect_desc"
+        },
+        {
+          "id": "kq_rob_weapon_kind",
+          "slot": "rob_weapon_kind",
+          "stringId": "kq_weapon_kind"
+        },
+        {
+          "id": "kq_rob_vehicle",
+          "slot": "rob_vehicle",
+          "stringId": "kq_vehicle"
+        },
+        {
+          "id": "kq_rob_direction",
+          "slot": "rob_direction",
+          "stringId": "kq_direction"
+        }
+      ],
+      "determinants": [
+        {
+          "id": "rob_p1_in_progress",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "in_progress"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "rob_p1_just_occurred",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "just_occurred"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "rob_p1_weapons",
+          "when": [
+            {
+              "slot": "weapons",
+              "option": "yes"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "rob_p3_cold",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "cold"
+            }
+          ],
+          "response": "PRIORITY_3"
+        },
+        {
+          "id": "rob_p1_timeframe_unknown",
+          "response": "PRIORITY_1"
+        }
+      ],
+      "postDispatch": [
+        "pd_units_coming",
+        "pd_stay_safe",
+        "pd_updates"
+      ]
+    },
+    {
+      "id": "domestic_violence",
+      "name": {
+        "en": "Domestic Violence / Disturbance"
+      },
+      "keywords": {
+        "en": [
+          "domestic",
+          "my husband is hitting",
+          "my wife is hitting",
+          "boyfriend hit",
+          "girlfriend hit",
+          "hitting me",
+          "beating",
+          "fighting",
+          "people fighting",
+          "screaming at each other"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_dv_physical",
+          "slot": "dv_physical",
+          "stringId": "kq_dv_physical",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "verbal",
+                "keywords": {
+                  "en": [
+                    "verbal",
+                    "yelling",
+                    "screaming",
+                    "arguing",
+                    "shouting"
+                  ]
+                }
+              },
+              {
+                "id": "physical",
+                "keywords": {
+                  "en": [
+                    "physical",
+                    "hitting",
+                    "hit",
+                    "punched",
+                    "beating",
+                    "pushed",
+                    "choked"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_dv_speak_freely",
+          "slot": "dv_speak_freely",
+          "stringId": "kq_dv_speak_freely",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "can't",
+                    "cannot"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "i can"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_dv_desc",
+          "slot": "dv_desc",
+          "stringId": "kq_suspect_desc"
+        }
+      ],
+      "determinants": [
+        {
+          "id": "dv_p1_physical",
+          "when": [
+            {
+              "slot": "dv_physical",
+              "option": "physical"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "dv_p1_weapons",
+          "when": [
+            {
+              "slot": "weapons",
+              "option": "yes"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "dv_p2_disturbance",
+          "response": "PRIORITY_2"
+        }
+      ],
+      "postDispatch": [
+        "pd_units_coming",
+        "pd_dv_code",
+        "pd_updates"
+      ]
+    },
+    {
+      "id": "suspicious_person_912p",
+      "name": {
+        "en": "Suspicious Person (912P)"
+      },
+      "keywords": {
+        "en": [
+          "suspicious person",
+          "suspicious man",
+          "suspicious woman",
+          "lurking",
+          "casing",
+          "acting suspicious",
+          "hanging around",
+          "looking into cars",
+          "looking in windows"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_susp_desc",
+          "slot": "susp_desc",
+          "stringId": "kq_suspect_desc"
+        },
+        {
+          "id": "kq_susp_doing",
+          "slot": "susp_doing",
+          "stringId": "kq_susp_doing"
+        },
+        {
+          "id": "kq_susp_vehicle",
+          "slot": "susp_vehicle",
+          "stringId": "kq_vehicle"
+        }
+      ],
+      "determinants": [
+        {
+          "id": "susp_p1_weapons",
+          "when": [
+            {
+              "slot": "weapons",
+              "option": "yes"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "susp_p2",
+          "response": "PRIORITY_2"
+        }
+      ],
+      "postDispatch": [
+        "pd_units_coming",
+        "pd_no_confront",
+        "pd_updates"
+      ]
+    },
+    {
+      "id": "injury_accident_901a",
+      "name": {
+        "en": "Injury Accident (901A)"
+      },
+      "keywords": {
+        "en": [
+          "car accident",
+          "car crash",
+          "crashed",
+          "collision",
+          "hit by a car",
+          "hit and run",
+          "accident with injuries"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_acc_injuries",
+          "slot": "acc_injuries",
+          "stringId": "kq_acc_injuries",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "nobody hurt",
+                    "no one hurt"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "hurt",
+                    "injured",
+                    "bleeding",
+                    "trapped"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_acc_vehicles",
+          "slot": "acc_vehicles",
+          "stringId": "kq_acc_vehicles"
+        },
+        {
+          "id": "kq_acc_blocking",
+          "slot": "acc_blocking",
+          "stringId": "kq_acc_blocking",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "pulled off",
+                    "parking lot"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "blocking",
+                    "in the road",
+                    "in the intersection"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "acc_p1_injury",
+          "when": [
+            {
+              "slot": "acc_injuries",
+              "option": "yes"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "acc_p3_non_injury",
+          "response": "PRIORITY_3"
+        }
+      ],
+      "postDispatch": [
+        "pd_ems_transfer",
+        "pd_units_coming",
+        "pd_updates"
+      ]
     },
     {
       "id": "fire_medical_transfer",
-      "name": { "en": "Fire/Medical — screen and transfer" },
-      "keywords": { "en": ["fire", "smoke", "not breathing", "heart attack", "unconscious", "bleeding badly", "ambulance", "medical emergency", "overdose"] },
+      "name": {
+        "en": "Fire/Medical — screen and transfer"
+      },
+      "keywords": {
+        "en": [
+          "fire",
+          "smoke",
+          "not breathing",
+          "heart attack",
+          "unconscious",
+          "bleeding badly",
+          "ambulance",
+          "medical emergency",
+          "overdose"
+        ]
+      },
       "keyQuestions": [],
-      "determinants": [{ "id": "transfer_fire_ems", "response": "TRANSFER_FIRE_EMS" }],
-      "postDispatch": ["pd_ems_transfer"]
+      "determinants": [
+        {
+          "id": "transfer_fire_ems",
+          "response": "TRANSFER_FIRE_EMS"
+        }
+      ],
+      "postDispatch": [
+        "pd_ems_transfer"
+      ]
     },
     {
       "id": "unknown_police",
-      "name": { "en": "Unknown / Other Police" },
-      "keywords": { "en": ["something strange", "not sure what"] },
+      "name": {
+        "en": "Unknown / Other Police"
+      },
+      "keywords": {
+        "en": [
+          "something strange",
+          "not sure what"
+        ]
+      },
       "keyQuestions": [
-        { "id": "kq_unk_details", "slot": "unk_details", "stringId": "kq_unk_details" },
-        { "id": "kq_unk_desc", "slot": "unk_desc", "stringId": "kq_suspect_desc" }
+        {
+          "id": "kq_unk_details",
+          "slot": "unk_details",
+          "stringId": "kq_unk_details"
+        },
+        {
+          "id": "kq_unk_desc",
+          "slot": "unk_desc",
+          "stringId": "kq_suspect_desc"
+        }
       ],
       "determinants": [
-        { "id": "unk_p1_weapons", "when": [{ "slot": "weapons", "option": "yes" }], "response": "PRIORITY_1" },
-        { "id": "unk_p2_in_progress", "when": [{ "slot": "timeframe", "option": "in_progress" }], "response": "PRIORITY_2" },
-        { "id": "unk_p3", "response": "PRIORITY_3" }
+        {
+          "id": "unk_p1_weapons",
+          "when": [
+            {
+              "slot": "weapons",
+              "option": "yes"
+            }
+          ],
+          "response": "PRIORITY_1"
+        },
+        {
+          "id": "unk_p2_in_progress",
+          "when": [
+            {
+              "slot": "timeframe",
+              "option": "in_progress"
+            }
+          ],
+          "response": "PRIORITY_2"
+        },
+        {
+          "id": "unk_p3",
+          "response": "PRIORITY_3"
+        }
       ],
-      "postDispatch": ["pd_units_coming", "pd_updates"]
+      "postDispatch": [
+        "pd_units_coming",
+        "pd_updates"
+      ]
     }
   ],
   "fallbackProtocol": "unknown_police",
