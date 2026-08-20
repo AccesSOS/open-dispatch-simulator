@@ -16,7 +16,7 @@
     "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
     "license": "GFDL-1.2-or-later",
     "digitizedDate": "2026-08-20",
-    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized. 2026-08-20 (5): added cards M1 (Abdominal Pain), M2 (Allergies/Stings), M15 (Sick Person), T2 (Assault/DV/Sexual Assault), T3 (Bleeding/Laceration), T6 (Falls), C3 (Drowning), C5 (Pregnancy/Childbirth). T3's post-dispatch reads the I11 Bleeding Control script (direct pressure, don't remove soaked cloth). T6 uses a numeric condition for the card's 'falls greater than 10 feet' RED. T2's stabbing/shooting answer jumps to T8 per the card; M1/M15 chest pain jumps to M5. Structural proxies noted: M1's 'lower abdominal pain in female 12-50' is approximated by the could-be-pregnant answer; M2's 'multiple areas' criterion by symptoms-getting-worse; T2/T3 'uncontrolled bleeding' by any-bleeding (safer tier). C5 imminent-delivery RED triggers on urge-to-push or visible head; its I8 Childbirth script is not yet digitized. 2026-08-20 (6): final card batch — M3 (Back Pain), M7 (Headache), M8 (HCP Requests EMS), M9 (Home Medical Equipment: the card's ventilator->C1, apnea-monitor->M4, implanted-defibrillator->M5 jumps are modeled), M10 (Obvious Death: caller-unsure jumps to C1 per the card; note the All-Caller breathing=no branch may route such calls to C1 before M10's question — mirroring the chart's precedence of resuscitation over confirmation), M12 (Person Assistance), T1 (Animal Bites), T5 (Eye Problems/Injuries: chemical answer jumps to T4 per the card; the card grades ANY eye injury CODE YELLOW), T7 (Heat/Cold Exposure), T9 (Traumatic Injury), H5 (Industrial Accident; the trapped question is editorial, drawn from the card's own CODE RED criterion). NOT digitized, by design: H1 (Aircraft/Terrorism — air-defense notification procedure, includes dated sector phone numbers), H3 (HazMat guidelines) and H4 (Helicopter landing zones) — dispatcher/responder procedure cards with no caller interrogation; and scripted cards I1, I3-I8. Anatomy-based criteria (injury above the knee, 20% body surface) remain free-text and land on the safer applicable tier. Instruction cards I1 (AED), I2 (Adult CPR, sections A–D) and I5 (Choking Adult, sections A–C) are digitized as v0.3 instruction scripts, one script per card section, because the source itself names sections as jump targets (\"Jump to I5: Choking Adult Instructions, Section B\"). Section C of I2 is split into two scripts — the \"Did the chest rise?\" gate and the \"Compression Only / Choking Adult Entry Point\" below it — because the card gives that lower half its own entry points; keeping them one script would have made the I2↔I5 hand-offs a cycle rather than the one-way flow the card actually describes. The printed cards react to things a caller volunteers (patient vomited, stoma, hysterical caller); a turn-based engine cannot receive an unprompted report, so those become one asked question whose options are the card’s own branch labels. I1’s step 1 age gate (\"if not at least one year of age, jump to I4\") is enforced upstream instead, by the card’s postDispatchScripts age routing. The paediatric instruction cards I3 (Child CPR), I4 (Infant CPR), I6 (Choking Child) and I7 (Choking Infant) follow the same section-per-script treatment, and C1/C2 route to the age-appropriate deck (under 1 → infant, under 9 → child, otherwise adult) as the source’s own card titles direct. Age routing depends on a number being captured from the caller’s answer: \"six months old\" currently reads as 6, so an infant described that way takes the child deck. I7 §B’s \"still conscious & choking, repeat sequence\" is a loop on the printed card; it is digitized as a terminal instruction to repeat the sequence and report back, because a script that can re-enter itself is rejected at load."
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized. 2026-08-20 (5): added cards M1 (Abdominal Pain), M2 (Allergies/Stings), M15 (Sick Person), T2 (Assault/DV/Sexual Assault), T3 (Bleeding/Laceration), T6 (Falls), C3 (Drowning), C5 (Pregnancy/Childbirth). T3's post-dispatch reads the I11 Bleeding Control script (direct pressure, don't remove soaked cloth). T6 uses a numeric condition for the card's 'falls greater than 10 feet' RED. T2's stabbing/shooting answer jumps to T8 per the card; M1/M15 chest pain jumps to M5. Structural proxies noted: M1's 'lower abdominal pain in female 12-50' is approximated by the could-be-pregnant answer; M2's 'multiple areas' criterion by symptoms-getting-worse; T2/T3 'uncontrolled bleeding' by any-bleeding (safer tier). C5 imminent-delivery RED triggers on urge-to-push or visible head; its I8 Childbirth script is not yet digitized. 2026-08-20 (6): final card batch — M3 (Back Pain), M7 (Headache), M8 (HCP Requests EMS), M9 (Home Medical Equipment: the card's ventilator->C1, apnea-monitor->M4, implanted-defibrillator->M5 jumps are modeled), M10 (Obvious Death: caller-unsure jumps to C1 per the card; note the All-Caller breathing=no branch may route such calls to C1 before M10's question — mirroring the chart's precedence of resuscitation over confirmation), M12 (Person Assistance), T1 (Animal Bites), T5 (Eye Problems/Injuries: chemical answer jumps to T4 per the card; the card grades ANY eye injury CODE YELLOW), T7 (Heat/Cold Exposure), T9 (Traumatic Injury), H5 (Industrial Accident; the trapped question is editorial, drawn from the card's own CODE RED criterion). NOT digitized, by design: H1 (Aircraft/Terrorism — air-defense notification procedure, includes dated sector phone numbers), H3 (HazMat guidelines) and H4 (Helicopter landing zones) — dispatcher/responder procedure cards with no caller interrogation; and scripted cards I1, I3-I8. Anatomy-based criteria (injury above the knee, 20% body surface) remain free-text and land on the safer applicable tier. Instruction cards I1 (AED), I2 (Adult CPR, sections A–D) and I5 (Choking Adult, sections A–C) are digitized as v0.3 instruction scripts, one script per card section, because the source itself names sections as jump targets (\"Jump to I5: Choking Adult Instructions, Section B\"). Section C of I2 is split into two scripts — the \"Did the chest rise?\" gate and the \"Compression Only / Choking Adult Entry Point\" below it — because the card gives that lower half its own entry points; keeping them one script would have made the I2↔I5 hand-offs a cycle rather than the one-way flow the card actually describes. The printed cards react to things a caller volunteers (patient vomited, stoma, hysterical caller); a turn-based engine cannot receive an unprompted report, so those become one asked question whose options are the card’s own branch labels. I1’s step 1 age gate (\"if not at least one year of age, jump to I4\") is enforced upstream instead, by the card’s postDispatchScripts age routing. The paediatric instruction cards I3 (Child CPR), I4 (Infant CPR), I6 (Choking Child) and I7 (Choking Infant) follow the same section-per-script treatment, and C1/C2 route to the age-appropriate deck (under 1 → infant, under 9 → child, otherwise adult) as the source’s own card titles direct. Age routing depends on a number being captured from the caller’s answer: \"six months old\" currently reads as 6, so an infant described that way takes the child deck. I7 §B’s \"still conscious & choking, repeat sequence\" is a loop on the printed card; it is digitized as a terminal instruction to repeat the sequence and report back, because a script that can re-enter itself is rejected at load. I8 (Childbirth) reuses C5’s own key questions for the imminence branch the card draws — a strong urge to push, or the head visible — rather than asking again. Its \"baby delivered and not breathing\" arrow points at the I7 card, and is digitized that way even though a newborn is not choking on an object: the arrow is the card’s."
   },
   "locales": [
     "en",
@@ -10312,12 +10312,16 @@
       ],
       "postDispatch": [
         "pd_c5_no_toilet",
-        "pd_c5_left_side",
-        "pd_c3_warm",
         "pd_c5_no_flush",
+        "pd_c3_warm",
         "pd_gather_meds",
         "pd_lock_pets",
-        "pd_c1_callback"
+        "pd_callback_changes"
+      ],
+      "postDispatchScripts": [
+        {
+          "script": "i8a_childbirth_entry"
+        }
       ]
     },
     {
@@ -14065,7 +14069,22 @@
       "i7_crying": "Is the baby crying or breathing?",
       "i7c_repeat": "Reposition the head and repeat the sequence one more time, then we'll move on.",
       "i7d_look": "Tilt the head slightly back by lifting the chin. Look into the baby's mouth — if you see anything, try to sweep it out with your little finger. Do not push the object backwards.",
-      "i7d_cycle": "Give two more small puffs of air slowly, then rapidly pump the chest 30 times. Keep doing it, and each time you look in the mouth, sweep out anything you can see without pushing it backwards."
+      "i7d_cycle": "Give two more small puffs of air slowly, then rapidly pump the chest 30 times. Keep doing it, and each time you look in the mouth, sweep out anything you can see without pushing it backwards.",
+      "i8_comfortable": "Have her lie in a comfortable position — on her left side is best — and have her take deep breaths.",
+      "i8_resist_push": "Ask her to resist the urge to push or bear down. If a strong urge to push develops, tell me right away — delivery may be close.",
+      "i8_monitor": "Keep watching her, and stay on the line with me until help arrives.",
+      "i8_get_phone": "Get the phone next to her if you can.",
+      "i8_position": "Ask her to lie on her back and relax, breathing deeply through her mouth, and to remove her underwear.",
+      "i8_towels": "Place clean towels under her buttocks and have more towels ready.",
+      "i8b_signs": "If she starts to deliver — her water breaks, there is bloody discharge, or the baby's head appears — tell me right away.",
+      "i8b_cradle": "The baby's head should appear first. Cradle it, and the rest of the baby as it is delivered. Do not push or pull on the baby. There will be water and blood with the delivery — that is normal.",
+      "i8b_status": "Tell me what you are seeing — is the baby delivered, or is something other than the head coming first?",
+      "i8b_complications": "Reassure her — tell her help has been dispatched. Ask her to stay on her back with her knees bent, to relax and breathe through her mouth, and not to push. I'll stay on the line with you.",
+      "i8b_clean": "Clean out the baby's mouth and nose with a clean, dry cloth. Do not try to cut or pull the cord.",
+      "i8b_breathing": "Is the baby breathing?",
+      "i8b_stimulate": "Rub the baby's back, or gently slap the soles of its feet. If the baby doesn't start breathing right away, come back to the phone.",
+      "i8b_wrap": "Wrap the baby in a dry blanket or towel — whatever is handy — and place it between the mother's legs on the floor. Massage the mother's lower abdomen very gently.",
+      "i8b_placenta": "When the placenta is delivered — the tissue on the other side of the cord — wrap it and keep it level with or slightly above the baby. That can take as long as twenty minutes after the baby. Stay on the line with me."
     },
     "es": {
       "greeting": "Nueve-uno-uno.",
@@ -14400,7 +14419,22 @@
       "i7_crying": "¿El bebé llora o respira?",
       "i7c_repeat": "Reacomode la cabeza y repita la secuencia una vez más; luego seguimos.",
       "i7d_look": "Incline la cabeza un poco hacia atrás levantando el mentón. Mire dentro de la boca del bebé; si ve algo, trate de sacarlo con el dedo meñique. No empuje el objeto hacia adentro.",
-      "i7d_cycle": "Dé dos soplos pequeños más, despacio, y luego bombee el pecho 30 veces rápido. Siga así, y cada vez que mire en la boca saque lo que pueda ver sin empujarlo hacia adentro."
+      "i7d_cycle": "Dé dos soplos pequeños más, despacio, y luego bombee el pecho 30 veces rápido. Siga así, y cada vez que mire en la boca saque lo que pueda ver sin empujarlo hacia adentro.",
+      "i8_comfortable": "Que se acueste en una posición cómoda; de lado izquierdo es lo mejor, y que respire profundo.",
+      "i8_resist_push": "Pídale que resista las ganas de pujar. Si le dan muchas ganas de pujar, dígamelo de inmediato: el parto puede estar cerca.",
+      "i8_monitor": "Siga vigilándola y quédese en la línea conmigo hasta que llegue la ayuda.",
+      "i8_get_phone": "Lleve el teléfono junto a ella si puede.",
+      "i8_position": "Pídale que se acueste boca arriba y se relaje, respirando profundo por la boca, y que se quite la ropa interior.",
+      "i8_towels": "Ponga toallas limpias debajo de sus glúteos y tenga más toallas listas.",
+      "i8b_signs": "Si empieza el parto —se le rompe la fuente, hay flujo con sangre, o aparece la cabeza del bebé—, dígamelo de inmediato.",
+      "i8b_cradle": "La cabeza del bebé debe salir primero. Sosténgala, y luego el resto del bebé conforme salga. No empuje ni jale al bebé. Habrá líquido y sangre en el parto; eso es normal.",
+      "i8b_status": "Dígame qué está viendo: ¿ya nació el bebé, o está saliendo primero algo que no es la cabeza?",
+      "i8b_complications": "Tranquilícela: dígale que ya se envió la ayuda. Pídale que se quede boca arriba con las rodillas dobladas, que se relaje y respire por la boca, y que no puje. Me quedo en la línea con usted.",
+      "i8b_clean": "Limpie la boca y la nariz del bebé con un paño limpio y seco. No intente cortar ni jalar el cordón.",
+      "i8b_breathing": "¿El bebé está respirando?",
+      "i8b_stimulate": "Frote la espalda del bebé o dele palmaditas suaves en las plantas de los pies. Si el bebé no empieza a respirar enseguida, vuelva al teléfono.",
+      "i8b_wrap": "Envuelva al bebé en una cobija o toalla seca, lo que tenga a la mano, y colóquelo entre las piernas de la madre, en el piso. Masajee muy suavemente el bajo vientre de la madre.",
+      "i8b_placenta": "Cuando salga la placenta —el tejido del otro lado del cordón—, envuélvala y manténgala al nivel del bebé o un poco más arriba. Puede tardar hasta veinte minutos después del bebé. Quédese en la línea conmigo."
     },
     "fr": {
       "greeting": "Neuf-un-un.",
@@ -14735,7 +14769,22 @@
       "i7_crying": "Le bébé pleure-t-il ou respire-t-il ?",
       "i7c_repeat": "Repositionnez la tête et répétez la séquence encore une fois, puis nous poursuivrons.",
       "i7d_look": "Basculez légèrement la tête en arrière en soulevant le menton. Regardez dans la bouche du bébé — si vous voyez quelque chose, essayez de le retirer avec votre petit doigt. Ne repoussez pas l'objet vers l'intérieur.",
-      "i7d_cycle": "Donnez deux petites insufflations lentes de plus, puis pompez rapidement la poitrine 30 fois. Continuez ainsi, et chaque fois que vous regardez dans la bouche, retirez ce que vous voyez sans le repousser."
+      "i7d_cycle": "Donnez deux petites insufflations lentes de plus, puis pompez rapidement la poitrine 30 fois. Continuez ainsi, et chaque fois que vous regardez dans la bouche, retirez ce que vous voyez sans le repousser.",
+      "i8_comfortable": "Faites-la s'allonger dans une position confortable — sur le côté gauche de préférence — et faites-lui prendre de grandes respirations.",
+      "i8_resist_push": "Demandez-lui de résister à l'envie de pousser. Si une forte envie de pousser apparaît, dites-le-moi tout de suite — l'accouchement peut être proche.",
+      "i8_monitor": "Continuez à la surveiller et restez en ligne avec moi jusqu'à l'arrivée des secours.",
+      "i8_get_phone": "Approchez le téléphone d'elle si vous le pouvez.",
+      "i8_position": "Demandez-lui de s'allonger sur le dos et de se détendre en respirant profondément par la bouche, et d'enlever ses sous-vêtements.",
+      "i8_towels": "Placez des serviettes propres sous ses fesses et préparez-en d'autres.",
+      "i8b_signs": "Si l'accouchement commence — perte des eaux, écoulement sanglant, ou apparition de la tête du bébé — dites-le-moi tout de suite.",
+      "i8b_cradle": "La tête du bébé doit apparaître en premier. Soutenez-la, puis le reste du bébé à mesure qu'il sort. Ne poussez ni ne tirez sur le bébé. Il y aura du liquide et du sang — c'est normal.",
+      "i8b_status": "Dites-moi ce que vous voyez — le bébé est-il né, ou est-ce autre chose que la tête qui sort en premier ?",
+      "i8b_complications": "Rassurez-la — dites-lui que les secours sont en route. Demandez-lui de rester sur le dos, genoux pliés, de se détendre et de respirer par la bouche, et de ne pas pousser. Je reste en ligne avec vous.",
+      "i8b_clean": "Nettoyez la bouche et le nez du bébé avec un linge propre et sec. N'essayez pas de couper ni de tirer sur le cordon.",
+      "i8b_breathing": "Le bébé respire-t-il ?",
+      "i8b_stimulate": "Frottez le dos du bébé, ou tapotez doucement la plante de ses pieds. Si le bébé ne se met pas à respirer tout de suite, revenez au téléphone.",
+      "i8b_wrap": "Enveloppez le bébé dans une couverture ou une serviette sèche — ce que vous avez sous la main — et placez-le entre les jambes de la mère, au sol. Massez très doucement le bas-ventre de la mère.",
+      "i8b_placenta": "Quand le placenta sort — le tissu de l'autre côté du cordon — enveloppez-le et gardez-le au niveau du bébé ou légèrement au-dessus. Cela peut prendre jusqu'à vingt minutes après le bébé. Restez en ligne avec moi."
     }
   },
   "scripts": [
@@ -18346,6 +18395,272 @@
           "id": "keep_going",
           "kind": "stay",
           "stringId": "i4c_keep_going"
+        }
+      ]
+    },
+    {
+      "id": "i8a_childbirth_entry",
+      "name": {
+        "en": "I8: Childbirth Instructions — Section A",
+        "es": "I8: Instrucciones de parto — Sección A",
+        "fr": "I8 : Instructions d’accouchement — Section A"
+      },
+      "source": "I8: Childbirth – Section A",
+      "steps": [
+        {
+          "id": "listen",
+          "kind": "say",
+          "stringId": "pd_cpr_listen",
+          "next": [
+            {
+              "when": [
+                {
+                  "slot": "c5_push",
+                  "option": "yes"
+                }
+              ],
+              "goto": "get_phone"
+            },
+            {
+              "when": [
+                {
+                  "slot": "c5_head",
+                  "option": "yes"
+                }
+              ],
+              "goto": "get_phone"
+            },
+            {
+              "goto": "comfortable"
+            }
+          ]
+        },
+        {
+          "id": "comfortable",
+          "kind": "say",
+          "stringId": "i8_comfortable"
+        },
+        {
+          "id": "resist_push",
+          "kind": "say",
+          "stringId": "i8_resist_push"
+        },
+        {
+          "id": "monitor",
+          "kind": "stay",
+          "stringId": "i8_monitor"
+        },
+        {
+          "id": "get_phone",
+          "kind": "say",
+          "stringId": "i8_get_phone"
+        },
+        {
+          "id": "position",
+          "kind": "say",
+          "stringId": "i8_position"
+        },
+        {
+          "id": "towels",
+          "kind": "say",
+          "stringId": "i8_towels",
+          "next": [
+            {
+              "gotoScript": "i8b_childbirth_delivery"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i8b_childbirth_delivery",
+      "name": {
+        "en": "I8: Childbirth Instructions — Section B",
+        "es": "I8: Instrucciones de parto — Sección B",
+        "fr": "I8 : Instructions d’accouchement — Section B"
+      },
+      "source": "I8: Childbirth – Section B",
+      "steps": [
+        {
+          "id": "signs",
+          "kind": "say",
+          "stringId": "i8b_signs"
+        },
+        {
+          "id": "cradle",
+          "kind": "say",
+          "stringId": "i8b_cradle"
+        },
+        {
+          "id": "status",
+          "kind": "ask",
+          "slot": "i8b_status",
+          "stringId": "i8b_status",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "complications",
+                "keywords": {
+                  "en": [
+                    "leg",
+                    "arm",
+                    "foot",
+                    "buttocks",
+                    "bottom first",
+                    "cord",
+                    "breech",
+                    "not the head"
+                  ],
+                  "es": [
+                    "pierna",
+                    "brazo",
+                    "pie",
+                    "nalgas",
+                    "cordón",
+                    "cordon",
+                    "de nalgas",
+                    "no es la cabeza"
+                  ],
+                  "fr": [
+                    "jambe",
+                    "bras",
+                    "pied",
+                    "fesses",
+                    "cordon",
+                    "siège",
+                    "siege",
+                    "pas la tête"
+                  ]
+                }
+              },
+              {
+                "id": "delivered",
+                "keywords": {
+                  "en": [
+                    "delivered",
+                    "the baby is out",
+                    "baby is here",
+                    "born",
+                    "head first"
+                  ],
+                  "es": [
+                    "ya nació",
+                    "ya nacio",
+                    "ya salió",
+                    "ya salio",
+                    "el bebé está aquí",
+                    "de cabeza"
+                  ],
+                  "fr": [
+                    "né",
+                    "nee",
+                    "le bébé est sorti",
+                    "il est né",
+                    "la tête d’abord"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "complications",
+              "goto": "complications"
+            },
+            {
+              "goto": "clean"
+            }
+          ]
+        },
+        {
+          "id": "complications",
+          "kind": "stay",
+          "stringId": "i8b_complications"
+        },
+        {
+          "id": "clean",
+          "kind": "say",
+          "stringId": "i8b_clean"
+        },
+        {
+          "id": "breathing",
+          "kind": "ask",
+          "slot": "i8b_breathing",
+          "stringId": "i8b_breathing",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "breathing",
+                    "crying"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "respira",
+                    "llora"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "respire",
+                    "pleure"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "stimulate"
+            },
+            {
+              "goto": "wrap"
+            }
+          ]
+        },
+        {
+          "id": "stimulate",
+          "kind": "say",
+          "stringId": "i8b_stimulate",
+          "next": [
+            {
+              "gotoScript": "i7a_choking_infant"
+            }
+          ]
+        },
+        {
+          "id": "wrap",
+          "kind": "say",
+          "stringId": "i8b_wrap"
+        },
+        {
+          "id": "placenta",
+          "kind": "stay",
+          "stringId": "i8b_placenta"
         }
       ]
     }

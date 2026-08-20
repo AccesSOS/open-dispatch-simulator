@@ -34,8 +34,8 @@ branch on what the caller answers and hand off to one another. They needed schem
 | I5 Choking Adult (sections A–C) | digitized |
 | I6 Choking Child (sections A–C) | digitized |
 | I7 Choking Infant (sections A–D) | digitized |
+| I8 Childbirth (sections A–B) | digitized |
 | I11 Bleeding Control | digitized (as flat post-dispatch lines — the card has no branches) |
-| I8 Childbirth | not yet |
 | I9/I10 Medical & Traumatic Airway Control | not yet |
 | H1 Aircraft/Terrorism, H3 HazMat, H4 Helicopter | not yet |
 
@@ -62,6 +62,10 @@ Two deliberate departures, both forced by the medium:
 - I7 §B's "still conscious & choking, repeat sequence" is a loop on the printed card. It is
   digitized as a terminal instruction to repeat the sequence and report back, because a script
   that can re-enter itself is rejected at load.
+- I8 reuses C5's own key questions for the imminence branch the card draws — a strong urge to
+  push, or the head visible — rather than asking again. Its "baby delivered and not breathing"
+  arrow points at the I7 card, and is digitized that way even though a newborn is not choking on
+  an object: the arrow is the card's.
 
 **Not digitized on purpose:** H1's list of Air Defense Sector telephone numbers. The source itself
 says "The numbers above should be verified before their use becomes necessary. These numbers can

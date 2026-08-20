@@ -178,10 +178,14 @@ test('text checks name what is missing, and pick up v0.3 instruction scripts', (
   assert.ok(cpr.evidence.some((e) => e.includes('pd_cpr_push')));
   assert.ok(cpr.evidence.some((e) => /aed|defibrillat/i.test(e)));
 
-  // …and a genuine gap still reads as one, naming the pattern that found nothing.
+  // Childbirth arrived with the I8 script, and the report picked it up from there.
   const childbirth = req(maine, openises, 'ME-II-2-A-23e');
-  assert.equal(childbirth.status, 'unmet');
-  assert.match(childbirth.detail!, /childbirth/);
+  assert.equal(childbirth.status, 'met');
+
+  // …and a genuine gap still reads as one, naming the pattern that found nothing.
+  const keyholder = req(maine, openises, 'ME-II-2-A-24c');
+  assert.equal(keyholder.status, 'unmet');
+  assert.match(keyholder.detail!, /unlock/);
 });
 
 test('a rubric may cite another rubric’s taxonomy', () => {

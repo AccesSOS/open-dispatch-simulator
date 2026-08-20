@@ -202,6 +202,64 @@ test('the instruction cards speak Spanish and French, not English fallbacks', ()
   }
 });
 
+const LABOR = {
+  location: '12 Pine St',
+  callback: '555-0100',
+  emergency: 'she is having a baby',
+  num_hurt: 'one',
+  age: '28',
+  conscious: 'yes',
+  breathing: 'yes',
+  sex: 'female',
+  caller_name: 'Ana',
+  c5_alert: 'yes',
+  c5_breathing_normal: 'yes',
+};
+
+test('C5: labour that is not imminent is coached to wait, not to deliver', () => {
+  const s = run({ ...LABOR, c5_push: 'no', c5_head: 'no' });
+  assert.deepEqual(s.result().scripts, ['i8a_childbirth_entry']);
+  const said = s.result().transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text).join(' ');
+  assert.match(said, /resist the urge to push/);
+  assert.doesNotMatch(said, /placenta/, 'delivery instructions are not read yet');
+});
+
+test('C5: I8 branches on what the card already asked, without asking again', () => {
+  const s = run({ ...LABOR, c5_push: 'yes', i8b_status: 'the baby is out', i8b_breathing: 'yes' });
+  assert.deepEqual(s.result().scripts, ['i8a_childbirth_entry', 'i8b_childbirth_delivery']);
+  const said = s.result().transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text);
+  assert.equal(
+    said.filter((t) => /Is there a strong urge to push/.test(t)).length,
+    1,
+    'asked once as a C5 key question; the script reads the answer rather than asking again',
+  );
+  assert.match(said.join(' '), /placenta/);
+});
+
+test('C5: a presentation other than the head gets the complications script', () => {
+  const s = run({ ...LABOR, c5_head: 'yes', i8b_status: 'I see a foot' });
+  const said = s.result().transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text).join(' ');
+  assert.match(said, /knees bent/);
+  assert.doesNotMatch(said, /Wrap the baby/);
+});
+
+test('C5: a newborn that is not breathing follows the card arrow to I7', () => {
+  const s = run({
+    ...LABOR,
+    c5_push: 'yes',
+    i8b_status: 'the baby is out',
+    i8b_breathing: 'no',
+    i7_conscious: 'no',
+    i7_witnessed: 'yes',
+    i7_chest_rose: 'yes',
+    i7c_crying: 'yes',
+  });
+  const scripts = s.result().scripts;
+  assert.ok(scripts.includes('i7a_choking_infant'), scripts.join(' → '));
+  const said = s.result().transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text).join(' ');
+  assert.match(said, /slap the soles of its feet/);
+});
+
 test('every instruction step is reachable in every locale, and every walk closes', () => {
   for (const locale of pack.locales) {
     const sweep = sweepInstructionScripts(pack, locale);

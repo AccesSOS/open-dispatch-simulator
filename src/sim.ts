@@ -203,11 +203,13 @@ function slotValueFor(pack: ProtocolPack, cond: Condition, locale: Locale): stri
  * Every root-to-terminal walk through an instruction script, as the option
  * answers a caller would have to give to take it.
  *
- * Scripts are a DAG (the loader guarantees it), so this terminates. Edge
- * `when` conditions are treated as satisfiable rather than solved, so a few
- * walks may be unreachable in practice — the same stance sweepScripts takes,
- * and the reason the sweep reports which steps it never actually reached
- * rather than assuming it reached them all.
+ * Scripts are a DAG (the loader guarantees it), so this terminates. An edge
+ * guarded by `when` is solved back into the answers a caller would have to have
+ * given earlier in the call — a script may branch on what the card already
+ * asked, and without solving those the branch is generated but never taken.
+ * Conditions with no expressible value are left unsolved, which is why the
+ * sweep reports the steps it never actually reached rather than assuming it
+ * reached them all.
  */
 function scriptPaths(
   pack: ProtocolPack,
@@ -215,6 +217,15 @@ function scriptPaths(
   locale: Locale,
   cap: number,
 ): { answers: Record<string, string>[]; capped: boolean } {
+  const solve = (conds: Condition[] | undefined, answers: Record<string, string>) => {
+    if (!conds?.length) return answers;
+    const solved = { ...answers };
+    for (const cond of conds) {
+      const value = slotValueFor(pack, cond, locale);
+      if (value !== undefined) solved[cond.slot] = value;
+    }
+    return solved;
+  };
   const byId = new Map((pack.scripts ?? []).map((s) => [s.id, s]));
   const out: Record<string, string>[] = [];
   let capped = false;
@@ -231,7 +242,8 @@ function scriptPaths(
     }
     const edges = step.next ?? [];
     const hasDefault = edges.some((e) => e.whenOption === undefined && !e.when?.length);
-    const follow = (edge: (typeof edges)[number] | null, withAnswers: Record<string, string>) => {
+    const follow = (edge: (typeof edges)[number] | null, given: Record<string, string>) => {
+      const withAnswers = solve(edge?.when, given);
       if (!edge) {
         const nextStep = script.steps[index + 1];
         if (!nextStep) out.push(withAnswers);
