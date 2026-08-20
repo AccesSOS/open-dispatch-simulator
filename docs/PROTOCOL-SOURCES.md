@@ -12,7 +12,7 @@ license, or written permission — with provenance recorded in the pack and enfo
 
 | Source | License | Pack | Notes |
 | --- | --- | --- | --- |
-| Open ISES Project EMD Guide Cards v0.26.2 (2008) | GFDL-1.2-or-later (verified in the PDF) | `us-openises-emd` | 15 cards digitized of ~34; community-authored model cards built for adoption. Remainder: T-cards, H1/H3–H5, M-cards, I-scripts (CPR/childbirth). Source: archive.org `files-all/cards911.zip`. |
+| Open ISES Project EMD Guide Cards v0.26.2 (2008) | GFDL-1.2-or-later (verified in the PDF) | `us-openises-emd` | **23 of ~34 cards digitized**, trilingual; I2 CPR + I11 bleeding scripts wired in. Remainder: M3, M7–M10, M12, T1, T5, T7, T9, C4, H1/H3–H5, and I-scripts I1/I3–I8. Source: archive.org `files-all/cards911.zip`. |
 | State of New Jersey EMD Guidecards ("Updated May 2026") | `state-published-permission-pending` — AccesSOS/infra#8 | `us-nj-emd` | Official statewide cards, no copyright notice, state-mandated (strong government-edicts posture). NJ publishes EMD only — no fire/police guidecards. |
 | Alameda PD Public Safety Dispatcher Training Manual (2020) | `city-published-permission-pending` — AccesSOS/infra#9 | `us-alameda-police` | First police pack. Training prose condensed to cards (pages cited in SOURCE.md). |
 | México CNIE v3.0 (SESNSP, junio 2024) | Libre-Uso-MX (gob.mx open-use terms) | `mx-cnie-911` | National classification catalog: codes/definitions/priorities verbatim; interrogation editorial. |
