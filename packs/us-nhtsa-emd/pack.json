@@ -59,12 +59,23 @@
               "en": [
                 "no",
                 "unconscious",
-                "passed out"
+                "passed out",
+                "nope",
+                "negative",
+                "none",
+                "never"
               ],
               "es": [
                 "no",
                 "inconsciente",
-                "desmayado"
+                "desmayado",
+                "nada",
+                "negativo",
+                "ninguno",
+                "ninguna",
+                "tampoco",
+                "nunca",
+                "en absoluto"
               ]
             }
           },
@@ -74,12 +85,20 @@
               "en": [
                 "yes",
                 "yeah",
-                "awake"
+                "awake",
+                "yep",
+                "correct",
+                "affirmative"
               ],
               "es": [
                 "sí",
                 "si",
-                "despierto"
+                "despierto",
+                "correcto",
+                "afirmativo",
+                "así es",
+                "asi es",
+                "claro"
               ]
             }
           }
@@ -98,10 +117,21 @@
             "keywords": {
               "en": [
                 "no",
-                "not breathing"
+                "not breathing",
+                "nope",
+                "negative",
+                "none",
+                "never"
               ],
               "es": [
-                "no"
+                "no",
+                "nada",
+                "negativo",
+                "ninguno",
+                "ninguna",
+                "tampoco",
+                "nunca",
+                "en absoluto"
               ]
             }
           },
@@ -111,12 +141,20 @@
               "en": [
                 "yes",
                 "yeah",
-                "breathing"
+                "breathing",
+                "yep",
+                "correct",
+                "affirmative"
               ],
               "es": [
                 "sí",
                 "si",
-                "respira"
+                "respira",
+                "correcto",
+                "afirmativo",
+                "así es",
+                "asi es",
+                "claro"
               ]
             }
           }
@@ -164,11 +202,22 @@
                   "en": [
                     "no",
                     "confused",
-                    "out of it"
+                    "out of it",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ],
                   "es": [
                     "no",
-                    "confundido"
+                    "confundido",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -178,12 +227,20 @@
                   "en": [
                     "yes",
                     "yeah",
-                    "alert"
+                    "alert",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ],
                   "es": [
                     "sí",
                     "si",
-                    "alerta"
+                    "alerta",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -211,11 +268,22 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "dry"
+                    "dry",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ],
                   "es": [
                     "no",
-                    "seca"
+                    "seca",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -227,14 +295,22 @@
                     "yeah",
                     "sweaty",
                     "pale",
-                    "clammy"
+                    "clammy",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ],
                   "es": [
                     "sí",
                     "si",
                     "sudoroso",
                     "pálido",
-                    "palido"
+                    "palido",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -308,11 +384,22 @@
                   "en": [
                     "no",
                     "not breathing",
-                    "gasping"
+                    "gasping",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ],
                   "es": [
                     "no",
-                    "jadeando"
+                    "jadeando",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -322,12 +409,20 @@
                   "en": [
                     "yes",
                     "yeah",
-                    "breathing"
+                    "breathing",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ],
                   "es": [
                     "sí",
                     "si",
-                    "respira"
+                    "respira",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }

@@ -60,5 +60,12 @@ external input (a permission reply, a decision from Kevin, a records request).
       Taking Procedure — Fire Dispatch"** — genuine fire call-taking, no proprietary system, no
       copyright notice; recorded as a permission-ask lead in the Alameda posture. Closes both the
       fire and Canada gaps if the ask lands. Full findings in PROTOCOL-SOURCES.md.
-- [ ] **Locale completeness pass.** Everything in the flagship pack trilingual en/es/fr;
+- [x] **Locale completeness pass.** Everything in the flagship pack trilingual en/es/fr;
       translations flagged editorial in SOURCE.md, as established.
+      → *Done.* Audit found the utterance catalogs already complete — 392/392 strings genuinely
+      translated in both es and fr, nothing copied from English. The real gap was the *answer*
+      side: Spanish shipped one negative ("no") on 201 of 471 options while en had "no"/"not" and
+      fr "non"/"pas", so "para nada" or "ninguno" met a clarify-and-re-ask. Yes/no vocabulary
+      brought to parity across the corpus (1369 option/locale sets, appended so the sweep's
+      answers are unchanged — every determinant and response count is byte-identical before and
+      after). `test/locales.test.ts` now enforces both directions corpus-wide.

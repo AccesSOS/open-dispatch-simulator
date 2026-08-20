@@ -15,7 +15,10 @@ Thanks for helping make emergency-call technology safer and more accessible.
    code, packs, tests, or issues.
 4. **Every locale ships complete.** The loader enforces that every string exists in every declared
    locale — translations are part of a pack, not an afterthought. Machine translation is
-   acceptable for a draft PR if flagged for native-speaker review.
+   acceptable for a draft PR if flagged for native-speaker review. Completeness covers what the
+   dispatcher *hears* too: an answer option must be recognisable by more than one word in every
+   locale, and no locale may be a byte-for-byte copy of the default. Both are enforced by the
+   suite, not by review.
 
 ## Developer Certificate of Origin
 

@@ -70,7 +70,11 @@
                 "not",
                 "unconscious",
                 "passed out",
-                "unresponsive"
+                "unresponsive",
+                "nope",
+                "negative",
+                "none",
+                "never"
               ]
             }
           },
@@ -82,7 +86,10 @@
                 "yeah",
                 "conscious",
                 "awake",
-                "talking"
+                "talking",
+                "yep",
+                "correct",
+                "affirmative"
               ]
             }
           }
@@ -121,7 +128,11 @@
                 "gasping",
                 "snoring",
                 "gurgling",
-                "barely"
+                "barely",
+                "nope",
+                "negative",
+                "none",
+                "never"
               ]
             }
           },
@@ -133,7 +144,10 @@
                 "yeah",
                 "normal",
                 "normally",
-                "fine"
+                "fine",
+                "yep",
+                "correct",
+                "affirmative"
               ]
             }
           }
@@ -249,7 +263,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -261,7 +279,10 @@
                     "yeah",
                     "sweating",
                     "sweaty",
-                    "drenched"
+                    "drenched",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -280,7 +301,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -292,7 +317,10 @@
                     "yeah",
                     "nauseated",
                     "vomiting",
-                    "throwing up"
+                    "throwing up",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -311,7 +339,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -323,7 +355,10 @@
                     "yeah",
                     "weak",
                     "dizzy",
-                    "faint"
+                    "faint",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -347,7 +382,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -358,7 +397,10 @@
                     "yes",
                     "yeah",
                     "worse",
-                    "changes"
+                    "changes",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -378,7 +420,10 @@
                   "en": [
                     "no",
                     "not",
-                    "never"
+                    "never",
+                    "nope",
+                    "negative",
+                    "none"
                   ]
                 }
               },
@@ -392,7 +437,10 @@
                     "surgery",
                     "pacemaker",
                     "stent",
-                    "bypass"
+                    "bypass",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -411,7 +459,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -423,7 +475,10 @@
                     "yeah",
                     "racing",
                     "rapid",
-                    "pounding"
+                    "pounding",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -557,7 +612,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -570,7 +629,10 @@
                     "responds",
                     "talking",
                     "moving",
-                    "flinched"
+                    "flinched",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -594,7 +656,11 @@
                     "snoring",
                     "gurgling",
                     "barely",
-                    "moaning"
+                    "moaning",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -605,7 +671,10 @@
                     "yes",
                     "yeah",
                     "normal",
-                    "normally"
+                    "normally",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -629,7 +698,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -640,7 +713,10 @@
                     "yes",
                     "yeah",
                     "hospice",
-                    "expected"
+                    "expected",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -706,7 +782,11 @@
                     "no",
                     "not",
                     "again",
-                    "before"
+                    "before",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -716,7 +796,10 @@
                   "en": [
                     "yes",
                     "yeah",
-                    "first"
+                    "first",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -735,7 +818,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -750,7 +837,10 @@
                     "alcohol",
                     "drugs",
                     "medication",
-                    "pills"
+                    "pills",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -774,7 +864,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -786,7 +880,10 @@
                     "yeah",
                     "responds",
                     "follows",
-                    "commands"
+                    "commands",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -923,7 +1020,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -935,7 +1036,10 @@
                     "yeah",
                     "asthma",
                     "inhaler",
-                    "nebulizer"
+                    "nebulizer",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -954,7 +1058,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -965,7 +1073,10 @@
                     "yes",
                     "yeah",
                     "full sentences",
-                    "talking"
+                    "talking",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -984,7 +1095,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -995,7 +1110,10 @@
                     "yes",
                     "yeah",
                     "drooling",
-                    "swallow"
+                    "swallow",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -1019,7 +1137,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -1030,7 +1152,10 @@
                     "yes",
                     "yeah",
                     "before",
-                    "happens"
+                    "happens",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -1054,7 +1179,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -1065,7 +1194,10 @@
                     "yes",
                     "yeah",
                     "sit up",
-                    "sitting"
+                    "sitting",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -1099,7 +1231,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -1111,7 +1247,10 @@
                     "yeah",
                     "hospitalized",
                     "childbirth",
-                    "broken leg"
+                    "broken leg",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -1130,7 +1269,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -1141,7 +1284,10 @@
                     "yes",
                     "yeah",
                     "birth control",
-                    "the pill"
+                    "the pill",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -1240,7 +1386,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -1252,7 +1402,10 @@
                     "yeah",
                     "bleeding",
                     "injured",
-                    "hurt"
+                    "hurt",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -1271,7 +1424,11 @@
                 "keywords": {
                   "en": [
                     "no",
-                    "not"
+                    "not",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -1282,7 +1439,10 @@
                     "yes",
                     "yeah",
                     "blood",
-                    "fluid"
+                    "fluid",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }

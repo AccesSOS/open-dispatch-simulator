@@ -116,7 +116,11 @@
                 "gone",
                 "left",
                 "ran off",
-                "fled"
+                "fled",
+                "nope",
+                "negative",
+                "none",
+                "never"
               ]
             }
           },
@@ -129,7 +133,10 @@
                 "still",
                 "here",
                 "there now",
-                "inside"
+                "inside",
+                "yep",
+                "correct",
+                "affirmative"
               ]
             }
           }
@@ -150,7 +157,10 @@
                 "no",
                 "not",
                 "none",
-                "unarmed"
+                "unarmed",
+                "nope",
+                "negative",
+                "never"
               ]
             }
           },
@@ -166,7 +176,10 @@
                 "armed",
                 "weapon",
                 "pistol",
-                "rifle"
+                "rifle",
+                "yep",
+                "correct",
+                "affirmative"
               ]
             }
           }
@@ -425,7 +438,11 @@
                     "no",
                     "not",
                     "can't",
-                    "cannot"
+                    "cannot",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -435,7 +452,10 @@
                   "en": [
                     "yes",
                     "yeah",
-                    "i can"
+                    "i can",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -568,7 +588,11 @@
                     "no",
                     "not",
                     "nobody hurt",
-                    "no one hurt"
+                    "no one hurt",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -581,7 +605,10 @@
                     "hurt",
                     "injured",
                     "bleeding",
-                    "trapped"
+                    "trapped",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }
@@ -607,7 +634,11 @@
                     "no",
                     "not",
                     "pulled off",
-                    "parking lot"
+                    "parking lot",
+                    "nope",
+                    "negative",
+                    "none",
+                    "never"
                   ]
                 }
               },
@@ -619,7 +650,10 @@
                     "yeah",
                     "blocking",
                     "in the road",
-                    "in the intersection"
+                    "in the intersection",
+                    "yep",
+                    "correct",
+                    "affirmative"
                   ]
                 }
               }

@@ -66,7 +66,14 @@
                 "no",
                 "inconsciente",
                 "desmayado",
-                "desmayada"
+                "desmayada",
+                "nada",
+                "negativo",
+                "ninguno",
+                "ninguna",
+                "tampoco",
+                "nunca",
+                "en absoluto"
               ]
             }
           },
@@ -78,7 +85,12 @@
                 "si",
                 "despierto",
                 "despierta",
-                "consciente"
+                "consciente",
+                "correcto",
+                "afirmativo",
+                "así es",
+                "asi es",
+                "claro"
               ]
             }
           }
@@ -96,7 +108,14 @@
             "id": "no",
             "keywords": {
               "es": [
-                "no"
+                "no",
+                "nada",
+                "negativo",
+                "ninguno",
+                "ninguna",
+                "tampoco",
+                "nunca",
+                "en absoluto"
               ]
             }
           },
@@ -107,7 +126,12 @@
                 "sí",
                 "si",
                 "respira",
-                "respirando"
+                "respirando",
+                "correcto",
+                "afirmativo",
+                "así es",
+                "asi es",
+                "claro"
               ]
             }
           }
@@ -179,7 +203,14 @@
                 "id": "no",
                 "keywords": {
                   "es": [
-                    "no"
+                    "no",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -192,7 +223,12 @@
                     "intenso",
                     "fuerte",
                     "opresión",
-                    "opresion"
+                    "opresion",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -210,7 +246,14 @@
                 "id": "no",
                 "keywords": {
                   "es": [
-                    "no"
+                    "no",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -221,7 +264,12 @@
                     "sí",
                     "si",
                     "brazo",
-                    "cuello"
+                    "cuello",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -239,7 +287,14 @@
                 "id": "no",
                 "keywords": {
                   "es": [
-                    "no"
+                    "no",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -251,7 +306,12 @@
                     "si",
                     "sudando",
                     "sudoración",
-                    "sudoracion"
+                    "sudoracion",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -269,7 +329,14 @@
                 "id": "no",
                 "keywords": {
                   "es": [
-                    "no"
+                    "no",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -283,7 +350,12 @@
                     "nauseas",
                     "vomitando",
                     "vómito",
-                    "vomito"
+                    "vomito",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -331,7 +403,14 @@
                 "id": "no",
                 "keywords": {
                   "es": [
-                    "no"
+                    "no",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -342,7 +421,12 @@
                     "sí",
                     "si",
                     "responde",
-                    "se mueve"
+                    "se mueve",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -396,7 +480,14 @@
                   "es": [
                     "no",
                     "jadea",
-                    "apenas"
+                    "apenas",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -407,7 +498,12 @@
                     "sí",
                     "si",
                     "normal",
-                    "normalmente"
+                    "normalmente",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -436,7 +532,14 @@
                   "es": [
                     "no",
                     "otra vez",
-                    "antes"
+                    "antes",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -446,7 +549,12 @@
                   "es": [
                     "sí",
                     "si",
-                    "primera"
+                    "primera",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -493,7 +601,14 @@
                 "id": "no",
                 "keywords": {
                   "es": [
-                    "no"
+                    "no",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -504,7 +619,12 @@
                     "sí",
                     "si",
                     "habla",
-                    "puede hablar"
+                    "puede hablar",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -555,7 +675,14 @@
                     "ya pasó",
                     "ya paso",
                     "terminó",
-                    "termino"
+                    "termino",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -567,7 +694,12 @@
                     "si",
                     "sigue",
                     "todavía",
-                    "todavia"
+                    "todavia",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }
@@ -588,7 +720,14 @@
                     "no",
                     "epiléptico",
                     "epileptico",
-                    "antes"
+                    "antes",
+                    "nada",
+                    "negativo",
+                    "ninguno",
+                    "ninguna",
+                    "tampoco",
+                    "nunca",
+                    "en absoluto"
                   ]
                 }
               },
@@ -598,7 +737,12 @@
                   "es": [
                     "sí",
                     "si",
-                    "primera"
+                    "primera",
+                    "correcto",
+                    "afirmativo",
+                    "así es",
+                    "asi es",
+                    "claro"
                   ]
                 }
               }

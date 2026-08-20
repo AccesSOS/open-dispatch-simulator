@@ -137,6 +137,11 @@ invariant: *every call reaches dispatch with a response level*, in every locale.
 clarify-and-re-ask when a choice answer doesn't parse (`clarifyAttempts`, default 1), and keyword
 matching is Unicode word-boundary aware — "I do not know" is not a "no".
 
+Locale completeness runs in both directions. The loader already refuses a pack missing a string in
+any declared locale; the suite additionally refuses one where a locale is a byte-for-byte copy of
+the default, or where an answer option is recognisable by only one word — a Spanish caller
+answering *"para nada"* should not be asked the question again.
+
 ## Dispatcher personas
 
 Real PSAPs don't all sound the same, so sessions accept a `persona` — deterministic given its

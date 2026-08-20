@@ -84,7 +84,11 @@ and do change" — shipping stale emergency phone numbers in a simulator would b
 shipping none.
 
 The Spanish and French catalogs (added 2026-08-20) are translations by the Open Dispatch Simulator
-project, not part of the English-only source document — flag translation issues as bugs.
+project, not part of the English-only source document — flag translation issues as bugs. That
+includes the **answer** vocabulary, not only what the dispatcher says: the keywords each yes/no
+option recognises were brought to parity across the three locales on 2026-08-20, because Spanish
+had shipped a single way to say no and a caller answering "para nada" was being asked the question
+again. A locale that ships one word per option now fails the test suite.
 
 ## Operational warning (from the source, and from us)
 
