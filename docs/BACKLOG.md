@@ -62,7 +62,7 @@ external input (a permission reply, a decision from Kevin, a records request).
       fire and Canada gaps if the ask lands. Full findings in PROTOCOL-SOURCES.md.
 - [x] **Locale completeness pass.** Everything in the flagship pack trilingual en/es/fr;
       translations flagged editorial in SOURCE.md, as established.
-      → *Done.* Audit found the utterance catalogs already complete — 392/392 strings genuinely
+      → *Done* (06593bf). Audit found the utterance catalogs already complete — 392/392 strings genuinely
       translated in both es and fr, nothing copied from English. The real gap was the *answer*
       side: Spanish shipped one negative ("no") on 201 of 471 options while en had "no"/"not" and
       fr "non"/"pas", so "para nada" or "ninguno" met a clarify-and-re-ask. Yes/no vocabulary
