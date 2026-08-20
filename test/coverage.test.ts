@@ -171,11 +171,17 @@ test('caseEntryOrder fails when the location question comes after the complaint'
   assert.match(r.detail!, /reverse order/);
 });
 
-test('text checks are partial when some patterns match and name what is missing', () => {
-  const r = req(maine, openises, 'ME-II-2-A-23a');
-  assert.equal(r.status, 'partial');
-  assert.match(r.detail!, /aed/i, 'the AED half of the requirement is the missing one');
-  assert.ok(r.evidence.some((e) => e.includes('pd_cpr_push')));
+test('text checks name what is missing, and pick up v0.3 instruction scripts', () => {
+  // Both halves of §23.a are covered now: CPR from the I2 script, AED from I1.
+  const cpr = req(maine, openises, 'ME-II-2-A-23a');
+  assert.equal(cpr.status, 'met');
+  assert.ok(cpr.evidence.some((e) => e.includes('pd_cpr_push')));
+  assert.ok(cpr.evidence.some((e) => /aed|defibrillat/i.test(e)));
+
+  // …and a genuine gap still reads as one, naming the pattern that found nothing.
+  const childbirth = req(maine, openises, 'ME-II-2-A-23e');
+  assert.equal(childbirth.status, 'unmet');
+  assert.match(childbirth.detail!, /childbirth/);
 });
 
 test('a rubric may cite another rubric’s taxonomy', () => {
@@ -208,8 +214,12 @@ test('the flagship pack clears both rubrics comfortably', () => {
   }
 });
 
-test('known gaps stay visible: no AED script, no proximity question, no electrocution card', () => {
+test('known gaps stay visible: no proximity question, no persistence phrasing', () => {
   assert.equal(req(maine, openises, 'ME-II-2-A-8').status, 'unmet');
   assert.equal(req(maine, openises, 'ME-II-2-A-23g').status, 'unmet');
-  assert.equal(req(nhtsa, openises, 'NHTSA-CARD-D').status, 'unmet');
+  // v0.3 gave the schema a place for EMD-facing notes; no pack fills it yet, so
+  // this reads as a content gap now rather than a schema one.
+  const cardD = req(nhtsa, openises, 'NHTSA-CARD-D');
+  assert.equal(cardD.status, 'unmet');
+  assert.match(cardD.detail!, /no protocol carries dispatcher-facing notes/);
 });

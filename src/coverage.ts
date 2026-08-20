@@ -21,6 +21,7 @@ export interface Check {
     | 'text'
     | 'cardJump'
     | 'complaints'
+    | 'dispatcherNotes'
     | 'notRepresentable'
     | 'manual';
   slot?: string;
@@ -163,7 +164,12 @@ function allQuestions(pack: ProtocolPack): Question[] {
 }
 
 function utterances(pack: ProtocolPack): Utterance[] {
-  const postDispatchIds = new Set(pack.protocols.flatMap((p) => p.postDispatch));
+  // v0.3 instruction-script lines are post-dispatch instructions too — they are
+  // what the caller is told to do once responders are rolling.
+  const postDispatchIds = new Set([
+    ...pack.protocols.flatMap((p) => p.postDispatch),
+    ...(pack.scripts ?? []).flatMap((s) => s.steps.map((step) => step.stringId)),
+  ]);
   const questionIds = new Set<string>();
   for (const q of allQuestions(pack)) {
     questionIds.add(q.stringId);
@@ -362,6 +368,24 @@ function evaluateCheck(
         status: jumps.length ? 'met' : 'unmet',
         evidence: jumps,
         detail: jumps.length ? undefined : 'no protocol-to-protocol jumps declared',
+      };
+    }
+
+    case 'dispatcherNotes': {
+      const carrying = pack.protocols.filter((p) => p.dispatcherNotes);
+      const need = check.minProtocols === 'all' ? pack.protocols.length : check.minProtocols ?? 1;
+      return {
+        status: carrying.length >= need ? 'met' : carrying.length ? 'partial' : 'unmet',
+        evidence: carrying.map((p) => {
+          const n = p.dispatcherNotes!;
+          const parts = [
+            ...(n.prompts ? [`${n.prompts.length} prompts`] : []),
+            ...(n.shortReport ? [`${n.shortReport.length} short-report lines`] : []),
+            ...(n.useful ? [`${n.useful.length} useful-information lines`] : []),
+          ];
+          return `${p.id}: ${parts.join(', ')}`;
+        }),
+        detail: carrying.length ? undefined : 'no protocol carries dispatcher-facing notes',
       };
     }
 

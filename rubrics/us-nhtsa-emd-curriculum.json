@@ -116,11 +116,8 @@
       "citation": "Module 3, Unit 1 — four major design components (d)",
       "text": "Useful Information: background, insights and possible complications for the EMD — explicitly not shared with the caller.",
       "appliesTo": "pack",
-      "notes": "A real structural gap, not a content gap: every string in a pack is caller-facing by construction (the grounding contract), so there is nowhere to put EMD-facing background. A candidate for a future schema revision.",
-      "check": {
-        "kind": "notRepresentable",
-        "note": "the pack schema has no EMD-facing (non-spoken) field"
-      }
+      "notes": "Reported as unrepresentable until schema v0.3, which added protocols[].dispatcherNotes for exactly this — the cards' Call Taker Prompts, Dispatcher Short Report and Useful Information. Those string ids are kept disjoint from every spoken id, so the section stays EMD-facing by construction.",
+      "check": { "kind": "dispatcherNotes", "minProtocols": 1 }
     },
     {
       "id": "NHTSA-SURVEY-LOCATION",

@@ -162,11 +162,21 @@ test('All Callers: unconscious + not breathing jumps to the C1 card (v0.2)', () 
   s.answer('no, gasping');
   s.answer('no response at all');
   s.answer('no, not expected');
+  // v0.3: dispatch is decided here, but the call continues into telephone CPR.
+  assert.equal(s.result().response, 'CODE_RED');
+  assert.ok(!s.isDone(), 'the dispatcher keeps talking the caller through CPR');
+  let guard = 0;
+  while (!s.isDone() && guard++ < 20) {
+    const pending = s.pending();
+    if (!pending) break;
+    s.answer('no');
+  }
   assert.ok(s.isDone());
   const r = s.result();
   assert.equal(r.protocolId, 'c1_cardiac_arrest');
   assert.equal(r.determinantId, 'c1_red_arrest');
   assert.equal(r.response, 'CODE_RED');
+  assert.ok(r.scripts.includes('i2a_adult_cpr_entry'));
 });
 
 test('All Callers: unconscious but breathing jumps to C6, overriding the complaint', () => {

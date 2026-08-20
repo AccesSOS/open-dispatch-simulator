@@ -204,11 +204,12 @@ recorded in [docs/PROTOCOL-SOURCES.md](docs/PROTOCOL-SOURCES.md).
 - **Synthetic data only.** No real emergency calls, transcripts, or personal data — ever.
 - The bundled [`packs/us-nhtsa-emd`](packs/us-nhtsa-emd/pack.json) is a heavily simplified
   reference subset that exists to exercise the engine, not a usable medical protocol.
-- [`packs/us-openises-emd`](packs/us-openises-emd/pack.json) is the first **source-faithful**
-  pack: the Open ISES Project's freely licensed (GFDL-1.2+) EMD guide cards — All Callers
-  Interrogation plus the M5 Chest Pain, C1 Cardiac Arrest, C6 Unconscious/Fainting, and M17
-  Unknown/Man Down cards, with the source's own Code RED/YELLOW response taxonomy. See its
-  [SOURCE.md](packs/us-openises-emd/SOURCE.md) for attribution and digitization decisions.
+- [`packs/us-openises-emd`](packs/us-openises-emd/pack.json) is the flagship **source-faithful**
+  pack: the Open ISES Project's freely licensed (GFDL-1.2+) EMD guide cards — the All Callers
+  Interrogation plus all 34 complaint cards, trilingual, with the source's own Code RED/YELLOW
+  response taxonomy, and the I1 (AED), I2 (Adult CPR) and I5 (Choking Adult) instruction cards as
+  interactive scripts. See its [SOURCE.md](packs/us-openises-emd/SOURCE.md) for attribution,
+  digitization decisions, and which cards are still to come.
 - [`packs/us-nj-emd`](packs/us-nj-emd/pack.json) digitizes the **official State of New Jersey
   EMD Guidecards** (nj.gov/911, updated May 2026): All Caller Interrogation + Chest Pain,
   Cardiac Arrest/DOA, Unconscious/Fainting, and Unknown/Person Down, with New Jersey's own

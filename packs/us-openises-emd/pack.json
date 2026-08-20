@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2",
+  "schemaVersion": "0.3",
   "id": "us-openises-emd",
   "name": {
     "en": "US — Open ISES EMD Guide Cards v0.26.2 (subset)",
@@ -16,7 +16,7 @@
     "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
     "license": "GFDL-1.2-or-later",
     "digitizedDate": "2026-08-20",
-    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized. 2026-08-20 (5): added cards M1 (Abdominal Pain), M2 (Allergies/Stings), M15 (Sick Person), T2 (Assault/DV/Sexual Assault), T3 (Bleeding/Laceration), T6 (Falls), C3 (Drowning), C5 (Pregnancy/Childbirth). T3's post-dispatch reads the I11 Bleeding Control script (direct pressure, don't remove soaked cloth). T6 uses a numeric condition for the card's 'falls greater than 10 feet' RED. T2's stabbing/shooting answer jumps to T8 per the card; M1/M15 chest pain jumps to M5. Structural proxies noted: M1's 'lower abdominal pain in female 12-50' is approximated by the could-be-pregnant answer; M2's 'multiple areas' criterion by symptoms-getting-worse; T2/T3 'uncontrolled bleeding' by any-bleeding (safer tier). C5 imminent-delivery RED triggers on urge-to-push or visible head; its I8 Childbirth script is not yet digitized. 2026-08-20 (6): final card batch — M3 (Back Pain), M7 (Headache), M8 (HCP Requests EMS), M9 (Home Medical Equipment: the card's ventilator->C1, apnea-monitor->M4, implanted-defibrillator->M5 jumps are modeled), M10 (Obvious Death: caller-unsure jumps to C1 per the card; note the All-Caller breathing=no branch may route such calls to C1 before M10's question — mirroring the chart's precedence of resuscitation over confirmation), M12 (Person Assistance), T1 (Animal Bites), T5 (Eye Problems/Injuries: chemical answer jumps to T4 per the card; the card grades ANY eye injury CODE YELLOW), T7 (Heat/Cold Exposure), T9 (Traumatic Injury), H5 (Industrial Accident; the trapped question is editorial, drawn from the card's own CODE RED criterion). NOT digitized, by design: H1 (Aircraft/Terrorism — air-defense notification procedure, includes dated sector phone numbers), H3 (HazMat guidelines) and H4 (Helicopter landing zones) — dispatcher/responder procedure cards with no caller interrogation; and scripted cards I1, I3-I8. Anatomy-based criteria (injury above the knee, 20% body surface) remain free-text and land on the safer applicable tier."
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized. 2026-08-20 (5): added cards M1 (Abdominal Pain), M2 (Allergies/Stings), M15 (Sick Person), T2 (Assault/DV/Sexual Assault), T3 (Bleeding/Laceration), T6 (Falls), C3 (Drowning), C5 (Pregnancy/Childbirth). T3's post-dispatch reads the I11 Bleeding Control script (direct pressure, don't remove soaked cloth). T6 uses a numeric condition for the card's 'falls greater than 10 feet' RED. T2's stabbing/shooting answer jumps to T8 per the card; M1/M15 chest pain jumps to M5. Structural proxies noted: M1's 'lower abdominal pain in female 12-50' is approximated by the could-be-pregnant answer; M2's 'multiple areas' criterion by symptoms-getting-worse; T2/T3 'uncontrolled bleeding' by any-bleeding (safer tier). C5 imminent-delivery RED triggers on urge-to-push or visible head; its I8 Childbirth script is not yet digitized. 2026-08-20 (6): final card batch — M3 (Back Pain), M7 (Headache), M8 (HCP Requests EMS), M9 (Home Medical Equipment: the card's ventilator->C1, apnea-monitor->M4, implanted-defibrillator->M5 jumps are modeled), M10 (Obvious Death: caller-unsure jumps to C1 per the card; note the All-Caller breathing=no branch may route such calls to C1 before M10's question — mirroring the chart's precedence of resuscitation over confirmation), M12 (Person Assistance), T1 (Animal Bites), T5 (Eye Problems/Injuries: chemical answer jumps to T4 per the card; the card grades ANY eye injury CODE YELLOW), T7 (Heat/Cold Exposure), T9 (Traumatic Injury), H5 (Industrial Accident; the trapped question is editorial, drawn from the card's own CODE RED criterion). NOT digitized, by design: H1 (Aircraft/Terrorism — air-defense notification procedure, includes dated sector phone numbers), H3 (HazMat guidelines) and H4 (Helicopter landing zones) — dispatcher/responder procedure cards with no caller interrogation; and scripted cards I1, I3-I8. Anatomy-based criteria (injury above the knee, 20% body surface) remain free-text and land on the safer applicable tier. Instruction cards I1 (AED), I2 (Adult CPR, sections A–D) and I5 (Choking Adult, sections A–C) are digitized as v0.3 instruction scripts, one script per card section, because the source itself names sections as jump targets (\"Jump to I5: Choking Adult Instructions, Section B\"). Section C of I2 is split into two scripts — the \"Did the chest rise?\" gate and the \"Compression Only / Choking Adult Entry Point\" below it — because the card gives that lower half its own entry points; keeping them one script would have made the I2↔I5 hand-offs a cycle rather than the one-way flow the card actually describes. The printed cards react to things a caller volunteers (patient vomited, stoma, hysterical caller); a turn-based engine cannot receive an unprompted report, so those become one asked question whose options are the card’s own branch labels. I1’s step 1 age gate (\"if not at least one year of age, jump to I4\") is enforced upstream instead, by the card’s postDispatchScripts age routing."
   },
   "locales": [
     "en",
@@ -1057,13 +1057,12 @@
         }
       ],
       "postDispatch": [
-        "pd_cpr_listen",
-        "pd_cpr_position",
-        "pd_cpr_hands",
-        "pd_cpr_push",
-        "pd_cpr_continue",
-        "pd_cpr_stay",
-        "pd_c1_callback"
+        "pd_callback_changes"
+      ],
+      "postDispatchScripts": [
+        {
+          "script": "i2a_adult_cpr_entry"
+        }
       ]
     },
     {
@@ -6509,6 +6508,11 @@
         "pd_gather_meds",
         "pd_lock_pets",
         "pd_c1_callback"
+      ],
+      "postDispatchScripts": [
+        {
+          "script": "i5a_choking_adult"
+        }
       ]
     },
     {
@@ -13924,7 +13928,52 @@
       "pd_t7_no_rub": "If it is cold exposure, do not rub frostbitten extremities.",
       "kq_t9_how": "How was the person injured? Describe what happened.",
       "kq_h5_amputation": "Has any part of the body been amputated? Which part?",
-      "pd_h5_machine": "If it is safe to do so, turn off any machinery involved — try to locate a maintenance person."
+      "pd_h5_machine": "If it is safe to do so, turn off any machinery involved — try to locate a maintenance person.",
+      "i1_caution": "Before you use it: do not use a defibrillator in or around water, snow or ice, a bathtub, pool or hot tub, metal or street ventilation grates, hazardous materials, or anything else that conducts electricity.",
+      "i1_bare": "Remove everything from the person's chest.",
+      "i1_place": "Place the defibrillator next to the person's left side.",
+      "i1_power": "Open the cover and turn on the defibrillator.",
+      "i1_pads": "Open the pad package and place the pads on the person as pictured on the pads. If this is a child, make sure you are using pediatric pads.",
+      "i1_cords": "Make sure the pad cords are attached to the machine.",
+      "i1_analyze": "Follow the machine's voice prompts. Wait for it to analyze — push the analyze button if there is one. Do not touch the person.",
+      "i1_what_says": "What is the machine telling you to do?",
+      "i1_shock": "Make sure no one is touching the person, then press the shock button.",
+      "i1_no_shock": "If the machine says no shock is indicated, keep doing CPR.",
+      "i1_follow": "Keep following the machine's voice prompts until help arrives.",
+      "i2_knows_cpr": "Does anyone there know how to do CPR?",
+      "i2_need_help": "Do you need help remembering the procedures?",
+      "i2_begin_now": "Begin CPR on the person now. I'll stay on the line if you need me, until help arrives.",
+      "i2_phone": "Get the phone next to the person if you can. If you have a cordless phone, or there is a phone closer to them, use that. If someone there can relay what I say to you, have them help.",
+      "i2_mouth_to_mouth": "Can you do mouth-to-mouth?",
+      "i2b_bare": "Bare the chest and kneel at the person's side.",
+      "i2b_obstacle": "Before you start — is anything in the way? Tell me if the person is vomiting, if they have a breathing hole in their neck, or if you are too upset to keep going.",
+      "i2b_vomit": "Turn their head to the side and sweep it all out with your fingers before you start mouth-to-mouth.",
+      "i2b_stoma": "Keep their head straight. Completely cover the opening in the neck with your mouth, and cover their mouth and nose with your hand.",
+      "i2b_calm": "You're going to have to calm down to be able to help. Take a breath and stay with me.",
+      "i2b_airway": "Pinch the nose shut with one hand. With your other hand, lift the chin so the head bends back.",
+      "i2b_breaths": "Completely cover their mouth with your mouth and give two breaths of air into their lungs — just like blowing up a balloon. Make sure the chest gently rises.",
+      "i2_chest_rose": "Did the chest rise?",
+      "i2_aed_present": "Is there an automated defibrillator nearby?",
+      "i2d_listen": "Listen carefully. I'll tell you what to do next.",
+      "i2d_thirty": "Do it 30 times. Push hard and push fast.",
+      "i2d_compression_only": "Pump the chest 200 times, then come back to the phone. If I'm not here, stay on the line.",
+      "i2d_breaths_again": "Pinch the nose shut and lift the chin so the head bends back. Give two more breaths, then pump the chest 30 times.",
+      "i5_can_talk": "Is the person able to talk or cough?",
+      "i5_stop_reassess": "Then stop — do not do anything else. Stay with them and watch them until help arrives, and tell me right away if anything changes.",
+      "i5_conscious": "Is the person conscious?",
+      "i5_witnessed": "Did you see it happen?",
+      "i5_listen_next": "Listen carefully. I'll tell you what to do next.",
+      "i5_stand_behind": "Stand behind the person and wrap your arms around their waist.",
+      "i5_fist": "Make a fist with one hand and place your thumb against their stomach, in the middle, slightly above the navel. Grasp your fist with your other hand.",
+      "i5_thrusts": "Press into the stomach with quick, upward thrusts. Repeat the thrusts until the object comes out.",
+      "i5_outcome": "Tell me what is happening now — has the object come out, or has the person gone unconscious?",
+      "i5b_position": "Get the person flat on their back on the floor.",
+      "i5b_repeat": "Reposition the head and repeat the sequence one more time, then we'll move on.",
+      "i5b_moving": "Is the person moving or breathing?",
+      "i5b_roll": "Roll the person onto their side and keep checking their breathing until help arrives.",
+      "i5c_push": "Push down on the heels of your hands, about two inches. Do it 30 times, push hard and fast.",
+      "i5c_look": "Pinch the nose shut and lift the chin so the head bends back. Open the mouth — if you see something, try to sweep it out. Do not push the object backwards.",
+      "i5c_cycle": "Give two more breaths, then pump the chest 30 times. Keep doing it, and each time you open the mouth, sweep out anything you can see without pushing it backwards."
     },
     "es": {
       "greeting": "Nueve-uno-uno.",
@@ -14158,7 +14207,52 @@
       "pd_t7_no_rub": "Si es exposición al frío, no frote las extremidades congeladas.",
       "kq_t9_how": "¿Cómo se lesionó la persona? Describa lo que pasó.",
       "kq_h5_amputation": "¿Se amputó alguna parte del cuerpo? ¿Cuál?",
-      "pd_h5_machine": "Si es seguro hacerlo, apague la maquinaria involucrada; intente localizar a una persona de mantenimiento."
+      "pd_h5_machine": "Si es seguro hacerlo, apague la maquinaria involucrada; intente localizar a una persona de mantenimiento.",
+      "i1_caution": "Antes de usarlo: no use un desfibrilador dentro ni cerca de agua, nieve o hielo, una tina, alberca o jacuzzi, rejillas de metal o de ventilación de la calle, materiales peligrosos, ni nada que conduzca electricidad.",
+      "i1_bare": "Quite todo del pecho de la persona.",
+      "i1_place": "Ponga el desfibrilador junto al lado izquierdo de la persona.",
+      "i1_power": "Abra la tapa y encienda el desfibrilador.",
+      "i1_pads": "Abra el paquete de parches y colóquelos en la persona como se muestra en los dibujos de los parches. Si es un niño, asegúrese de usar parches pediátricos.",
+      "i1_cords": "Asegúrese de que los cables de los parches estén conectados a la máquina.",
+      "i1_analyze": "Siga las indicaciones de voz de la máquina. Espere a que analice; presione el botón de analizar si lo tiene. No toque a la persona.",
+      "i1_what_says": "¿Qué le está diciendo la máquina que haga?",
+      "i1_shock": "Asegúrese de que nadie esté tocando a la persona, y luego presione el botón de descarga.",
+      "i1_no_shock": "Si la máquina dice que no se indica descarga, siga con la RCP.",
+      "i1_follow": "Siga las indicaciones de voz de la máquina hasta que llegue la ayuda.",
+      "i2_knows_cpr": "¿Alguien ahí sabe hacer RCP?",
+      "i2_need_help": "¿Necesita ayuda para recordar los pasos?",
+      "i2_begin_now": "Empiece la RCP en la persona ahora. Me quedo en la línea por si me necesita, hasta que llegue la ayuda.",
+      "i2_phone": "Lleve el teléfono junto a la persona si puede. Si tiene un teléfono inalámbrico, o hay un teléfono más cerca de ella, use ese. Si alguien ahí puede repetirle lo que yo diga, que le ayude.",
+      "i2_mouth_to_mouth": "¿Puede hacer respiración boca a boca?",
+      "i2b_bare": "Descubra el pecho y arrodíllese al lado de la persona.",
+      "i2b_obstacle": "Antes de empezar, ¿hay algo que lo impida? Dígame si la persona está vomitando, si tiene un orificio para respirar en el cuello, o si usted está demasiado alterado para seguir.",
+      "i2b_vomit": "Voltee su cabeza hacia un lado y saque todo con los dedos antes de empezar la respiración boca a boca.",
+      "i2b_stoma": "Mantenga la cabeza recta. Cubra por completo con su boca la abertura del cuello, y tápele la boca y la nariz con la mano.",
+      "i2b_calm": "Va a tener que calmarse para poder ayudar. Respire y quédese conmigo.",
+      "i2b_airway": "Apriete la nariz con una mano. Con la otra mano, levante el mentón para que la cabeza se incline hacia atrás.",
+      "i2b_breaths": "Cubra por completo su boca con la suya y dé dos respiraciones de aire a sus pulmones, como si inflara un globo. Asegúrese de que el pecho suba suavemente.",
+      "i2_chest_rose": "¿Subió el pecho?",
+      "i2_aed_present": "¿Hay un desfibrilador automático cerca?",
+      "i2d_listen": "Escuche con atención. Le voy a decir qué hacer ahora.",
+      "i2d_thirty": "Hágalo 30 veces. Empuje fuerte y rápido.",
+      "i2d_compression_only": "Bombee el pecho 200 veces y luego vuelva al teléfono. Si no estoy, quédese en la línea.",
+      "i2d_breaths_again": "Apriete la nariz y levante el mentón para que la cabeza se incline hacia atrás. Dé dos respiraciones más y luego bombee el pecho 30 veces.",
+      "i5_can_talk": "¿La persona puede hablar o toser?",
+      "i5_stop_reassess": "Entonces deténgase; no haga nada más. Quédese con ella y obsérvela hasta que llegue la ayuda, y dígame de inmediato si algo cambia.",
+      "i5_conscious": "¿La persona está consciente?",
+      "i5_witnessed": "¿Usted vio cuando pasó?",
+      "i5_listen_next": "Escuche con atención. Le voy a decir qué hacer ahora.",
+      "i5_stand_behind": "Párese detrás de la persona y rodéele la cintura con los brazos.",
+      "i5_fist": "Haga un puño con una mano y ponga el pulgar contra el abdomen, en el centro, un poco arriba del ombligo. Agarre el puño con la otra mano.",
+      "i5_thrusts": "Presione el abdomen con empujones rápidos hacia arriba. Repita los empujones hasta que salga el objeto.",
+      "i5_outcome": "Dígame qué está pasando ahora: ¿salió el objeto, o la persona quedó inconsciente?",
+      "i5b_position": "Ponga a la persona boca arriba en el piso.",
+      "i5b_repeat": "Reacomode la cabeza y repita la secuencia una vez más; luego seguimos.",
+      "i5b_moving": "¿La persona se mueve o respira?",
+      "i5b_roll": "Gire a la persona de lado y siga revisando su respiración hasta que llegue la ayuda.",
+      "i5c_push": "Empuje con el talón de las manos, unos cinco centímetros. Hágalo 30 veces, fuerte y rápido.",
+      "i5c_look": "Apriete la nariz y levante el mentón para que la cabeza se incline hacia atrás. Abra la boca; si ve algo, trate de sacarlo con el dedo. No empuje el objeto hacia adentro.",
+      "i5c_cycle": "Dé dos respiraciones más y luego bombee el pecho 30 veces. Siga así, y cada vez que abra la boca saque lo que pueda ver sin empujarlo hacia adentro."
     },
     "fr": {
       "greeting": "Neuf-un-un.",
@@ -14392,7 +14486,1334 @@
       "pd_t7_no_rub": "En cas d'exposition au froid, ne frottez pas les extrémités gelées.",
       "kq_t9_how": "Comment la personne s'est-elle blessée? Décrivez ce qui s'est passé.",
       "kq_h5_amputation": "Une partie du corps a-t-elle été amputée? Laquelle?",
-      "pd_h5_machine": "Si c'est sécuritaire, éteignez la machinerie impliquée — essayez de trouver une personne d'entretien."
+      "pd_h5_machine": "Si c'est sécuritaire, éteignez la machinerie impliquée — essayez de trouver une personne d'entretien.",
+      "i1_caution": "Avant de l'utiliser : n'utilisez pas de défibrillateur dans ou près de l'eau, la neige ou la glace, une baignoire, une piscine ou un spa, des grilles métalliques ou de ventilation, des matières dangereuses, ni rien qui conduise l'électricité.",
+      "i1_bare": "Dégagez complètement la poitrine de la personne.",
+      "i1_place": "Placez le défibrillateur à côté du côté gauche de la personne.",
+      "i1_power": "Ouvrez le couvercle et allumez le défibrillateur.",
+      "i1_pads": "Ouvrez l'emballage des électrodes et posez-les sur la personne comme illustré dessus. S'il s'agit d'un enfant, utilisez des électrodes pédiatriques.",
+      "i1_cords": "Assurez-vous que les câbles des électrodes sont branchés à l'appareil.",
+      "i1_analyze": "Suivez les invites vocales de l'appareil. Attendez qu'il analyse — appuyez sur le bouton d'analyse s'il y en a un. Ne touchez pas la personne.",
+      "i1_what_says": "Que vous dit l'appareil de faire ?",
+      "i1_shock": "Assurez-vous que personne ne touche la personne, puis appuyez sur le bouton de choc.",
+      "i1_no_shock": "Si l'appareil indique qu'aucun choc n'est conseillé, continuez la réanimation.",
+      "i1_follow": "Continuez à suivre les invites vocales jusqu'à l'arrivée des secours.",
+      "i2_knows_cpr": "Est-ce que quelqu'un sait faire la réanimation ?",
+      "i2_need_help": "Avez-vous besoin d'aide pour vous rappeler les étapes ?",
+      "i2_begin_now": "Commencez la réanimation maintenant. Je reste en ligne si vous avez besoin de moi, jusqu'à l'arrivée des secours.",
+      "i2_phone": "Approchez le téléphone de la personne si vous le pouvez. Si vous avez un téléphone sans fil, ou s'il y en a un plus près d'elle, utilisez-le. Si quelqu'un peut vous répéter ce que je dis, faites-vous aider.",
+      "i2_mouth_to_mouth": "Pouvez-vous faire du bouche-à-bouche ?",
+      "i2b_bare": "Dégagez la poitrine et agenouillez-vous à côté de la personne.",
+      "i2b_obstacle": "Avant de commencer — y a-t-il un obstacle ? Dites-moi si la personne vomit, si elle a un orifice de respiration au cou, ou si vous êtes trop bouleversé pour continuer.",
+      "i2b_vomit": "Tournez sa tête sur le côté et retirez tout avec vos doigts avant de commencer le bouche-à-bouche.",
+      "i2b_stoma": "Gardez sa tête droite. Couvrez complètement de votre bouche l'orifice au cou, et bouchez sa bouche et son nez avec votre main.",
+      "i2b_calm": "Vous allez devoir vous calmer pour pouvoir aider. Respirez et restez avec moi.",
+      "i2b_airway": "Pincez le nez avec une main. De l'autre main, soulevez le menton pour que la tête bascule en arrière.",
+      "i2b_breaths": "Couvrez complètement sa bouche avec la vôtre et insufflez deux fois dans ses poumons, comme si vous gonfliez un ballon. Vérifiez que la poitrine se soulève doucement.",
+      "i2_chest_rose": "Est-ce que la poitrine s'est soulevée ?",
+      "i2_aed_present": "Y a-t-il un défibrillateur automatique à proximité ?",
+      "i2d_listen": "Écoutez bien. Je vais vous dire quoi faire ensuite.",
+      "i2d_thirty": "Faites-le 30 fois. Appuyez fort et vite.",
+      "i2d_compression_only": "Pompez la poitrine 200 fois, puis revenez au téléphone. Si je ne suis pas là, restez en ligne.",
+      "i2d_breaths_again": "Pincez le nez et soulevez le menton pour que la tête bascule en arrière. Donnez deux insufflations de plus, puis pompez la poitrine 30 fois.",
+      "i5_can_talk": "La personne peut-elle parler ou tousser ?",
+      "i5_stop_reassess": "Alors arrêtez — ne faites rien d'autre. Restez avec elle et surveillez-la jusqu'à l'arrivée des secours, et dites-moi tout de suite si quelque chose change.",
+      "i5_conscious": "La personne est-elle consciente ?",
+      "i5_witnessed": "Avez-vous vu cela se produire ?",
+      "i5_listen_next": "Écoutez bien. Je vais vous dire quoi faire ensuite.",
+      "i5_stand_behind": "Placez-vous derrière la personne et entourez sa taille de vos bras.",
+      "i5_fist": "Faites un poing avec une main et placez votre pouce contre son ventre, au milieu, juste au-dessus du nombril. Saisissez votre poing avec l'autre main.",
+      "i5_thrusts": "Enfoncez d'un mouvement vif vers le haut. Répétez jusqu'à ce que l'objet sorte.",
+      "i5_outcome": "Dites-moi ce qui se passe maintenant — l'objet est-il sorti, ou la personne a-t-elle perdu connaissance ?",
+      "i5b_position": "Mettez la personne à plat sur le dos, sur le sol.",
+      "i5b_repeat": "Repositionnez la tête et répétez la séquence encore une fois, puis nous poursuivrons.",
+      "i5b_moving": "La personne bouge-t-elle ou respire-t-elle ?",
+      "i5b_roll": "Tournez la personne sur le côté et continuez à surveiller sa respiration jusqu'à l'arrivée des secours.",
+      "i5c_push": "Appuyez avec le talon des mains, environ cinq centimètres. Faites-le 30 fois, fort et vite.",
+      "i5c_look": "Pincez le nez et soulevez le menton pour que la tête bascule en arrière. Ouvrez la bouche — si vous voyez quelque chose, essayez de le retirer. Ne repoussez pas l'objet vers l'intérieur.",
+      "i5c_cycle": "Donnez deux insufflations de plus, puis pompez la poitrine 30 fois. Continuez ainsi, et chaque fois que vous ouvrez la bouche, retirez ce que vous voyez sans le repousser."
     }
-  }
+  },
+  "scripts": [
+    {
+      "id": "i1_aed",
+      "name": {
+        "en": "I1: Automated External Defibrillator Instructions",
+        "es": "I1: Instrucciones del desfibrilador externo automático",
+        "fr": "I1 : Instructions du défibrillateur externe automatisé"
+      },
+      "source": "I1: Automated External Defibrillator Instructions",
+      "steps": [
+        {
+          "id": "caution",
+          "kind": "say",
+          "stringId": "i1_caution"
+        },
+        {
+          "id": "bare",
+          "kind": "say",
+          "stringId": "i1_bare"
+        },
+        {
+          "id": "place",
+          "kind": "say",
+          "stringId": "i1_place"
+        },
+        {
+          "id": "power",
+          "kind": "say",
+          "stringId": "i1_power"
+        },
+        {
+          "id": "pads",
+          "kind": "say",
+          "stringId": "i1_pads"
+        },
+        {
+          "id": "cords",
+          "kind": "say",
+          "stringId": "i1_cords"
+        },
+        {
+          "id": "analyze",
+          "kind": "say",
+          "stringId": "i1_analyze"
+        },
+        {
+          "id": "what_says",
+          "kind": "ask",
+          "slot": "i1_machine_says",
+          "stringId": "i1_what_says",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no_shock",
+                "keywords": {
+                  "en": [
+                    "no shock",
+                    "not advised",
+                    "continue cpr",
+                    "nothing"
+                  ],
+                  "es": [
+                    "sin descarga",
+                    "no descarga",
+                    "no se indica",
+                    "nada",
+                    "siga la rcp"
+                  ],
+                  "fr": [
+                    "aucun choc",
+                    "pas de choc",
+                    "rien",
+                    "continuer"
+                  ]
+                }
+              },
+              {
+                "id": "shock",
+                "keywords": {
+                  "en": [
+                    "shock",
+                    "shock advised",
+                    "press the button",
+                    "deliver"
+                  ],
+                  "es": [
+                    "descarga",
+                    "descargue",
+                    "choque",
+                    "presione el botón"
+                  ],
+                  "fr": [
+                    "choc",
+                    "choc conseillé",
+                    "appuyer",
+                    "appuyez"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no_shock",
+              "goto": "no_shock"
+            }
+          ]
+        },
+        {
+          "id": "shock",
+          "kind": "say",
+          "stringId": "i1_shock",
+          "next": [
+            {
+              "goto": "follow"
+            }
+          ]
+        },
+        {
+          "id": "no_shock",
+          "kind": "say",
+          "stringId": "i1_no_shock"
+        },
+        {
+          "id": "follow",
+          "kind": "stay",
+          "stringId": "i1_follow"
+        }
+      ]
+    },
+    {
+      "id": "i2a_adult_cpr_entry",
+      "name": {
+        "en": "I2: Adult CPR Instructions — Section A",
+        "es": "I2: Instrucciones de RCP en adultos — Sección A",
+        "fr": "I2 : Instructions de réanimation chez l’adulte — Section A"
+      },
+      "source": "I2: Adult CPR Instructions – Section A",
+      "steps": [
+        {
+          "id": "knows_cpr",
+          "kind": "ask",
+          "slot": "i2_knows_cpr",
+          "stringId": "i2_knows_cpr",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "knows cpr",
+                    "i do"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "sé",
+                    "yo sé"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "je sais"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "goto": "need_help"
+            },
+            {
+              "goto": "phone"
+            }
+          ]
+        },
+        {
+          "id": "need_help",
+          "kind": "ask",
+          "slot": "i2_need_help",
+          "stringId": "i2_need_help",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah"
+                  ],
+                  "es": [
+                    "sí",
+                    "si"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "begin_now"
+            },
+            {
+              "goto": "phone"
+            }
+          ]
+        },
+        {
+          "id": "begin_now",
+          "kind": "stay",
+          "stringId": "i2_begin_now"
+        },
+        {
+          "id": "phone",
+          "kind": "say",
+          "stringId": "i2_phone"
+        },
+        {
+          "id": "listen",
+          "kind": "say",
+          "stringId": "pd_cpr_listen"
+        },
+        {
+          "id": "position",
+          "kind": "say",
+          "stringId": "pd_cpr_position"
+        },
+        {
+          "id": "mouth_to_mouth",
+          "kind": "ask",
+          "slot": "i2_mouth_to_mouth",
+          "stringId": "i2_mouth_to_mouth",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah"
+                  ],
+                  "es": [
+                    "sí",
+                    "si"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "gotoScript": "i2c_adult_cpr_entry"
+            },
+            {
+              "gotoScript": "i2b_adult_cpr_breaths"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i2b_adult_cpr_breaths",
+      "name": {
+        "en": "I2: Adult CPR Instructions — Section B",
+        "es": "I2: Instrucciones de RCP en adultos — Sección B",
+        "fr": "I2 : Instructions de réanimation chez l’adulte — Section B"
+      },
+      "source": "I2: Adult CPR Instructions – Section B",
+      "steps": [
+        {
+          "id": "bare",
+          "kind": "say",
+          "stringId": "i2b_bare"
+        },
+        {
+          "id": "obstacle",
+          "kind": "ask",
+          "slot": "i2b_obstacle",
+          "stringId": "i2b_obstacle",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "vomit",
+                "keywords": {
+                  "en": [
+                    "vomit",
+                    "vomiting",
+                    "threw up",
+                    "being sick",
+                    "sick"
+                  ],
+                  "es": [
+                    "vomita",
+                    "vomitando",
+                    "vomitó",
+                    "vomito",
+                    "está vomitando"
+                  ],
+                  "fr": [
+                    "vomit",
+                    "vomissement",
+                    "a vomi",
+                    "régurgite"
+                  ]
+                }
+              },
+              {
+                "id": "stoma",
+                "keywords": {
+                  "en": [
+                    "stoma",
+                    "hole in his neck",
+                    "hole in her neck",
+                    "hole in their neck",
+                    "tube in the neck",
+                    "breathing hole"
+                  ],
+                  "es": [
+                    "estoma",
+                    "agujero en el cuello",
+                    "orificio en el cuello",
+                    "traqueotomía",
+                    "traqueotomia"
+                  ],
+                  "fr": [
+                    "stomie",
+                    "trou dans le cou",
+                    "orifice au cou",
+                    "trachéotomie",
+                    "tracheotomie"
+                  ]
+                }
+              },
+              {
+                "id": "panicking",
+                "keywords": {
+                  "en": [
+                    "i cannot",
+                    "i can't do this",
+                    "panicking",
+                    "too upset",
+                    "freaking out"
+                  ],
+                  "es": [
+                    "no puedo",
+                    "estoy muy alterado",
+                    "estoy muy alterada",
+                    "en pánico",
+                    "en panico"
+                  ],
+                  "fr": [
+                    "je ne peux pas",
+                    "je panique",
+                    "trop bouleversé",
+                    "trop bouleversee"
+                  ]
+                }
+              },
+              {
+                "id": "none",
+                "keywords": {
+                  "en": [
+                    "nothing",
+                    "no",
+                    "ready",
+                    "go ahead",
+                    "clear"
+                  ],
+                  "es": [
+                    "nada",
+                    "no",
+                    "listo",
+                    "lista",
+                    "adelante"
+                  ],
+                  "fr": [
+                    "rien",
+                    "non",
+                    "prêt",
+                    "pret",
+                    "allez-y"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "vomit",
+              "goto": "vomit"
+            },
+            {
+              "whenOption": "stoma",
+              "goto": "stoma"
+            },
+            {
+              "whenOption": "panicking",
+              "goto": "calm"
+            },
+            {
+              "goto": "airway"
+            }
+          ]
+        },
+        {
+          "id": "vomit",
+          "kind": "say",
+          "stringId": "i2b_vomit",
+          "next": [
+            {
+              "goto": "airway"
+            }
+          ]
+        },
+        {
+          "id": "calm",
+          "kind": "say",
+          "stringId": "i2b_calm",
+          "next": [
+            {
+              "goto": "airway"
+            }
+          ]
+        },
+        {
+          "id": "stoma",
+          "kind": "say",
+          "stringId": "i2b_stoma",
+          "next": [
+            {
+              "gotoScript": "i2c_adult_cpr_check"
+            }
+          ]
+        },
+        {
+          "id": "airway",
+          "kind": "say",
+          "stringId": "i2b_airway"
+        },
+        {
+          "id": "breaths",
+          "kind": "say",
+          "stringId": "i2b_breaths",
+          "next": [
+            {
+              "gotoScript": "i2c_adult_cpr_check"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i2c_adult_cpr_check",
+      "name": {
+        "en": "I2: Adult CPR Instructions — Section C (airway check)",
+        "es": "I2: Instrucciones de RCP en adultos — Sección C (revisión de la vía aérea)",
+        "fr": "I2 : Instructions de réanimation chez l’adulte — Section C (vérification des voies respiratoires)"
+      },
+      "source": "I2: Adult CPR Instructions – Section C, \"Did the chest rise?\"",
+      "steps": [
+        {
+          "id": "chest_rose",
+          "kind": "ask",
+          "slot": "i2_chest_rose",
+          "stringId": "i2_chest_rose",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "rose",
+                    "it rose",
+                    "went up"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "subió",
+                    "subio"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "soulevée",
+                    "soulevee"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "gotoScript": "i5b_choking_adult_airway"
+            },
+            {
+              "gotoScript": "i2c_adult_cpr_entry"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i2c_adult_cpr_entry",
+      "name": {
+        "en": "I2: Adult CPR Instructions — Section C (compression entry point)",
+        "es": "I2: Instrucciones de RCP en adultos — Sección C (entrada a compresiones)",
+        "fr": "I2 : Instructions de réanimation chez l’adulte — Section C (entrée en compressions)"
+      },
+      "source": "I2: Adult CPR Instructions – Section C, \"Compression Only / Choking Adult Entry Point\"",
+      "steps": [
+        {
+          "id": "aed_present",
+          "kind": "ask",
+          "slot": "i2_aed_present",
+          "stringId": "i2_aed_present",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "there is one",
+                    "we have one"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "hay uno",
+                    "tenemos uno"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "il y en a un"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "gotoScript": "i1_aed"
+            },
+            {
+              "gotoScript": "i2d_adult_cpr_compressions"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "i2d_adult_cpr_compressions",
+      "name": {
+        "en": "I2: Adult CPR Instructions — Section D",
+        "es": "I2: Instrucciones de RCP en adultos — Sección D",
+        "fr": "I2 : Instructions de réanimation chez l’adulte — Section D"
+      },
+      "source": "I2: Adult CPR Instructions – Section D",
+      "steps": [
+        {
+          "id": "listen",
+          "kind": "say",
+          "stringId": "i2d_listen"
+        },
+        {
+          "id": "hands",
+          "kind": "say",
+          "stringId": "pd_cpr_hands"
+        },
+        {
+          "id": "push",
+          "kind": "say",
+          "stringId": "pd_cpr_push"
+        },
+        {
+          "id": "thirty",
+          "kind": "say",
+          "stringId": "i2d_thirty",
+          "next": [
+            {
+              "when": [
+                {
+                  "slot": "i2_mouth_to_mouth",
+                  "option": "no"
+                }
+              ],
+              "goto": "compression_only"
+            },
+            {
+              "goto": "breaths_again"
+            }
+          ]
+        },
+        {
+          "id": "compression_only",
+          "kind": "stay",
+          "stringId": "i2d_compression_only"
+        },
+        {
+          "id": "breaths_again",
+          "kind": "say",
+          "stringId": "i2d_breaths_again"
+        },
+        {
+          "id": "continue",
+          "kind": "say",
+          "stringId": "pd_cpr_continue"
+        },
+        {
+          "id": "stay",
+          "kind": "stay",
+          "stringId": "pd_cpr_stay"
+        }
+      ]
+    },
+    {
+      "id": "i5a_choking_adult",
+      "name": {
+        "en": "I5: Choking Adult Instructions — Section A",
+        "es": "I5: Instrucciones de atragantamiento en adultos — Sección A",
+        "fr": "I5 : Instructions d’étouffement chez l’adulte — Section A"
+      },
+      "source": "I5: Choking Adult Instructions – Section A",
+      "steps": [
+        {
+          "id": "can_talk",
+          "kind": "ask",
+          "slot": "i5_can_talk",
+          "stringId": "i5_can_talk",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "talk",
+                    "talking",
+                    "cough",
+                    "coughing"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "habla",
+                    "tose",
+                    "puede hablar"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "parle",
+                    "tousse"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "goto": "stop_reassess"
+            },
+            {
+              "goto": "conscious"
+            }
+          ]
+        },
+        {
+          "id": "stop_reassess",
+          "kind": "stay",
+          "stringId": "i5_stop_reassess"
+        },
+        {
+          "id": "conscious",
+          "kind": "ask",
+          "slot": "i5_conscious",
+          "stringId": "i5_conscious",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "awake",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "despierto",
+                    "despierta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "éveillé",
+                    "eveille"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "witnessed"
+            },
+            {
+              "goto": "listen_next"
+            }
+          ]
+        },
+        {
+          "id": "witnessed",
+          "kind": "ask",
+          "slot": "i5_witnessed",
+          "stringId": "i5_witnessed",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "saw it",
+                    "i saw"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "lo vi",
+                    "la vi"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "je l’ai vu",
+                    "j’ai vu"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "gotoScript": "i2a_adult_cpr_entry"
+            },
+            {
+              "gotoScript": "i5b_choking_adult_airway"
+            }
+          ]
+        },
+        {
+          "id": "listen_next",
+          "kind": "say",
+          "stringId": "i5_listen_next"
+        },
+        {
+          "id": "stand_behind",
+          "kind": "say",
+          "stringId": "i5_stand_behind"
+        },
+        {
+          "id": "fist",
+          "kind": "say",
+          "stringId": "i5_fist"
+        },
+        {
+          "id": "thrusts",
+          "kind": "say",
+          "stringId": "i5_thrusts"
+        },
+        {
+          "id": "outcome",
+          "kind": "ask",
+          "slot": "i5_outcome",
+          "stringId": "i5_outcome",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "unconscious",
+                "keywords": {
+                  "en": [
+                    "unconscious",
+                    "passed out",
+                    "went limp",
+                    "not awake",
+                    "collapsed"
+                  ],
+                  "es": [
+                    "inconsciente",
+                    "se desmayó",
+                    "se desmayo",
+                    "no despierta",
+                    "se desplomó"
+                  ],
+                  "fr": [
+                    "inconscient",
+                    "inconsciente",
+                    "évanoui",
+                    "evanoui",
+                    "ne réagit plus"
+                  ]
+                }
+              },
+              {
+                "id": "dislodged",
+                "keywords": {
+                  "en": [
+                    "out",
+                    "came out",
+                    "dislodged",
+                    "coughed it up",
+                    "breathing now"
+                  ],
+                  "es": [
+                    "salió",
+                    "salio",
+                    "ya salió",
+                    "lo escupió",
+                    "ya respira"
+                  ],
+                  "fr": [
+                    "sorti",
+                    "sortie",
+                    "dégagé",
+                    "degage",
+                    "respire maintenant"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "unconscious",
+              "gotoScript": "i5b_choking_adult_airway"
+            },
+            {
+              "goto": "dislodged"
+            }
+          ]
+        },
+        {
+          "id": "dislodged",
+          "kind": "stay",
+          "stringId": "i5_stop_reassess"
+        }
+      ]
+    },
+    {
+      "id": "i5b_choking_adult_airway",
+      "name": {
+        "en": "I5: Choking Adult Instructions — Section B",
+        "es": "I5: Instrucciones de atragantamiento en adultos — Sección B",
+        "fr": "I5 : Instructions d’étouffement chez l’adulte — Section B"
+      },
+      "source": "I5: Choking Adult Instructions – Section B",
+      "steps": [
+        {
+          "id": "listen",
+          "kind": "say",
+          "stringId": "pd_cpr_listen"
+        },
+        {
+          "id": "position",
+          "kind": "say",
+          "stringId": "i5b_position"
+        },
+        {
+          "id": "airway",
+          "kind": "say",
+          "stringId": "i2b_airway"
+        },
+        {
+          "id": "breaths",
+          "kind": "say",
+          "stringId": "i2b_breaths"
+        },
+        {
+          "id": "chest_rose",
+          "kind": "ask",
+          "slot": "i5b_chest_rose",
+          "stringId": "i2_chest_rose",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "rose",
+                    "it rose",
+                    "went up"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "subió",
+                    "subio"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "soulevée",
+                    "soulevee"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "repeat"
+            },
+            {
+              "goto": "moving"
+            }
+          ]
+        },
+        {
+          "id": "repeat",
+          "kind": "say",
+          "stringId": "i5b_repeat",
+          "next": [
+            {
+              "gotoScript": "i5c_choking_adult_compressions"
+            }
+          ]
+        },
+        {
+          "id": "moving",
+          "kind": "ask",
+          "slot": "i5b_moving",
+          "stringId": "i5b_moving",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "moving",
+                    "breathing"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "se mueve",
+                    "respira"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "bouge",
+                    "respire"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "gotoScript": "i2c_adult_cpr_entry"
+            },
+            {
+              "goto": "roll"
+            }
+          ]
+        },
+        {
+          "id": "roll",
+          "kind": "stay",
+          "stringId": "i5b_roll"
+        }
+      ]
+    },
+    {
+      "id": "i5c_choking_adult_compressions",
+      "name": {
+        "en": "I5: Choking Adult Instructions — Section C",
+        "es": "I5: Instrucciones de atragantamiento en adultos — Sección C",
+        "fr": "I5 : Instructions d’étouffement chez l’adulte — Section C"
+      },
+      "source": "I5: Choking Adult Instructions – Section C",
+      "steps": [
+        {
+          "id": "listen",
+          "kind": "say",
+          "stringId": "i2d_listen"
+        },
+        {
+          "id": "hands",
+          "kind": "say",
+          "stringId": "pd_cpr_hands"
+        },
+        {
+          "id": "push",
+          "kind": "say",
+          "stringId": "i5c_push"
+        },
+        {
+          "id": "look",
+          "kind": "say",
+          "stringId": "i5c_look"
+        },
+        {
+          "id": "cycle",
+          "kind": "say",
+          "stringId": "i5c_cycle"
+        },
+        {
+          "id": "moving",
+          "kind": "ask",
+          "slot": "i5c_moving",
+          "stringId": "i5b_moving",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "moving",
+                    "breathing"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "se mueve",
+                    "respira"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "bouge",
+                    "respire"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "gotoScript": "i2c_adult_cpr_entry"
+            },
+            {
+              "goto": "roll"
+            }
+          ]
+        },
+        {
+          "id": "roll",
+          "kind": "stay",
+          "stringId": "i5b_roll"
+        }
+      ]
+    }
+  ]
 }
