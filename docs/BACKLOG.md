@@ -47,10 +47,18 @@ external input (a permission reply, a decision from Kevin, a records request).
       Street"), `age` is unit-aware so six months routes to the infant deck, and extraction that
       recognises nothing leaves the caller's own words in place. Applied to `us-openises-emd`
       (en/es/fr) and `mx-cnie-911` (es); the other packs stay at 0.1/0.2 as back-compat canaries.
-- [ ] **Fire call-taking deck source hunt (ONE bounded round).** Verify the leads already
+- [x] **Fire call-taking deck source hunt (ONE bounded round).** Verify the leads already
       recorded in PROTOCOL-SOURCES.md (state-admin-code edicts, MuckRock released records,
       obxairwaves stray cards — verify authorship/license before touching, could be an APCO
       copy). Ship a pack ONLY if license-clean; otherwise record findings and mark this item done
       with a summary. Do not loop on hunting.
+      → *Done.* No pack shipped — nothing was licence-clean. Verified and closed: the obxairwaves
+      PDF (33 scanned bitmaps, no text layer, no author/copyright anywhere, host has no standing
+      to license it), the PowerDMS "PGPD" fire dispatch procedure (Punta Gorda, dispatch-side),
+      Butler County KS (mandates ProQA by name), state admin codes (nothing embedded), MuckRock
+      (nothing released). One real find: **North Island 9-1-1 (BC) O.G. 7.4.0 "Standard Call
+      Taking Procedure — Fire Dispatch"** — genuine fire call-taking, no proprietary system, no
+      copyright notice; recorded as a permission-ask lead in the Alameda posture. Closes both the
+      fire and Canada gaps if the ask lands. Full findings in PROTOCOL-SOURCES.md.
 - [ ] **Locale completeness pass.** Everything in the flagship pack trilingual en/es/fr;
       translations flagged editorial in SOURCE.md, as established.

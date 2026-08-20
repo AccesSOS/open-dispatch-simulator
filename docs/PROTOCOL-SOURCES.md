@@ -46,6 +46,23 @@ license, or written permission — with provenance recorded in the pack and enfo
   source only. The shippable scripts are the OpenISES **I-cards** (GFDL) — I2 Adult CPR is now
   wired into the C1 card; I1/I3–I8 (AED, child/infant CPR, choking, childbirth) remain.
 - **Wisconsin / North Carolina / Pennsylvania** — no state-published guidecards found.
+- **`obxairwaves.com/EMD-Cards.pdf`** — checked 2026-08-20 and closed. The file is 33 scanned
+  bitmaps (`emd_card_01.bmp`…`emd_card_33.bmp`) run through Acrobat's image converter: no text
+  layer, and no author, publisher or copyright anywhere in the document. The host is a hobbyist
+  scanner-feed site for Dare County NC whose own page carries only "© 2013 MindBreaking
+  Technologies" for the website and no attribution for the cards. Whatever the images turn out to
+  be, there is no licence notice in the document to verify and the host has no standing to grant
+  one. (It is an EMD set, not fire, so it was never the answer to the fire gap either.)
+- **Punta Gorda FD/PD, "Communications 605.00 General Fire Dispatch Procedures"** (hosted on
+  PowerDMS under the path `PGPD`, which is Punta Gorda Police, not Prince George's) — dispatch-side
+  again: dispatcher responsibilities, general dispatch, incident command, radio, notifications. The
+  only caller-facing content is a four-item minimum-information list (location, type, hazards,
+  caller location). Same category as Phoenix and La Verne.
+- **Butler County KS, "Dispatching SOP IR-1: Incoming Reports"** — mandates the **Priority
+  Dispatch System / ProQA** by name (EPD, EMD, EFD) rather than containing any protocol. Worth
+  generalizing: a county call-taking SOP is usually a pointer at a licensed system, not a source.
+- **NFPA 1221** — referenced by the NI 9-1-1 guideline below as the standard it works to.
+  Copyrighted and sold by NFPA, like ASTM F 1258; not shippable, and not usable as a rubric.
 
 ## Permission-pending / in flight
 
@@ -54,11 +71,35 @@ license, or written permission — with provenance recorded in the pack and enfo
 
 ## Open gaps and promising leads
 
-- **Fire call-taking interrogation** — the biggest remaining domain gap. Four sources checked
-  were dispatch-side only. Leads: more city fire *communications/call-taking* manuals (the
+- **Fire call-taking interrogation** — still the biggest domain gap, but a bounded round on
+  2026-08-20 finally turned up a real one. **North Island 9-1-1 Corporation** (British Columbia)
+  publishes *Operational Guideline 7.4.0, "Standard Call Taking Procedure — Fire Dispatch"* on its
+  own site: a scripted answer phrase ("Fire emergency, for what address?"), address validation,
+  nature-of-call coding with a safety-first default ("when in doubt, page it out"), a caller-safety
+  and evacuation rule (callers are *never* to be told to manage the emergency themselves), a line
+  of questioning (hazards to responders, exposures within 15 ft, special access, special response
+  instructions, medical distress), a medical hand-off question set for BCEHS, and interrogation
+  technique — active listening, resolve an unclear answer within three attempts, open- versus
+  closed-ended questions. No APCO, ProQA, Priority Dispatch or PowerPhone anywhere in it, and no
+  copyright notice.
+
+  **Posture: permission ask, same as Alameda.** NI 9-1-1 is a not-for-profit corporation owned by
+  BC regional districts — a public body publishing its own operational guideline — which is the
+  government-published/no-notice pattern, not an open licence. Recommended next step is a drafted
+  ask filed as an AccesSOS/infra issue for Kevin to send, plus a commented CI allowlist exception,
+  exactly as NJ and Alameda were handled. Note it would be a *thin* pack: it has interrogation and
+  safety instructions but no per-complaint decision trees and no response tiers of its own (it
+  defers to the CAD's initial-assignment recommendation). It is worth having anyway — it closes two
+  recorded gaps at once, fire call-taking **and Canada**.
+
+  Still-unchecked leads for this gap: more city fire *communications/call-taking* manuals (the
   police-manual pattern worked — try Belmont, Sebastopol, Cloverdale, Yuba City equivalents for
-  fire); county public-records requests for PSAP fire guidecards; USFA/FEMA publications
-  (federal PD) worth a deeper pass.
+  fire); county public-records requests for PSAP fire guidecards; USFA/FEMA publications (federal
+  PD) worth a deeper pass. A systematic pass of *state administrative codes* for embedded fire
+  guidecards was run in the same round and found nothing — search results are dominated by APCO's
+  commercial Fire Service Dispatch Guidecards. A MuckRock pass for released fire guidecards or
+  PSAP SOPs also surfaced nothing; filing requests, rather than browsing completed ones, looks
+  like the actual route.
 - **More police packs** — Belmont, Sebastopol, Cloverdale, Yuba City PD dispatcher manuals are
   published like Alameda's (city-permission posture). Useful for jurisdictional variance.
 - **Canada** — no open source found; path is public-records/FOI to Ontario MOH or a CACC, or a
@@ -77,8 +118,9 @@ license, or written permission — with provenance recorded in the pack and enfo
 - **State admin codes as edicts** — some states incorporate dispatch standards into regulation
   (e.g. NJ NJAC 17:24). Cards embedded *in* the administrative code itself would be
   government-edict material (strongest tier). Worth a systematic pass of state 911 regs.
-- **MuckRock** — completed public-records requests are browsable; search for released PSAP
-  guidecards/SOPs before filing new requests.
+- **MuckRock** — completed public-records requests are browsable, but a 2026-08-20 pass for
+  released fire guidecards and PSAP SOPs surfaced none. Treat it as a place to file requests
+  rather than a place to find documents already released.
 - **988 / crisis lines** — SAMHSA publications are federal PD; the Lifeline's clinical safety
   assessment is not. Treat as future work with clinical review, not a quick pack.
 
