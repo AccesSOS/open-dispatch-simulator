@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.4",
   "id": "us-openises-emd",
   "name": {
     "en": "US — Open ISES EMD Guide Cards v0.26.2 (subset)",
@@ -29,13 +29,15 @@
       "id": "q_location",
       "slot": "location",
       "stringId": "q_location",
-      "confirmStringId": "confirm_location"
+      "confirmStringId": "confirm_location",
+      "extract": "address"
     },
     {
       "id": "q_callback",
       "slot": "callback",
       "stringId": "q_callback",
-      "confirmStringId": "confirm_callback"
+      "confirmStringId": "confirm_callback",
+      "extract": "phone"
     },
     {
       "id": "q_emergency",
@@ -46,13 +48,14 @@
     {
       "id": "q_num_hurt",
       "slot": "num_hurt",
-      "stringId": "q_num_hurt"
+      "stringId": "q_num_hurt",
+      "extract": "count"
     },
     {
       "id": "q_age",
       "slot": "age",
       "stringId": "q_age",
-      "extract": "number"
+      "extract": "age"
     },
     {
       "id": "q_conscious",

@@ -35,8 +35,8 @@ const ARREST = {
 
 const CHOKING = { ...ARREST, emergency: 'he is choking', conscious: 'yes', breathing: 'yes' };
 
-test('the pack is v0.3 and carries the digitized instruction cards', () => {
-  assert.equal(pack.schemaVersion, '0.3');
+test('the pack carries the digitized instruction cards', () => {
+  assert.equal(pack.schemaVersion, '0.4');
   const ids = new Set((pack.scripts ?? []).map((s) => s.id));
   for (const expected of [
     'i1_aed',

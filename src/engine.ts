@@ -1,7 +1,10 @@
+import { extractValue } from './extract.js';
 import { determineNodeId, keyQuestionNodeId, scriptStepNodeId } from './graph.js';
+import { lexiconFor } from './lexicon.js';
 import type {
   Condition,
   InstructionScript,
+  Lexicon,
   Locale,
   Persona,
   Phase,
@@ -57,6 +60,7 @@ export class DispatchSession {
   private readonly answers: Record<string, string> = {};
   private readonly choices: Record<string, string> = {};
   private readonly numbers: Record<string, number> = {};
+  private readonly values: Record<string, string> = {};
   private readonly transcript: { role: 'dispatcher' | 'caller'; text: string }[] = [];
   private protocol: Protocol | null = null;
   private determinantId: string | null = null;
@@ -73,6 +77,7 @@ export class DispatchSession {
   private readonly clarifyAttempts: number;
   private readonly confirmRate: number;
   private readonly rng: () => number;
+  private readonly lexicon: Lexicon;
   private clarifies = 0;
 
   constructor(private readonly pack: ProtocolPack, options: SessionOptions = {}) {
@@ -81,6 +86,7 @@ export class DispatchSession {
     this.clarifyAttempts = options.persona?.clarifyAttempts ?? options.clarifyAttempts ?? 1;
     this.confirmRate = options.persona?.confirmRate ?? 0;
     this.rng = mulberry32(options.persona?.seed ?? 1);
+    this.lexicon = lexiconFor(this.locale, pack.lexicon);
     if (!pack.locales.includes(this.locale)) {
       throw new Error(`Pack "${pack.id}" does not support locale "${this.locale}"`);
     }
@@ -119,10 +125,7 @@ export class DispatchSession {
     }
     this.clarifies = 0;
     this.answers[q.slot] = text;
-    if (q.extract === 'number') {
-      const m = text.match(/-?\d+(?:[.,]\d+)?/);
-      if (m) this.numbers[q.slot] = Number(m[0].replace(',', '.'));
-    }
+    this.capture(q.slot, q.extract, text);
     this.emit({
       type: 'answer',
       nodeId: this.nodeIdFor(q),
@@ -211,9 +214,24 @@ export class DispatchSession {
       answers: { ...this.answers },
       choices: { ...this.choices },
       numbers: { ...this.numbers },
+      values: { ...this.values },
       scripts: [...this.scriptsEntered],
       transcript: [...this.transcript],
     };
+  }
+
+  /**
+   * Pull the value out of an answer, if the question asks for one. Extraction
+   * that recognises nothing leaves the caller's own words standing — a
+   * read-back that repeats too much is a nuisance; one that drops the address
+   * is a hazard.
+   */
+  private capture(slot: string, kind: Question['extract'], text: string): void {
+    if (!kind) return;
+    const found = extractValue(kind, text, this.lexicon);
+    if (!found) return;
+    this.values[slot] = found.value;
+    if (found.number !== undefined) this.numbers[slot] = found.number;
   }
 
   /** Evaluate a choice or numeric condition against collected state. A
@@ -440,7 +458,8 @@ export class DispatchSession {
         : entry[0]!
       : entry;
     const text = template.replace(/\{([a-zA-Z][a-zA-Z0-9_]*)\}/g, (_, slot: string) => {
-      const value = this.answers[slot];
+      // An extracted value where there is one; otherwise what the caller said.
+      const value = this.values[slot] ?? this.answers[slot];
       if (value === undefined) throw new Error(`Slot "{${slot}}" not yet collected for "${stringId}"`);
       return value;
     });

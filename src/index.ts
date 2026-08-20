@@ -9,6 +9,9 @@ export {
   scriptStepNodeId,
 } from './graph.js';
 export { loadPack, loadPackFromFile, PackValidationError, REQUIRED_STRING_IDS } from './loader.js';
+export { extractValue, NUMERIC_KINDS } from './extract.js';
+export type { Extracted } from './extract.js';
+export { DEFAULT_LEXICONS, lexiconFor } from './lexicon.js';
 export { runCall, runBatch, sweepScripts, sweepInstructionScripts } from './sim.js';
 export { coverage, loadRubric, loadRubricFromFile, matchTaxonomy, RubricValidationError } from './coverage.js';
 export { diffPacks } from './diff.js';

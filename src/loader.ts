@@ -1,12 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Ajv2020 } from 'ajv/dist/2020.js';
-import type { Condition, ProtocolPack, Question } from './types.js';
+import { KIND_REQUIREMENTS, NUMERIC_KINDS } from './extract.js';
+import { lexiconFor } from './lexicon.js';
+import type { Condition, ExtractKind, ProtocolPack, Question } from './types.js';
 
 const schemaPath = fileURLToPath(new URL('../schema/pack.schema.json', import.meta.url));
 
 const ajv = new Ajv2020({ allErrors: true, formats: { date: true } });
 const validateSchema = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')));
+
+/** Schema versions in order, so feature gates read "at least this version". */
+const SCHEMA_VERSIONS = ['0.1', '0.2', '0.3', '0.4'] as const;
+const atLeast = (declared: string, required: (typeof SCHEMA_VERSIONS)[number]): boolean =>
+  SCHEMA_VERSIONS.indexOf(declared as (typeof SCHEMA_VERSIONS)[number]) >=
+  SCHEMA_VERSIONS.indexOf(required);
 
 /** Engine-required string ids that every locale catalog must define. */
 export const REQUIRED_STRING_IDS = ['greeting', 'closing', 'dispatch_confirm', 'clarify'] as const;
@@ -45,11 +53,15 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
   const stringIds = new Set<string>(REQUIRED_STRING_IDS);
   const slots = new Set<string>();
   const extractNumberSlots = new Set<string>();
+  const extractors = new Map<string, ExtractKind>();
   const collectQuestion = (q: Question) => {
     stringIds.add(q.stringId);
     if (q.confirmStringId) stringIds.add(q.confirmStringId);
     slots.add(q.slot);
-    if (q.extract === 'number') extractNumberSlots.add(q.slot);
+    if (q.extract) {
+      extractors.set(q.id, q.extract);
+      if (NUMERIC_KINDS.has(q.extract)) extractNumberSlots.add(q.slot);
+    }
   };
   pack.caseEntry.forEach(collectQuestion);
   for (const p of pack.protocols) {
@@ -80,9 +92,40 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
     }
   }
 
+  // v0.4 extractors, and the vocabulary they need. A pack that asks for
+  // word-aware extraction in a locale nothing covers is rejected rather than
+  // quietly falling back to digits — the same posture as a missing string.
+  const v04Kinds = [...extractors].filter(([, kind]) => kind !== 'number');
+  if (!atLeast(pack.schemaVersion, '0.4') && v04Kinds.length) {
+    for (const [id, kind] of v04Kinds) {
+      problems.push(`question "${id}" extract: "${kind}" requires schemaVersion 0.4 (pack declares ${pack.schemaVersion})`);
+    }
+  }
+  if (pack.lexicon && !atLeast(pack.schemaVersion, '0.4')) {
+    problems.push(`lexicon requires schemaVersion 0.4 (pack declares ${pack.schemaVersion})`);
+  }
+  for (const [id, kind] of extractors) {
+    for (const needed of KIND_REQUIREMENTS[kind]) {
+      for (const locale of pack.locales) {
+        const table = lexiconFor(locale, pack.lexicon)[needed];
+        const empty = table === undefined || (Array.isArray(table) ? !table.length : !Object.keys(table).length);
+        if (empty) {
+          problems.push(
+            `question "${id}" extract: "${kind}" needs lexicon.${needed} for locale "${locale}" — the engine ships none, so the pack must declare it`,
+          );
+        }
+      }
+    }
+  }
+  for (const locale of Object.keys(pack.lexicon ?? {})) {
+    if (!pack.locales.includes(locale)) {
+      problems.push(`lexicon declares locale "${locale}", which the pack does not`);
+    }
+  }
+
   // v0.3 features must not appear in a pack that declares an older schema:
   // an old engine reading them would silently skip the instructions.
-  if (pack.schemaVersion !== '0.3') {
+  if (!atLeast(pack.schemaVersion, '0.3')) {
     if (pack.scripts?.length) problems.push(`scripts require schemaVersion 0.3 (pack declares ${pack.schemaVersion})`);
     for (const p of pack.protocols) {
       if (p.postDispatchScripts?.length) {
@@ -192,7 +235,7 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
           problems.push(`${where} references unknown option "${cond.option}" on slot "${cond.slot}"`);
         }
       } else if (!extractNumberSlots.has(cond.slot)) {
-        problems.push(`${where} has a numeric condition on slot "${cond.slot}" but no question declares extract: "number" for it`);
+        problems.push(`${where} has a numeric condition on slot "${cond.slot}" but no question declares a numeric extractor for it`);
       }
     }
     const last = p.determinants[p.determinants.length - 1];
@@ -229,7 +272,7 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
       }
     } else if (!extractNumberSlots.has(cond.slot)) {
       problems.push(
-        `${where} has a numeric condition on slot "${cond.slot}" but no question declares extract: "number" for it`,
+        `${where} has a numeric condition on slot "${cond.slot}" but no question declares a numeric extractor for it`,
       );
     }
   };

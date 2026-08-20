@@ -19,7 +19,7 @@
   ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": { "enum": ["0.1", "0.2", "0.3"] },
+    "schemaVersion": { "enum": ["0.1", "0.2", "0.3", "0.4"] },
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "name": { "$ref": "#/$defs/localizedText" },
     "jurisdiction": {
@@ -66,6 +66,22 @@
     "fallbackProtocol": {
       "type": "string",
       "description": "Protocol id used when the chief complaint matches no protocol's keywords."
+    },
+    "lexicon": {
+      "type": "object",
+      "description": "v0.4: per-locale vocabulary the value extractors read — spoken numerals, time units, words for a newborn, street types. The engine ships tables for the locales the corpus speaks; this overrides or extends them, and is required for a locale the engine does not ship.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "numbers": { "type": "object", "additionalProperties": { "type": "number" }, "minProperties": 1 },
+          "ageUnits": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Time-unit word to fraction of a year.", "minProperties": 1 },
+          "ageTerms": { "type": "object", "additionalProperties": { "type": "number" }, "description": "Standalone age word to years.", "minProperties": 1 },
+          "streetTypes": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "unitTypes": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        }
+      }
     },
     "scripts": {
       "type": "array",
@@ -119,8 +135,8 @@
           "description": "Optional read-back template (interpolating this question's slot) that a persona may speak after the answer, e.g. \"Okay, {address}.\""
         },
         "extract": {
-          "const": "number",
-          "description": "v0.2: structurally extract the first number in the answer as this slot's numeric value, enabling numeric determinant/edge conditions (e.g. age > 35)."
+          "enum": ["number", "age", "count", "address", "phone"],
+          "description": "Pull a value out of the caller's answer instead of storing the whole sentence, so a read-back can confirm what was recorded and a condition can test it. v0.2: \"number\" — the first number in the answer, enabling numeric determinant/edge conditions (e.g. age > 35). v0.4: \"age\" is unit-aware (\"six months old\" is 0.5 years, not 6) and understands the locale's words for a newborn; \"count\" reads spoken numerals; \"address\" and \"phone\" pull the value out of a sentence. Extraction that finds nothing leaves the caller's own words in place."
         },
         "expect": { "$ref": "#/$defs/expectation" },
         "next": {

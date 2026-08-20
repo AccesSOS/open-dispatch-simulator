@@ -71,6 +71,7 @@ console.log(call.result());             // protocol, determinant, response level
 | `protocols[].postDispatch` | Instructions read after responders are dispatched |
 | `scripts` | v0.3: interactive instruction scripts (CPR, choking, childbirth) a card hands off to |
 | `protocols[].dispatcherNotes` | v0.3: content for the dispatcher, structurally never spoken |
+| `lexicon` | v0.4: per-locale vocabulary the value extractors read |
 | `strings.<locale>` | Every utterance template, per locale — validated complete at load time |
 | `provenance` | Where the playbook came from and its redistribution license |
 
@@ -99,6 +100,28 @@ v0.3 also adds `dispatcherNotes`: the cards' "Call Taker Prompts", "Dispatcher S
 "Useful Information" — content for the call-taker that is **never spoken**. Those string ids are
 kept disjoint from every spoken id, so "never said to the caller" is enforced by the loader rather
 than trusted.
+
+Schema **v0.4** adds **value extraction**. A caller does not answer in fields — asked for an
+address they say *"uh, we're at 12 Pine Street, the blue house on the corner"* — so a read-back
+that repeats all of that is not a read-back, it is an echo. A question may declare
+`extract: "address" | "phone" | "age" | "count" | "number"`, and `{slot}` then interpolates the
+value instead of the sentence:
+
+```
+I have 12 Pine Street — is that correct?
+Tengo Calle Reforma 10, ¿es correcto?
+```
+
+`age` is unit-aware, which is a routing question and not only a cosmetic one: *"he's six months
+old"* is 0.5 years, not 6, so the cardiac-arrest card reaches the **infant** CPR script rather
+than the child one. It also reads the locale's words for a newborn. Extraction that recognises
+nothing returns nothing and the caller's own words stand — losing information is never the failure
+mode, and `result().answers` always keeps what was actually said.
+
+The words these extractors match are language, not logic, so they live beside the pack's keywords:
+the engine ships tables for the locales the corpus speaks (en/es/fr) and a pack may override them
+or add a locale with its own `lexicon`. A pack that asks for word-aware extraction in a locale
+nothing covers is **rejected at load**, the same as a missing string.
 
 The loader (`loadPack`) enforces the grounding contract up front: every referenced string must
 exist in **every** declared locale, templates may only interpolate collected slots, every edge and

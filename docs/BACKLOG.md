@@ -36,12 +36,17 @@ external input (a permission reply, a decision from Kevin, a records request).
       childbirth, `262fc0e` H1/H3/H4 procedure cards. 37 cards, 27 scripts, 172 steps,
       trilingual; only I9/I10 (airway control) remain. Coverage moved 31/37 → 33/37 (Maine) and
       17/19 → 18/19 with nothing unmet (NHTSA).
-- [ ] **Slot value extraction.** Dispatch read-backs currently interpolate whole caller
+- [x] **Slot value extraction.** Dispatch read-backs currently interpolate whole caller
       sentences. Add deterministic extractors (regex/structured, per slot type — age, counts,
       yes/no, addresses) so read-backs echo values. No LLM. Verify via the sim sweep.
-      *Now also a routing concern:* C1/C2 pick the infant, child or adult instruction deck from
-      the age slot, and "six months old" currently extracts as 6, so an infant described that
-      way takes the child deck.
+      *Was also a routing concern:* C1/C2 pick the infant, child or adult instruction deck from
+      the age slot, and "six months old" extracted as 6, so an infant described that way took the
+      child deck.
+      → *Done.* Schema v0.4: `extract` widened to `number` / `age` / `count` / `address` /
+      `phone`, plus a per-locale `lexicon`. Read-backs now echo the value ("I have 12 Pine
+      Street"), `age` is unit-aware so six months routes to the infant deck, and extraction that
+      recognises nothing leaves the caller's own words in place. Applied to `us-openises-emd`
+      (en/es/fr) and `mx-cnie-911` (es); the other packs stay at 0.1/0.2 as back-compat canaries.
 - [ ] **Fire call-taking deck source hunt (ONE bounded round).** Verify the leads already
       recorded in PROTOCOL-SOURCES.md (state-admin-code edicts, MuckRock released records,
       obxairwaves stray cards — verify authorship/license before touching, could be an APCO

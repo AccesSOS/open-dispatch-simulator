@@ -1,4 +1,9 @@
-/** Types mirroring schema/pack.schema.json (v0.3). */
+/** Types mirroring schema/pack.schema.json (v0.4). */
+
+import type { ExtractKind } from './extract.js';
+import type { Lexicon } from './lexicon.js';
+
+export type { ExtractKind, Lexicon };
 
 export type Locale = string;
 
@@ -52,8 +57,9 @@ export interface Question {
   selectsProtocol?: boolean;
   /** Optional read-back a persona may speak after the answer ("Okay, {address}."). */
   confirmStringId?: string;
-  /** v0.2: structurally extract the first number in the answer for numeric conditions. */
-  extract?: 'number';
+  /** Pull a value out of the answer rather than keeping the whole sentence.
+   * v0.2: 'number'. v0.4: 'age' (unit-aware), 'count', 'address', 'phone'. */
+  extract?: ExtractKind;
   expect?: Expectation;
   next?: Edge[];
 }
@@ -134,7 +140,7 @@ export interface Protocol {
 }
 
 export interface ProtocolPack {
-  schemaVersion: '0.1' | '0.2' | '0.3';
+  schemaVersion: '0.1' | '0.2' | '0.3' | '0.4';
   id: string;
   name: LocalizedText;
   jurisdiction: Jurisdiction;
@@ -144,6 +150,8 @@ export interface ProtocolPack {
   caseEntry: Question[];
   protocols: Protocol[];
   fallbackProtocol: string;
+  /** v0.4: per-locale extractor vocabulary, layered over the engine's tables. */
+  lexicon?: Record<Locale, Lexicon>;
   scripts?: InstructionScript[];
   strings: Record<Locale, Record<string, StringTemplate>>;
 }
@@ -231,8 +239,10 @@ export interface SessionResult {
   response: string | null;
   answers: Record<string, string>;
   choices: Record<string, string>;
-  /** Numbers captured by extract: 'number' questions. */
+  /** Magnitudes captured by numeric extractors — an age is in years. */
   numbers: Record<string, number>;
+  /** v0.4: values pulled out of the answers, for read-backs and templates. */
+  values: Record<string, string>;
   /** v0.3: instruction scripts entered after dispatch, in order. */
   scripts: string[];
   transcript: { role: 'dispatcher' | 'caller'; text: string }[];

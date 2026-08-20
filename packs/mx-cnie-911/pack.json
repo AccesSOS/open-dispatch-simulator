@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.2",
+  "schemaVersion": "0.4",
   "id": "mx-cnie-911",
   "name": {
     "es": "México — 9-1-1 CNIE v3.0 (incidentes médicos, subconjunto)"
@@ -16,14 +16,42 @@
     "digitizedDate": "2026-08-20",
     "notes": "Grounded on the CNIE: incident codes, names, definitions, and atención priorities (ALTA/MEDIA) are taken verbatim from the catalog — protocols cover 10314 Infarto/Urgencia cardiológica, 10313 Paro cardiorrespiratorio, 10308 Persona inconsciente, 10305 Dificultad respiratoria, 10307 Convulsiones, 10224 Deshidratación (MEDIA example), and 10310 Urgencia por enfermedad general (fallback). The CNIE is a CLASSIFICATION catalog, not an interrogation script: the case-entry and key questions are editorial, except the 10314 probes, which are drawn from the catalog's own symptom list (dolor intenso en el pecho, opresión, dolor en brazo izquierdo y cuello, sudoración abundante, náusea y vómito). Card jumps implement CNIE reclassification by definition: unconscious + not breathing IS 10313 ('interrupción... de la actividad mecánica del corazón y de la respiración espontánea'); unconscious but breathing IS 10308 ('pérdida súbita del estado de alerta, incluye personas desmayadas'). Post-dispatch lines are deliberately minimal and non-medical — the CNIE contains no pre-arrival instructions and none are invented. License: gob.mx open-use terms (Libre Uso MX, https://datos.gob.mx/libreusomx) with attribution; the catalog is also a normative instrument of the Sistema Nacional de Seguridad Pública (government-edict character). SIMULATION ONLY — never for live call-taking."
   },
-  "locales": ["es"],
+  "locales": [
+    "es"
+  ],
   "defaultLocale": "es",
   "caseEntry": [
-    { "id": "q_ubicacion", "slot": "ubicacion", "stringId": "q_ubicacion", "confirmStringId": "confirm_ubicacion" },
-    { "id": "q_telefono", "slot": "telefono", "stringId": "q_telefono", "confirmStringId": "confirm_telefono" },
-    { "id": "q_que_sucede", "slot": "que_sucede", "stringId": "q_que_sucede", "selectsProtocol": true },
-    { "id": "q_nombre", "slot": "nombre", "stringId": "q_nombre" },
-    { "id": "q_edad", "slot": "edad", "stringId": "q_edad", "extract": "number" },
+    {
+      "id": "q_ubicacion",
+      "slot": "ubicacion",
+      "stringId": "q_ubicacion",
+      "confirmStringId": "confirm_ubicacion",
+      "extract": "address"
+    },
+    {
+      "id": "q_telefono",
+      "slot": "telefono",
+      "stringId": "q_telefono",
+      "confirmStringId": "confirm_telefono",
+      "extract": "phone"
+    },
+    {
+      "id": "q_que_sucede",
+      "slot": "que_sucede",
+      "stringId": "q_que_sucede",
+      "selectsProtocol": true
+    },
+    {
+      "id": "q_nombre",
+      "slot": "nombre",
+      "stringId": "q_nombre"
+    },
+    {
+      "id": "q_edad",
+      "slot": "edad",
+      "stringId": "q_edad",
+      "extract": "age"
+    },
     {
       "id": "q_consciente",
       "slot": "consciente",
@@ -31,8 +59,29 @@
       "expect": {
         "type": "choice",
         "options": [
-          { "id": "no", "keywords": { "es": ["no", "inconsciente", "desmayado", "desmayada"] } },
-          { "id": "yes", "keywords": { "es": ["sí", "si", "despierto", "despierta", "consciente"] } }
+          {
+            "id": "no",
+            "keywords": {
+              "es": [
+                "no",
+                "inconsciente",
+                "desmayado",
+                "desmayada"
+              ]
+            }
+          },
+          {
+            "id": "yes",
+            "keywords": {
+              "es": [
+                "sí",
+                "si",
+                "despierto",
+                "despierta",
+                "consciente"
+              ]
+            }
+          }
         ]
       }
     },
@@ -43,153 +92,581 @@
       "expect": {
         "type": "choice",
         "options": [
-          { "id": "no", "keywords": { "es": ["no"] } },
-          { "id": "yes", "keywords": { "es": ["sí", "si", "respira", "respirando"] } }
+          {
+            "id": "no",
+            "keywords": {
+              "es": [
+                "no"
+              ]
+            }
+          },
+          {
+            "id": "yes",
+            "keywords": {
+              "es": [
+                "sí",
+                "si",
+                "respira",
+                "respirando"
+              ]
+            }
+          }
         ]
       },
       "next": [
-        { "when": [{ "slot": "consciente", "option": "no" }, { "slot": "respira", "option": "no" }], "gotoProtocol": "inc10313_paro_cardiorrespiratorio" },
-        { "when": [{ "slot": "consciente", "option": "no" }, { "slot": "respira", "option": "yes" }], "gotoProtocol": "inc10308_persona_inconsciente" },
-        { "whenOption": "no", "goto": "$determine" }
+        {
+          "when": [
+            {
+              "slot": "consciente",
+              "option": "no"
+            },
+            {
+              "slot": "respira",
+              "option": "no"
+            }
+          ],
+          "gotoProtocol": "inc10313_paro_cardiorrespiratorio"
+        },
+        {
+          "when": [
+            {
+              "slot": "consciente",
+              "option": "no"
+            },
+            {
+              "slot": "respira",
+              "option": "yes"
+            }
+          ],
+          "gotoProtocol": "inc10308_persona_inconsciente"
+        },
+        {
+          "whenOption": "no",
+          "goto": "$determine"
+        }
       ]
     }
   ],
   "protocols": [
     {
       "id": "inc10314_infarto",
-      "name": { "es": "10314 Infarto / Urgencia cardiológica" },
-      "keywords": { "es": ["dolor de pecho", "pecho", "infarto", "ataque al corazón", "ataque al corazon", "ataque cardiaco", "corazón", "corazon", "opresión en el pecho", "opresion en el pecho"] },
+      "name": {
+        "es": "10314 Infarto / Urgencia cardiológica"
+      },
+      "keywords": {
+        "es": [
+          "dolor de pecho",
+          "pecho",
+          "infarto",
+          "ataque al corazón",
+          "ataque al corazon",
+          "ataque cardiaco",
+          "corazón",
+          "corazon",
+          "opresión en el pecho",
+          "opresion en el pecho"
+        ]
+      },
       "keyQuestions": [
         {
-          "id": "kq_inf_dolor", "slot": "inf_dolor", "stringId": "kq_inf_dolor",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "intenso", "fuerte", "opresión", "opresion"] } }
-          ] }
+          "id": "kq_inf_dolor",
+          "slot": "inf_dolor",
+          "stringId": "kq_inf_dolor",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "intenso",
+                    "fuerte",
+                    "opresión",
+                    "opresion"
+                  ]
+                }
+              }
+            ]
+          }
         },
         {
-          "id": "kq_inf_brazo", "slot": "inf_brazo", "stringId": "kq_inf_brazo",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "brazo", "cuello"] } }
-          ] }
+          "id": "kq_inf_brazo",
+          "slot": "inf_brazo",
+          "stringId": "kq_inf_brazo",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "brazo",
+                    "cuello"
+                  ]
+                }
+              }
+            ]
+          }
         },
         {
-          "id": "kq_inf_sudor", "slot": "inf_sudor", "stringId": "kq_inf_sudor",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "sudando", "sudoración", "sudoracion"] } }
-          ] }
+          "id": "kq_inf_sudor",
+          "slot": "inf_sudor",
+          "stringId": "kq_inf_sudor",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "sudando",
+                    "sudoración",
+                    "sudoracion"
+                  ]
+                }
+              }
+            ]
+          }
         },
         {
-          "id": "kq_inf_nausea", "slot": "inf_nausea", "stringId": "kq_inf_nausea",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "náuseas", "nauseas", "vomitando", "vómito", "vomito"] } }
-          ] }
+          "id": "kq_inf_nausea",
+          "slot": "inf_nausea",
+          "stringId": "kq_inf_nausea",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "náuseas",
+                    "nauseas",
+                    "vomitando",
+                    "vómito",
+                    "vomito"
+                  ]
+                }
+              }
+            ]
+          }
         }
       ],
-      "determinants": [{ "id": "inc10314_alta", "response": "ALTA" }],
-      "postDispatch": ["pd_no_mover", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10314_alta",
+          "response": "ALTA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_no_colgar"
+      ]
     },
     {
       "id": "inc10313_paro_cardiorrespiratorio",
-      "name": { "es": "10313 Paro cardiorrespiratorio" },
-      "keywords": { "es": ["paro cardiaco", "paro cardíaco", "paro", "no respira", "dejó de respirar", "dejo de respirar", "sin pulso", "rcp"] },
+      "name": {
+        "es": "10313 Paro cardiorrespiratorio"
+      },
+      "keywords": {
+        "es": [
+          "paro cardiaco",
+          "paro cardíaco",
+          "paro",
+          "no respira",
+          "dejó de respirar",
+          "dejo de respirar",
+          "sin pulso",
+          "rcp"
+        ]
+      },
       "keyQuestions": [
         {
-          "id": "kq_paro_responde", "slot": "paro_responde", "stringId": "kq_paro_responde",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "responde", "se mueve"] } }
-          ] }
+          "id": "kq_paro_responde",
+          "slot": "paro_responde",
+          "stringId": "kq_paro_responde",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "responde",
+                    "se mueve"
+                  ]
+                }
+              }
+            ]
+          }
         },
-        { "id": "kq_paro_desde", "slot": "paro_desde", "stringId": "kq_paro_desde" }
+        {
+          "id": "kq_paro_desde",
+          "slot": "paro_desde",
+          "stringId": "kq_paro_desde"
+        }
       ],
-      "determinants": [{ "id": "inc10313_alta", "response": "ALTA" }],
-      "postDispatch": ["pd_no_mover", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10313_alta",
+          "response": "ALTA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_no_colgar"
+      ]
     },
     {
       "id": "inc10308_persona_inconsciente",
-      "name": { "es": "10308 Persona inconsciente" },
-      "keywords": { "es": ["inconsciente", "desmayado", "desmayada", "desmayo", "se desmayó", "se desmayo", "no despierta"] },
+      "name": {
+        "es": "10308 Persona inconsciente"
+      },
+      "keywords": {
+        "es": [
+          "inconsciente",
+          "desmayado",
+          "desmayada",
+          "desmayo",
+          "se desmayó",
+          "se desmayo",
+          "no despierta"
+        ]
+      },
       "keyQuestions": [
         {
-          "id": "kq_inc_respira_normal", "slot": "inc_respira_normal", "stringId": "kq_inc_respira_normal",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no", "jadea", "apenas"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "normal", "normalmente"] } }
-          ] },
+          "id": "kq_inc_respira_normal",
+          "slot": "inc_respira_normal",
+          "stringId": "kq_inc_respira_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no",
+                    "jadea",
+                    "apenas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ]
+                }
+              }
+            ]
+          },
           "next": [
-            { "whenOption": "no", "gotoProtocol": "inc10313_paro_cardiorrespiratorio" },
-            { "goto": "kq_inc_primera_vez" }
+            {
+              "whenOption": "no",
+              "gotoProtocol": "inc10313_paro_cardiorrespiratorio"
+            },
+            {
+              "goto": "kq_inc_primera_vez"
+            }
           ]
         },
         {
-          "id": "kq_inc_primera_vez", "slot": "inc_primera_vez", "stringId": "kq_inc_primera_vez",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no", "otra vez", "antes"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "primera"] } }
-          ] }
+          "id": "kq_inc_primera_vez",
+          "slot": "inc_primera_vez",
+          "stringId": "kq_inc_primera_vez",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no",
+                    "otra vez",
+                    "antes"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "primera"
+                  ]
+                }
+              }
+            ]
+          }
         }
       ],
-      "determinants": [{ "id": "inc10308_alta", "response": "ALTA" }],
-      "postDispatch": ["pd_no_mover", "pd_de_lado", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10308_alta",
+          "response": "ALTA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_de_lado",
+        "pd_no_colgar"
+      ]
     },
     {
       "id": "inc10305_dificultad_respiratoria",
-      "name": { "es": "10305 Dificultad respiratoria / Urgencia respiratoria" },
-      "keywords": { "es": ["no puede respirar", "le falta el aire", "falta de aire", "dificultad para respirar", "asma", "se ahoga"] },
+      "name": {
+        "es": "10305 Dificultad respiratoria / Urgencia respiratoria"
+      },
+      "keywords": {
+        "es": [
+          "no puede respirar",
+          "le falta el aire",
+          "falta de aire",
+          "dificultad para respirar",
+          "asma",
+          "se ahoga"
+        ]
+      },
       "keyQuestions": [
         {
-          "id": "kq_dif_habla", "slot": "dif_habla", "stringId": "kq_dif_habla",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "habla", "puede hablar"] } }
-          ] }
+          "id": "kq_dif_habla",
+          "slot": "dif_habla",
+          "stringId": "kq_dif_habla",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "habla",
+                    "puede hablar"
+                  ]
+                }
+              }
+            ]
+          }
         }
       ],
-      "determinants": [{ "id": "inc10305_alta", "response": "ALTA" }],
-      "postDispatch": ["pd_no_mover", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10305_alta",
+          "response": "ALTA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_no_colgar"
+      ]
     },
     {
       "id": "inc10307_convulsiones",
-      "name": { "es": "10307 Convulsiones" },
-      "keywords": { "es": ["convulsión", "convulsion", "convulsiones", "convulsionando", "ataque epiléptico", "ataque epileptico", "epilepsia"] },
+      "name": {
+        "es": "10307 Convulsiones"
+      },
+      "keywords": {
+        "es": [
+          "convulsión",
+          "convulsion",
+          "convulsiones",
+          "convulsionando",
+          "ataque epiléptico",
+          "ataque epileptico",
+          "epilepsia"
+        ]
+      },
       "keyQuestions": [
         {
-          "id": "kq_conv_sigue", "slot": "conv_sigue", "stringId": "kq_conv_sigue",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no", "ya pasó", "ya paso", "terminó", "termino"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "sigue", "todavía", "todavia"] } }
-          ] }
+          "id": "kq_conv_sigue",
+          "slot": "conv_sigue",
+          "stringId": "kq_conv_sigue",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no",
+                    "ya pasó",
+                    "ya paso",
+                    "terminó",
+                    "termino"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "sigue",
+                    "todavía",
+                    "todavia"
+                  ]
+                }
+              }
+            ]
+          }
         },
         {
-          "id": "kq_conv_primera", "slot": "conv_primera", "stringId": "kq_conv_primera",
-          "expect": { "type": "choice", "options": [
-            { "id": "no", "keywords": { "es": ["no", "epiléptico", "epileptico", "antes"] } },
-            { "id": "yes", "keywords": { "es": ["sí", "si", "primera"] } }
-          ] }
+          "id": "kq_conv_primera",
+          "slot": "conv_primera",
+          "stringId": "kq_conv_primera",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "es": [
+                    "no",
+                    "epiléptico",
+                    "epileptico",
+                    "antes"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "es": [
+                    "sí",
+                    "si",
+                    "primera"
+                  ]
+                }
+              }
+            ]
+          }
         }
       ],
-      "determinants": [{ "id": "inc10307_alta", "response": "ALTA" }],
-      "postDispatch": ["pd_no_mover", "pd_no_sujetar", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10307_alta",
+          "response": "ALTA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_no_sujetar",
+        "pd_no_colgar"
+      ]
     },
     {
       "id": "inc10224_deshidratacion",
-      "name": { "es": "10224 Deshidratación" },
-      "keywords": { "es": ["deshidratado", "deshidratada", "deshidratación", "deshidratacion"] },
+      "name": {
+        "es": "10224 Deshidratación"
+      },
+      "keywords": {
+        "es": [
+          "deshidratado",
+          "deshidratada",
+          "deshidratación",
+          "deshidratacion"
+        ]
+      },
       "keyQuestions": [],
-      "determinants": [{ "id": "inc10224_media", "response": "MEDIA" }],
-      "postDispatch": ["pd_no_mover", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10224_media",
+          "response": "MEDIA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_no_colgar"
+      ]
     },
     {
       "id": "inc10310_urgencia_general",
-      "name": { "es": "10310 Urgencia por enfermedad general" },
-      "keywords": { "es": ["se siente mal", "enfermo", "enferma", "malestar"] },
+      "name": {
+        "es": "10310 Urgencia por enfermedad general"
+      },
+      "keywords": {
+        "es": [
+          "se siente mal",
+          "enfermo",
+          "enferma",
+          "malestar"
+        ]
+      },
       "keyQuestions": [],
-      "determinants": [{ "id": "inc10310_alta", "response": "ALTA" }],
-      "postDispatch": ["pd_no_mover", "pd_no_colgar"]
+      "determinants": [
+        {
+          "id": "inc10310_alta",
+          "response": "ALTA"
+        }
+      ],
+      "postDispatch": [
+        "pd_no_mover",
+        "pd_no_colgar"
+      ]
     }
   ],
   "fallbackProtocol": "inc10310_urgencia_general",

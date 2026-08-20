@@ -30,5 +30,7 @@ the work under the project license (https://developercertificate.org/).
   `schema/pack.schema.json`.
 - `npm run coverage` scores packs against the published requirements rubrics in `rubrics/`;
   `npm run diff -- a/pack.json b/pack.json` compares two packs structurally.
+- Extractor vocabulary (`src/lexicon.ts`) is language data, not logic. Adding a locale there is
+  welcome; a pack may also carry its own `lexicon` block.
   Requirements rubrics carry the same licensing bar as packs — see
   [rubrics/README.md](rubrics/README.md).

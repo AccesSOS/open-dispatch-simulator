@@ -44,8 +44,9 @@ branch on what the caller answers and hand off to one another. They needed schem
 C1 (Cardiac/Respiratory Arrest) and C2 (Choking) route to the age-appropriate deck — under 1 to
 the infant cards, under 9 to the child cards, otherwise adult — as the source's own card titles
 direct. The last route carries no condition, so a caller who never gives an age still gets
-instructions. Age routing depends on a number being read out of the caller's answer, and
-"six months old" currently reads as 6, so an infant described that way takes the child deck.
+instructions. Since schema v0.4 the age question uses the unit-aware `age` extractor, so
+"six months old" is 0.5 years and reaches the infant deck; "newborn", "bebé" and "nouveau-né"
+resolve too.
 
 Each card *section* is digitized as its own script, because the source itself names sections as
 jump targets ("Jump to I5: Choking Adult Instructions, Section B"). I2 §C is split further, into
