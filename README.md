@@ -1,0 +1,88 @@
+# Open Dispatch Simulator
+
+> ⚠️ **SIMULATION ONLY.** This project simulates the *dispatcher's* side of an emergency call for
+> testing, research, and practice. It is **not certified for live emergency call-taking**, gives no
+> medical advice, and must never be connected to a real emergency line. **In a real emergency, call
+> your local emergency number (911 in the US, Canada, and Mexico).**
+
+A protocol-grounded, multilingual synthetic 911 dispatcher, built by
+[accesSOS](https://accessos.io) — the nonprofit making emergency services accessible.
+
+Real dispatchers follow strict, trained protocol decision trees. Everyone building toward 911 —
+accessibility apps, crash detection, alarm monitoring, AI callers — needs to test against a
+realistic dispatcher, and there has never been an open, faithful stand-in for one. This engine
+plays that role by **strictly executing a loaded protocol pack, never improvising**: every word it
+says is rendered from the pack's string catalog, so it structurally cannot say anything the
+playbook does not say.
+
+## Two axes, deliberately separate
+
+- **Jurisdiction** is a *pack*: a country/region's call-intake playbook (case-entry questions,
+  protocol decision trees, dispatch determinants, post-dispatch instructions) with provenance and
+  licensing declared per pack. See [`schema/pack.schema.json`](schema/pack.schema.json).
+- **Language** is a *catalog*: protocol logic references string ids, and each pack carries
+  per-locale catalogs. Any playbook can speak any language it ships catalogs for. The reference
+  pack speaks English and Spanish; Canadian packs will ship English/French.
+
+A Mexico pack is not a translated US pack — different protocols, different institutions. The
+schema keeps those concerns apart so both can grow independently.
+
+## Quick start
+
+```bash
+npm install
+npm test
+```
+
+```ts
+import { DispatchSession, loadPackFromFile } from 'open-dispatch-simulator';
+
+const pack = loadPackFromFile('packs/us-nhtsa-emd/pack.json');
+const call = new DispatchSession(pack, { locale: 'es' });
+
+let utterances = call.start();          // "Nueve-uno-uno." / "¿Cuál es la dirección…?"
+utterances = call.answer('Calle Reforma 10');
+// … keep answering until call.isDone()
+console.log(call.result());             // protocol, determinant, response level, transcript
+```
+
+## What's in a pack
+
+| Piece | What it is |
+| --- | --- |
+| `caseEntry` | Universal intake questions asked on every call, in order |
+| `protocols[].keywords` | Per-locale complaint keywords that select the protocol |
+| `protocols[].keyQuestions` | The decision tree: choice questions with conditional edges |
+| `protocols[].determinants` | Ordered rules mapping answers to a neutral response level |
+| `protocols[].postDispatch` | Instructions read after responders are dispatched |
+| `strings.<locale>` | Every utterance template, per locale — validated complete at load time |
+| `provenance` | Where the playbook came from and its redistribution license |
+
+The loader (`loadPack`) enforces the grounding contract up front: every referenced string must
+exist in **every** declared locale, templates may only interpolate collected slots, every edge and
+determinant must reference real questions and options. A pack that loads is safe to execute.
+
+## Content policy
+
+- **Only openly licensed playbooks ship here** — public-domain sources (e.g. the NHTSA EMD
+  National Standard Curriculum), state-published protocols, and public-records SOPs, each with
+  provenance declared in the pack. Proprietary systems (e.g. MPDS®/ProQA®) are **not** included
+  and must not be contributed; agencies that license them may encode them as *private* packs and
+  load them locally.
+- **Synthetic data only.** No real emergency calls, transcripts, or personal data — ever.
+- The bundled [`packs/us-nhtsa-emd`](packs/us-nhtsa-emd/pack.json) is a heavily simplified
+  reference subset that exists to exercise the engine, not a usable medical protocol.
+
+## Roadmap
+
+- Protocol corpus: US state-published protocols; Canada (bilingual EN/FR); Mexico (starting from
+  the national 911 incident catalog, CNIE).
+- Richer caller-answer matching (the v0 keyword matcher is deliberately simple), dispatcher
+  persona traits (patience, interruption handling, interpreter-relay simulation), and
+  call-scoring for automated evaluation.
+- A practice-call web UI so anyone can safely rehearse calling 911 in their own language.
+
+## License
+
+[AGPL-3.0-only](LICENSE). Protocol packs carry their own content licenses in `provenance`.
+"accesSOS" and the accesSOS logo are trademarks of accesSOS — see [TRADEMARKS.md](TRADEMARKS.md).

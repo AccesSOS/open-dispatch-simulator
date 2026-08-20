@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AccesSOS/open-dispatch-simulator/schema/pack.schema.json",
+  "title": "Protocol Pack",
+  "description": "A jurisdiction's emergency call-intake playbook, expressed as a decision tree with per-locale string catalogs. Protocol logic is language-neutral; every caller-facing utterance is a stringId resolved against the catalog for the active locale.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "jurisdiction",
+    "provenance",
+    "locales",
+    "defaultLocale",
+    "caseEntry",
+    "protocols",
+    "fallbackProtocol",
+    "strings"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "name": { "$ref": "#/$defs/localizedText" },
+    "jurisdiction": {
+      "type": "object",
+      "required": ["country", "emergencyNumber"],
+      "additionalProperties": false,
+      "properties": {
+        "country": { "type": "string", "description": "ISO 3166-1 alpha-2", "pattern": "^[A-Z]{2}$" },
+        "region": { "type": "string", "description": "State/province/agency scope, free-form" },
+        "emergencyNumber": { "type": "string", "description": "e.g. 911" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Where this playbook's content came from and under what license it may be redistributed. Packs without redistribution rights must not be published in the public corpus.",
+      "required": ["source", "license"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "url": { "type": "string" },
+        "license": { "type": "string", "description": "SPDX id or 'public-domain'" },
+        "digitizedDate": { "type": "string", "format": "date" },
+        "notes": { "type": "string" }
+      }
+    },
+    "locales": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/locale" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "defaultLocale": { "$ref": "#/$defs/locale" },
+    "caseEntry": {
+      "type": "array",
+      "description": "Universal intake questions asked on every call, in order, before a protocol is selected.",
+      "items": { "$ref": "#/$defs/question" },
+      "minItems": 1
+    },
+    "protocols": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/protocol" },
+      "minItems": 1
+    },
+    "fallbackProtocol": {
+      "type": "string",
+      "description": "Protocol id used when the chief complaint matches no protocol's keywords."
+    },
+    "strings": {
+      "type": "object",
+      "description": "Per-locale catalogs: stringId -> template. Templates may interpolate collected slots as {slotName}. The catalogs 'greeting', 'closing', and 'dispatch_confirm' ids are required by the engine.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "locale": { "type": "string", "pattern": "^[a-z]{2}(-[A-Za-z0-9]+)?$" },
+    "localizedText": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "minProperties": 1
+    },
+    "localizedKeywords": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" },
+        "minItems": 1
+      },
+      "minProperties": 1
+    },
+    "question": {
+      "type": "object",
+      "required": ["id", "slot", "stringId"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "slot": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$" },
+        "stringId": { "type": "string" },
+        "selectsProtocol": {
+          "type": "boolean",
+          "description": "This answer is matched against protocol keywords to choose the protocol."
+        },
+        "expect": { "$ref": "#/$defs/expectation" },
+        "next": {
+          "type": "array",
+          "description": "Conditional edges evaluated after this question is answered. If absent, flow continues to the next question in sequence.",
+          "items": { "$ref": "#/$defs/edge" }
+        }
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "required": ["type", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "choice" },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id", "keywords"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "keywords": { "$ref": "#/$defs/localizedKeywords" }
+            }
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["goto"],
+      "additionalProperties": false,
+      "properties": {
+        "whenOption": {
+          "type": "string",
+          "description": "Take this edge when the answered option id matches. An edge without whenOption is the default."
+        },
+        "goto": {
+          "type": "string",
+          "description": "A question id within the same protocol, or the sentinel '$determine' to proceed to determinant selection."
+        }
+      }
+    },
+    "protocol": {
+      "type": "object",
+      "required": ["id", "name", "keywords", "keyQuestions", "determinants", "postDispatch"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "keywords": { "$ref": "#/$defs/localizedKeywords" },
+        "keyQuestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/question" }
+        },
+        "determinants": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Ordered rules; the first whose conditions all match wins. The final rule should omit 'when' as a default.",
+          "items": {
+            "type": "object",
+            "required": ["id", "response"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "when": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["slot", "option"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "slot": { "type": "string" },
+                    "option": { "type": "string" }
+                  }
+                }
+              },
+              "response": {
+                "type": "string",
+                "description": "Neutral response level, e.g. BLS_COLD, ALS_COLD, ALS_HOT."
+              }
+            }
+          }
+        },
+        "postDispatch": {
+          "type": "array",
+          "description": "stringIds of instructions read to the caller after responders are dispatched.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

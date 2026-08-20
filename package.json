@@ -1,0 +1,41 @@
+{
+  "name": "open-dispatch-simulator",
+  "version": "0.1.0",
+  "description": "A protocol-grounded, multilingual synthetic 911 dispatcher for testing, research, and practice. Simulation only — not for live emergency call-taking.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "schema",
+    "packs",
+    "TRADEMARKS.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AccesSOS/open-dispatch-simulator"
+  },
+  "keywords": [
+    "911",
+    "emergency-dispatch",
+    "simulation",
+    "psap",
+    "emd",
+    "accessibility",
+    "i18n"
+  ],
+  "dependencies": {
+    "ajv": "^8.17.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
