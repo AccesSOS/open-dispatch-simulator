@@ -36,8 +36,10 @@ branch on what the caller answers and hand off to one another. They needed schem
 | I7 Choking Infant (sections A–D) | digitized |
 | I8 Childbirth (sections A–B) | digitized |
 | I11 Bleeding Control | digitized (as flat post-dispatch lines — the card has no branches) |
+| H1 Aircraft/Terrorism | digitized |
+| H3 HazMat Incident Guidelines | digitized |
+| H4 Helicopter Guidelines (landing zone) | digitized |
 | I9/I10 Medical & Traumatic Airway Control | not yet |
-| H1 Aircraft/Terrorism, H3 HazMat, H4 Helicopter | not yet |
 
 C1 (Cardiac/Respiratory Arrest) and C2 (Choking) route to the age-appropriate deck — under 1 to
 the infant cards, under 9 to the child cards, otherwise adult — as the source's own card titles
@@ -66,6 +68,14 @@ Two deliberate departures, both forced by the medium:
   push, or the head visible — rather than asking again. Its "baby delivered and not breathing"
   arrow points at the I7 card, and is digitized that way even though a newborn is not choking on
   an object: the arrow is the card's.
+
+The three procedure cards produce no CODE RED/YELLOW tier — their dispatch sections are agency
+notifications and a landing zone, not medical responses — so each declares its own outcome
+(`NOTIFY_AIR_DEFENSE`, `NOTIFY_HAZMAT_AGENCIES`, `LANDING_ZONE`) rather than being filed under a
+tier it does not have. H3 routes injuries to the T9 traumatic injury card, which is what its own
+dispatch section directs. H4's first page is air-transport criteria for the call-taker rather than
+anything spoken, so it lives in `dispatcherNotes.useful`; its landing-zone page is the caller
+interrogation.
 
 **Not digitized on purpose:** H1's list of Air Defense Sector telephone numbers. The source itself
 says "The numbers above should be verified before their use becomes necessary. These numbers can

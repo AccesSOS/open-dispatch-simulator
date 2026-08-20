@@ -272,3 +272,83 @@ test('every instruction step is reachable in every locale, and every walk closes
     }
   }
 });
+
+test('the H procedure cards declare their own outcome, not a medical tier', () => {
+  const outcomes = new Map(
+    ['h1_aircraft_terrorism', 'h3_hazmat_incident', 'h4_helicopter_landing_zone'].map((id) => {
+      const p = pack.protocols.find((x) => x.id === id)!;
+      return [id, p.determinants.map((d) => d.response)];
+    }),
+  );
+  assert.deepEqual(outcomes.get('h1_aircraft_terrorism'), ['NOTIFY_AIR_DEFENSE']);
+  assert.deepEqual(outcomes.get('h3_hazmat_incident'), ['NOTIFY_HAZMAT_AGENCIES']);
+  assert.deepEqual(outcomes.get('h4_helicopter_landing_zone'), ['LANDING_ZONE']);
+  // …and none of them borrow the medical taxonomy.
+  for (const responses of outcomes.values()) {
+    assert.ok(!responses.some((r) => r.startsWith('CODE_')));
+  }
+});
+
+test('H3 hands injuries to the trauma card, as its own dispatch section directs', () => {
+  const s = run({
+    location: 'the rail yard on 4th',
+    callback: '555-0100',
+    emergency: 'a tanker is leaking',
+    num_hurt: 'two',
+    age: '40',
+    conscious: 'yes',
+    breathing: 'yes',
+    sex: 'unknown',
+    caller_name: 'Ana',
+    h3_safe: 'yes',
+    h3_injuries: 'yes, two people are hurt',
+    t9_alert: 'yes',
+    t9_breathing_normal: 'yes',
+  });
+  const r = s.result();
+  assert.equal(r.protocolId, 't9_traumatic_injury', 'the trauma card took over');
+  assert.ok(r.response?.startsWith('CODE_'), 'and it produces a medical tier');
+});
+
+test('H3 with no injuries stays on the HazMat card and notifies agencies', () => {
+  const s = run({
+    location: 'the rail yard on 4th',
+    callback: '555-0100',
+    emergency: 'a tanker is leaking',
+    num_hurt: 'nobody',
+    age: '40',
+    conscious: 'yes',
+    breathing: 'yes',
+    sex: 'unknown',
+    caller_name: 'Ana',
+    h3_safe: 'yes',
+    h3_injuries: 'no',
+    h3_state: 'liquid',
+  });
+  const r = s.result();
+  assert.equal(r.protocolId, 'h3_hazmat_incident');
+  assert.equal(r.response, 'NOTIFY_HAZMAT_AGENCIES');
+  const said = r.transcript.filter((t) => t.role === 'dispatcher').map((t) => t.text).join(' ');
+  assert.match(said, /Deny entry to the affected area/);
+});
+
+test('dispatcher notes never reach the caller, on any card, in any locale', () => {
+  const noteIds = new Set(
+    pack.protocols.flatMap((p) => {
+      const n = p.dispatcherNotes;
+      return n ? [...(n.prompts ?? []), ...(n.shortReport ?? []), ...(n.useful ?? [])] : [];
+    }),
+  );
+  assert.ok(noteIds.size >= 8, `only ${noteIds.size} dispatcher-note strings`);
+  for (const locale of pack.locales) {
+    const texts = new Set<string>();
+    for (const call of runBatch(pack, sweepInstructionScripts(pack, locale).scripts).calls) {
+      for (const line of call.result.transcript) texts.add(line.text);
+    }
+    for (const id of noteIds) {
+      const note = pack.strings[locale]?.[id];
+      assert.ok(note, `note ${id} missing in ${locale}`);
+      assert.ok(!texts.has(note as string), `note ${id} was spoken in ${locale}`);
+    }
+  }
+});

@@ -16,7 +16,7 @@
     "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
     "license": "GFDL-1.2-or-later",
     "digitizedDate": "2026-08-20",
-    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized. 2026-08-20 (5): added cards M1 (Abdominal Pain), M2 (Allergies/Stings), M15 (Sick Person), T2 (Assault/DV/Sexual Assault), T3 (Bleeding/Laceration), T6 (Falls), C3 (Drowning), C5 (Pregnancy/Childbirth). T3's post-dispatch reads the I11 Bleeding Control script (direct pressure, don't remove soaked cloth). T6 uses a numeric condition for the card's 'falls greater than 10 feet' RED. T2's stabbing/shooting answer jumps to T8 per the card; M1/M15 chest pain jumps to M5. Structural proxies noted: M1's 'lower abdominal pain in female 12-50' is approximated by the could-be-pregnant answer; M2's 'multiple areas' criterion by symptoms-getting-worse; T2/T3 'uncontrolled bleeding' by any-bleeding (safer tier). C5 imminent-delivery RED triggers on urge-to-push or visible head; its I8 Childbirth script is not yet digitized. 2026-08-20 (6): final card batch — M3 (Back Pain), M7 (Headache), M8 (HCP Requests EMS), M9 (Home Medical Equipment: the card's ventilator->C1, apnea-monitor->M4, implanted-defibrillator->M5 jumps are modeled), M10 (Obvious Death: caller-unsure jumps to C1 per the card; note the All-Caller breathing=no branch may route such calls to C1 before M10's question — mirroring the chart's precedence of resuscitation over confirmation), M12 (Person Assistance), T1 (Animal Bites), T5 (Eye Problems/Injuries: chemical answer jumps to T4 per the card; the card grades ANY eye injury CODE YELLOW), T7 (Heat/Cold Exposure), T9 (Traumatic Injury), H5 (Industrial Accident; the trapped question is editorial, drawn from the card's own CODE RED criterion). NOT digitized, by design: H1 (Aircraft/Terrorism — air-defense notification procedure, includes dated sector phone numbers), H3 (HazMat guidelines) and H4 (Helicopter landing zones) — dispatcher/responder procedure cards with no caller interrogation; and scripted cards I1, I3-I8. Anatomy-based criteria (injury above the knee, 20% body surface) remain free-text and land on the safer applicable tier. Instruction cards I1 (AED), I2 (Adult CPR, sections A–D) and I5 (Choking Adult, sections A–C) are digitized as v0.3 instruction scripts, one script per card section, because the source itself names sections as jump targets (\"Jump to I5: Choking Adult Instructions, Section B\"). Section C of I2 is split into two scripts — the \"Did the chest rise?\" gate and the \"Compression Only / Choking Adult Entry Point\" below it — because the card gives that lower half its own entry points; keeping them one script would have made the I2↔I5 hand-offs a cycle rather than the one-way flow the card actually describes. The printed cards react to things a caller volunteers (patient vomited, stoma, hysterical caller); a turn-based engine cannot receive an unprompted report, so those become one asked question whose options are the card’s own branch labels. I1’s step 1 age gate (\"if not at least one year of age, jump to I4\") is enforced upstream instead, by the card’s postDispatchScripts age routing. The paediatric instruction cards I3 (Child CPR), I4 (Infant CPR), I6 (Choking Child) and I7 (Choking Infant) follow the same section-per-script treatment, and C1/C2 route to the age-appropriate deck (under 1 → infant, under 9 → child, otherwise adult) as the source’s own card titles direct. Age routing depends on a number being captured from the caller’s answer: \"six months old\" currently reads as 6, so an infant described that way takes the child deck. I7 §B’s \"still conscious & choking, repeat sequence\" is a loop on the printed card; it is digitized as a terminal instruction to repeat the sequence and report back, because a script that can re-enter itself is rejected at load. I8 (Childbirth) reuses C5’s own key questions for the imminence branch the card draws — a strong urge to push, or the head visible — rather than asking again. Its \"baby delivered and not breathing\" arrow points at the I7 card, and is digitized that way even though a newborn is not choking on an object: the arrow is the card’s."
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized. 2026-08-20 (5): added cards M1 (Abdominal Pain), M2 (Allergies/Stings), M15 (Sick Person), T2 (Assault/DV/Sexual Assault), T3 (Bleeding/Laceration), T6 (Falls), C3 (Drowning), C5 (Pregnancy/Childbirth). T3's post-dispatch reads the I11 Bleeding Control script (direct pressure, don't remove soaked cloth). T6 uses a numeric condition for the card's 'falls greater than 10 feet' RED. T2's stabbing/shooting answer jumps to T8 per the card; M1/M15 chest pain jumps to M5. Structural proxies noted: M1's 'lower abdominal pain in female 12-50' is approximated by the could-be-pregnant answer; M2's 'multiple areas' criterion by symptoms-getting-worse; T2/T3 'uncontrolled bleeding' by any-bleeding (safer tier). C5 imminent-delivery RED triggers on urge-to-push or visible head; its I8 Childbirth script is not yet digitized. 2026-08-20 (6): final card batch — M3 (Back Pain), M7 (Headache), M8 (HCP Requests EMS), M9 (Home Medical Equipment: the card's ventilator->C1, apnea-monitor->M4, implanted-defibrillator->M5 jumps are modeled), M10 (Obvious Death: caller-unsure jumps to C1 per the card; note the All-Caller breathing=no branch may route such calls to C1 before M10's question — mirroring the chart's precedence of resuscitation over confirmation), M12 (Person Assistance), T1 (Animal Bites), T5 (Eye Problems/Injuries: chemical answer jumps to T4 per the card; the card grades ANY eye injury CODE YELLOW), T7 (Heat/Cold Exposure), T9 (Traumatic Injury), H5 (Industrial Accident; the trapped question is editorial, drawn from the card's own CODE RED criterion). NOT digitized, by design: H1 (Aircraft/Terrorism — air-defense notification procedure, includes dated sector phone numbers), H3 (HazMat guidelines) and H4 (Helicopter landing zones) — dispatcher/responder procedure cards with no caller interrogation; and scripted cards I1, I3-I8. Anatomy-based criteria (injury above the knee, 20% body surface) remain free-text and land on the safer applicable tier. Instruction cards I1 (AED), I2 (Adult CPR, sections A–D) and I5 (Choking Adult, sections A–C) are digitized as v0.3 instruction scripts, one script per card section, because the source itself names sections as jump targets (\"Jump to I5: Choking Adult Instructions, Section B\"). Section C of I2 is split into two scripts — the \"Did the chest rise?\" gate and the \"Compression Only / Choking Adult Entry Point\" below it — because the card gives that lower half its own entry points; keeping them one script would have made the I2↔I5 hand-offs a cycle rather than the one-way flow the card actually describes. The printed cards react to things a caller volunteers (patient vomited, stoma, hysterical caller); a turn-based engine cannot receive an unprompted report, so those become one asked question whose options are the card’s own branch labels. I1’s step 1 age gate (\"if not at least one year of age, jump to I4\") is enforced upstream instead, by the card’s postDispatchScripts age routing. The paediatric instruction cards I3 (Child CPR), I4 (Infant CPR), I6 (Choking Child) and I7 (Choking Infant) follow the same section-per-script treatment, and C1/C2 route to the age-appropriate deck (under 1 → infant, under 9 → child, otherwise adult) as the source’s own card titles direct. Age routing depends on a number being captured from the caller’s answer: \"six months old\" currently reads as 6, so an infant described that way takes the child deck. I7 §B’s \"still conscious & choking, repeat sequence\" is a loop on the printed card; it is digitized as a terminal instruction to repeat the sequence and report back, because a script that can re-enter itself is rejected at load. I8 (Childbirth) reuses C5’s own key questions for the imminence branch the card draws — a strong urge to push, or the head visible — rather than asking again. Its \"baby delivered and not breathing\" arrow points at the I7 card, and is digitized that way even though a newborn is not choking on an object: the arrow is the card’s. The three procedure cards H1 (Aircraft/Terrorism), H3 (HazMat Incident Guidelines) and H4 (Helicopter Guidelines) produce no CODE RED/YELLOW tier — their dispatch sections are agency notifications and a landing zone, so each declares its own outcome (NOTIFY_AIR_DEFENSE / NOTIFY_HAZMAT_AGENCIES / LANDING_ZONE) rather than being filed under a medical tier it does not have. H3 routes injuries to the T9 traumatic injury card, which is what its own dispatch section directs. H4’s first page is air-transport criteria for the call-taker rather than anything spoken, so it lives in dispatcherNotes.useful; the landing-zone page is the caller interrogation. H1’s Air Defense Sector telephone numbers are deliberately not shipped — the source itself says they change and must be verified before use."
   },
   "locales": [
     "en",
@@ -13732,6 +13732,572 @@
         "pd_m17_flag_unit",
         "pd_callback_changes"
       ]
+    },
+    {
+      "id": "h1_aircraft_terrorism",
+      "name": {
+        "en": "H1: Aircraft/Terrorism",
+        "es": "H1: Aeronave / Terrorismo",
+        "fr": "H1 : Aéronef / Terrorisme"
+      },
+      "keywords": {
+        "en": [
+          "hijack",
+          "hijacked",
+          "hijacking",
+          "terrorist",
+          "terrorism",
+          "on the plane",
+          "on board the plane",
+          "aircraft",
+          "airplane",
+          "suspicious aircraft",
+          "stolen plane"
+        ],
+        "es": [
+          "secuestro aéreo",
+          "secuestro aereo",
+          "secuestraron el avión",
+          "terrorista",
+          "terrorismo",
+          "en el avión",
+          "en el avion",
+          "aeronave",
+          "avión sospechoso",
+          "avion sospechoso"
+        ],
+        "fr": [
+          "détournement",
+          "detournement",
+          "détourné",
+          "terroriste",
+          "terrorisme",
+          "dans l’avion",
+          "à bord de l’avion",
+          "aéronef",
+          "avion suspect"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_h1_caller",
+          "slot": "h1_caller",
+          "stringId": "kq_h1_caller"
+        },
+        {
+          "id": "kq_h1_flight",
+          "slot": "h1_flight",
+          "stringId": "kq_h1_flight"
+        },
+        {
+          "id": "kq_h1_cell",
+          "slot": "h1_cell",
+          "stringId": "kq_h1_cell"
+        },
+        {
+          "id": "kq_h1_intent",
+          "slot": "h1_intent",
+          "stringId": "kq_h1_intent"
+        },
+        {
+          "id": "kq_h1_injured",
+          "slot": "h1_injured",
+          "stringId": "kq_h1_injured",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "hurt",
+                    "injured",
+                    "bleeding"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "herido",
+                    "herida",
+                    "lastimado"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "blessé",
+                    "blesse"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_h1_can_help",
+          "slot": "h1_can_help",
+          "stringId": "kq_h1_can_help",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "i can",
+                    "able"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "puedo",
+                    "sí puedo"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "je peux"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "h1_notify_air_defense",
+          "response": "NOTIFY_AIR_DEFENSE"
+        }
+      ],
+      "postDispatch": [
+        "pd_h1_stay_calm",
+        "pd_h1_help_hurt"
+      ],
+      "dispatcherNotes": {
+        "prompts": [
+          "note_h1_notify",
+          "note_h1_when_to_call",
+          "note_h1_when_not"
+        ],
+        "shortReport": [
+          "note_h1_report"
+        ]
+      }
+    },
+    {
+      "id": "h3_hazmat_incident",
+      "name": {
+        "en": "H3: HazMat Incident Guidelines",
+        "es": "H3: Guía de incidentes con materiales peligrosos",
+        "fr": "H3 : Directives pour incident de matières dangereuses"
+      },
+      "keywords": {
+        "en": [
+          "spill",
+          "spilled",
+          "tanker",
+          "placard",
+          "railcar",
+          "leaking drum",
+          "hazardous material",
+          "material release",
+          "tank leaking"
+        ],
+        "es": [
+          "derrame",
+          "se derramó",
+          "se derramo",
+          "pipa",
+          "placa de identificación",
+          "vagón",
+          "vagon",
+          "tambo con fuga",
+          "material peligroso",
+          "fuga del tanque"
+        ],
+        "fr": [
+          "déversement",
+          "deversement",
+          "citerne",
+          "plaque de danger",
+          "wagon",
+          "fût qui fuit",
+          "matière dangereuse",
+          "rejet de matière",
+          "réservoir qui fuit"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_h3_exact",
+          "slot": "h3_exact",
+          "stringId": "kq_h3_exact"
+        },
+        {
+          "id": "kq_h3_direction",
+          "slot": "h3_direction",
+          "stringId": "kq_h3_direction"
+        },
+        {
+          "id": "kq_h3_access",
+          "slot": "h3_access",
+          "stringId": "kq_h3_access"
+        },
+        {
+          "id": "kq_h3_safe",
+          "slot": "h3_safe",
+          "stringId": "kq_h3_safe",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "safe",
+                    "i am safe"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "seguro",
+                    "a salvo"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "en sécurité",
+                    "en securite"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_h3_hazard",
+          "slot": "h3_hazard",
+          "stringId": "kq_h3_hazard"
+        },
+        {
+          "id": "kq_h3_injuries",
+          "slot": "h3_injuries",
+          "stringId": "kq_h3_injuries",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "hurt",
+                    "injured",
+                    "bleeding"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "herido",
+                    "herida",
+                    "lastimado"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "blessé",
+                    "blesse"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "gotoProtocol": "t9_traumatic_injury"
+            }
+          ]
+        },
+        {
+          "id": "kq_h3_material",
+          "slot": "h3_material",
+          "stringId": "kq_h3_material"
+        },
+        {
+          "id": "kq_h3_state",
+          "slot": "h3_state",
+          "stringId": "kq_h3_state",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "gas",
+                "keywords": {
+                  "en": [
+                    "gas",
+                    "vapor",
+                    "fumes",
+                    "cloud"
+                  ],
+                  "es": [
+                    "gas",
+                    "vapor",
+                    "humo",
+                    "nube"
+                  ],
+                  "fr": [
+                    "gaz",
+                    "vapeur",
+                    "fumée",
+                    "nuage"
+                  ]
+                }
+              },
+              {
+                "id": "liquid",
+                "keywords": {
+                  "en": [
+                    "liquid",
+                    "fluid",
+                    "pooling"
+                  ],
+                  "es": [
+                    "líquido",
+                    "liquido",
+                    "encharcado"
+                  ],
+                  "fr": [
+                    "liquide",
+                    "flaque"
+                  ]
+                }
+              },
+              {
+                "id": "solid",
+                "keywords": {
+                  "en": [
+                    "solid",
+                    "powder",
+                    "pellets",
+                    "granules"
+                  ],
+                  "es": [
+                    "sólido",
+                    "solido",
+                    "polvo",
+                    "gránulos"
+                  ],
+                  "fr": [
+                    "solide",
+                    "poudre",
+                    "granulés"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "h3_notify_hazmat_agencies",
+          "response": "NOTIFY_HAZMAT_AGENCIES"
+        }
+      ],
+      "postDispatch": [
+        "pd_h3_leave",
+        "pd_h3_gather_info",
+        "pd_h3_deny_entry",
+        "pd_h3_isolate_injured"
+      ],
+      "dispatcherNotes": {
+        "prompts": [
+          "note_h3_prompts",
+          "note_h3_agencies"
+        ],
+        "shortReport": [
+          "note_h3_report"
+        ]
+      }
+    },
+    {
+      "id": "h4_helicopter_landing_zone",
+      "name": {
+        "en": "H4: Helicopter Guidelines — Landing Zone",
+        "es": "H4: Guía de helicóptero — Zona de aterrizaje",
+        "fr": "H4 : Directives hélicoptère — Zone d’atterrissage"
+      },
+      "keywords": {
+        "en": [
+          "landing zone",
+          "helicopter",
+          "air ambulance",
+          "medevac",
+          "life flight",
+          "air transport",
+          "flight crew coming"
+        ],
+        "es": [
+          "zona de aterrizaje",
+          "helicóptero",
+          "helicoptero",
+          "ambulancia aérea",
+          "ambulancia aerea",
+          "transporte aéreo",
+          "transporte aereo"
+        ],
+        "fr": [
+          "zone d’atterrissage",
+          "hélicoptère",
+          "helicoptere",
+          "ambulance aérienne",
+          "évacuation sanitaire",
+          "transport aérien"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_h4_where",
+          "slot": "h4_where",
+          "stringId": "kq_h4_where"
+        },
+        {
+          "id": "kq_h4_describe",
+          "slot": "h4_describe",
+          "stringId": "kq_h4_describe"
+        },
+        {
+          "id": "kq_h4_size",
+          "slot": "h4_size",
+          "stringId": "kq_h4_size"
+        },
+        {
+          "id": "kq_h4_terrain",
+          "slot": "h4_terrain",
+          "stringId": "kq_h4_terrain"
+        },
+        {
+          "id": "kq_h4_obstacles",
+          "slot": "h4_obstacles",
+          "stringId": "kq_h4_obstacles"
+        },
+        {
+          "id": "kq_h4_wind",
+          "slot": "h4_wind",
+          "stringId": "kq_h4_wind"
+        },
+        {
+          "id": "kq_h4_marking",
+          "slot": "h4_marking",
+          "stringId": "kq_h4_marking"
+        },
+        {
+          "id": "kq_h4_approach",
+          "slot": "h4_approach",
+          "stringId": "kq_h4_approach"
+        },
+        {
+          "id": "kq_h4_relative",
+          "slot": "h4_relative",
+          "stringId": "kq_h4_relative"
+        }
+      ],
+      "determinants": [
+        {
+          "id": "h4_landing_zone",
+          "response": "LANDING_ZONE"
+        }
+      ],
+      "postDispatch": [
+        "pd_h4_keep_clear",
+        "pd_h4_secure_loose",
+        "pd_h4_stay_on_line"
+      ],
+      "dispatcherNotes": {
+        "prompts": [
+          "note_h4_prompts"
+        ],
+        "shortReport": [
+          "note_h4_report"
+        ],
+        "useful": [
+          "note_h4_criteria_time",
+          "note_h4_criteria_mechanism",
+          "note_h4_criteria_clinical"
+        ]
+      }
     }
   ],
   "fallbackProtocol": "m17_unknown_man_down",
@@ -14084,7 +14650,51 @@
       "i8b_breathing": "Is the baby breathing?",
       "i8b_stimulate": "Rub the baby's back, or gently slap the soles of its feet. If the baby doesn't start breathing right away, come back to the phone.",
       "i8b_wrap": "Wrap the baby in a dry blanket or towel — whatever is handy — and place it between the mother's legs on the floor. Massage the mother's lower abdomen very gently.",
-      "i8b_placenta": "When the placenta is delivered — the tissue on the other side of the cord — wrap it and keep it level with or slightly above the baby. That can take as long as twenty minutes after the baby. Stay on the line with me."
+      "i8b_placenta": "When the placenta is delivered — the tissue on the other side of the cord — wrap it and keep it level with or slightly above the baby. That can take as long as twenty minutes after the baby. Stay on the line with me.",
+      "kq_h1_caller": "What is your name, and what seat are you in?",
+      "kq_h1_flight": "What airline and flight number is this, and where did you leave from and where are you going?",
+      "kq_h1_cell": "What is the cell phone number you are calling from?",
+      "kq_h1_intent": "Do you know what they intend to do, or what they are targeting?",
+      "kq_h1_injured": "Is anyone hurt or injured?",
+      "kq_h1_can_help": "Are you in a position to help them?",
+      "pd_h1_stay_calm": "Stay calm. If it is safe to do so, stay on the line and keep telling me what is happening.",
+      "pd_h1_help_hurt": "If someone is hurt and you can reach them safely, tell me and I will give you instructions.",
+      "note_h1_notify": "Notify the local Air Defense Sector, and patch the caller through if requested or needed. Use your center's current Air Defense Sector contact list — the source card notes these numbers change and must be verified before use, so none are shipped here.",
+      "note_h1_when_to_call": "When to call: an emergency call from an airborne aircraft; a suspicious airborne object or aircraft; an aircraft theft in progress or just occurred. If in doubt — call.",
+      "note_h1_when_not": "When not to call: complaints about sonic booms; aircraft noise reported near airports; a crop duster spraying a field; military aircraft flying in a typical military operations area.",
+      "note_h1_report": "Short report: flight and airline, departure and destination, caller name and seat, cell number, intentions or target if known, number and nature of injuries, other agencies notified.",
+      "kq_h3_exact": "Where exactly is the emergency?",
+      "kq_h3_direction": "Which way is it travelling?",
+      "kq_h3_access": "What is the best route in?",
+      "kq_h3_safe": "Are you in a safe location?",
+      "kq_h3_hazard": "What type of hazard is involved?",
+      "kq_h3_injuries": "Are there any injuries?",
+      "kq_h3_material": "Do you know the name or the ID number of the material?",
+      "kq_h3_state": "Is the material a solid, a liquid, or a gas?",
+      "pd_h3_leave": "If you are not in a safe location, leave the area immediately and call back when you are safe.",
+      "pd_h3_gather_info": "If you can do it safely, gather any information you have on the materials involved, including the safety data sheet.",
+      "pd_h3_deny_entry": "Deny entry to the affected area. If it is safe to do so, secure the premises and isolate the area.",
+      "pd_h3_isolate_injured": "If it is safe to do so, move the injured away from the scene.",
+      "note_h3_prompts": "Prompts: amount of material spilled or released; size and type of container; whether the release is continuous, intermittent, contained, entering a waterway, or entering a storm drain or sewer; whether personnel have been evacuated; whether responders or HazMat personnel are on scene and who they are; whether chemical information is available for the responders; wind direction.",
+      "note_h3_report": "Short report: specific location, access route, type of incident, number and nature of injuries, release type, wind direction and weather, other agencies responding.",
+      "note_h3_agencies": "Notify all applicable local, county and state agencies. Refer injuries to the appropriate traumatic injury card.",
+      "kq_h4_where": "Where is the landing zone going to be?",
+      "kq_h4_describe": "Describe the landing zone for me.",
+      "kq_h4_size": "About how big is it?",
+      "kq_h4_terrain": "What is the ground like — is it flat, sloped, soft, or uneven?",
+      "kq_h4_obstacles": "What obstacles will the aircraft meet landing or taking off?",
+      "kq_h4_wind": "Which way is the wind blowing there?",
+      "kq_h4_marking": "How is the landing zone going to be marked?",
+      "kq_h4_approach": "What is the best approach in?",
+      "kq_h4_relative": "Where is the landing zone in relation to the incident?",
+      "pd_h4_keep_clear": "Keep everyone and every vehicle clear of the landing zone until the crew waves you in.",
+      "pd_h4_secure_loose": "Secure anything loose nearby — the rotor wash will pick it up.",
+      "pd_h4_stay_on_line": "Stay on the line and tell me right away if anything changes at the landing zone.",
+      "note_h4_prompts": "Prompts: call the local air medical transport providers; notify fire, rescue and law enforcement for the landing site; if HazMat is involved, site the landing zone one mile from explosives, poisonous gases, or chemicals in danger of exploding.",
+      "note_h4_report": "Short report: ground contact, specific location, description and size, obstacles, wind direction, landing zone markings, best approach, location relative to the incident, anything else pertinent.",
+      "note_h4_criteria_time": "Consider air transport when: ground transport time to an appropriate facility threatens survival or recovery; weather, road or traffic conditions would seriously delay access to Advanced Life Support; or critical care personnel and equipment are needed during transport.",
+      "note_h4_criteria_mechanism": "Mechanism criteria: falls of 20 feet or more; a collision at 20 mph or more without restraints, or a rollover; rearward displacement of the front of the car by 20 inches, or of the front axle; passenger compartment intrusion; ejection from the vehicle; deformity of a contact point such as the steering wheel, windshield or dashboard; death of an occupant in the same vehicle; a pedestrian struck at 20 mph or more.",
+      "note_h4_criteria_clinical": "Clinical criteria: unconscious or a decreasing level of consciousness; systolic blood pressure under 90; a respiratory rate under 10 or over 30; a Glasgow Coma Score under 10; a compromised airway; penetrating injury to the chest, abdomen, head, neck or groin; two or more long bone fractures; flail chest; amputation of an extremity; paralysis or spinal cord injury; severe burns."
     },
     "es": {
       "greeting": "Nueve-uno-uno.",
@@ -14434,7 +15044,51 @@
       "i8b_breathing": "¿El bebé está respirando?",
       "i8b_stimulate": "Frote la espalda del bebé o dele palmaditas suaves en las plantas de los pies. Si el bebé no empieza a respirar enseguida, vuelva al teléfono.",
       "i8b_wrap": "Envuelva al bebé en una cobija o toalla seca, lo que tenga a la mano, y colóquelo entre las piernas de la madre, en el piso. Masajee muy suavemente el bajo vientre de la madre.",
-      "i8b_placenta": "Cuando salga la placenta —el tejido del otro lado del cordón—, envuélvala y manténgala al nivel del bebé o un poco más arriba. Puede tardar hasta veinte minutos después del bebé. Quédese en la línea conmigo."
+      "i8b_placenta": "Cuando salga la placenta —el tejido del otro lado del cordón—, envuélvala y manténgala al nivel del bebé o un poco más arriba. Puede tardar hasta veinte minutos después del bebé. Quédese en la línea conmigo.",
+      "kq_h1_caller": "¿Cuál es su nombre y en qué asiento va?",
+      "kq_h1_flight": "¿Qué aerolínea y número de vuelo es, de dónde salió y a dónde va?",
+      "kq_h1_cell": "¿Cuál es el número de celular desde el que llama?",
+      "kq_h1_intent": "¿Sabe qué pretenden hacer, o cuál es su objetivo?",
+      "kq_h1_injured": "¿Hay alguien herido o lastimado?",
+      "kq_h1_can_help": "¿Está usted en condiciones de ayudarlos?",
+      "pd_h1_stay_calm": "Manténgase tranquilo. Si es seguro hacerlo, quédese en la línea y siga diciéndome qué está pasando.",
+      "pd_h1_help_hurt": "Si alguien está herido y puede llegar hasta él sin peligro, dígamelo y le daré instrucciones.",
+      "note_h1_notify": "Notifique al Sector de Defensa Aérea local y transfiera la llamada si se solicita o se necesita. Use la lista de contactos vigente de su central: la tarjeta original advierte que esos números cambian y deben verificarse antes de usarse, por lo que no se incluyen aquí.",
+      "note_h1_when_to_call": "Cuándo llamar: una llamada de emergencia desde una aeronave en vuelo; un objeto o aeronave sospechosa en el aire; un robo de aeronave en curso o recién ocurrido. Si tiene dudas, llame.",
+      "note_h1_when_not": "Cuándo no llamar: quejas por estampidos sónicos; ruido de aeronaves cerca de aeropuertos; una avioneta fumigando un campo; aeronaves militares volando en una zona habitual de operaciones militares.",
+      "note_h1_report": "Reporte breve: vuelo y aerolínea, origen y destino, nombre y asiento de quien llama, número de celular, intenciones u objetivo si se conocen, número y tipo de heridos, otras agencias notificadas.",
+      "kq_h3_exact": "¿Dónde exactamente es la emergencia?",
+      "kq_h3_direction": "¿Hacia dónde se está moviendo?",
+      "kq_h3_access": "¿Cuál es la mejor ruta de acceso?",
+      "kq_h3_safe": "¿Está usted en un lugar seguro?",
+      "kq_h3_hazard": "¿Qué tipo de peligro hay?",
+      "kq_h3_injuries": "¿Hay heridos?",
+      "kq_h3_material": "¿Sabe el nombre o el número de identificación del material?",
+      "kq_h3_state": "¿El material es sólido, líquido o gas?",
+      "pd_h3_leave": "Si no está en un lugar seguro, salga del área de inmediato y vuelva a llamar cuando esté a salvo.",
+      "pd_h3_gather_info": "Si puede hacerlo sin peligro, reúna la información que tenga sobre los materiales involucrados, incluida la hoja de datos de seguridad.",
+      "pd_h3_deny_entry": "No deje entrar a nadie al área afectada. Si es seguro hacerlo, asegure el lugar y aísle la zona.",
+      "pd_h3_isolate_injured": "Si es seguro hacerlo, aleje a los heridos de la escena.",
+      "note_h3_prompts": "Preguntas de apoyo: cantidad derramada o liberada; tamaño y tipo de contenedor; si la liberación es continua, intermitente, contenida, si llega a un cuerpo de agua o a un drenaje pluvial o alcantarilla; si se evacuó al personal; si hay respondedores o personal de materiales peligrosos en la escena y quiénes son; si hay información química disponible para los respondedores; dirección del viento.",
+      "note_h3_report": "Reporte breve: ubicación específica, ruta de acceso, tipo de incidente, número y tipo de heridos, tipo de liberación, dirección del viento y clima, otras agencias que responden.",
+      "note_h3_agencies": "Notifique a todas las agencias locales, del condado y estatales que correspondan. Refiera a los heridos a la tarjeta de lesión traumática correspondiente.",
+      "kq_h4_where": "¿Dónde va a estar la zona de aterrizaje?",
+      "kq_h4_describe": "Descríbame la zona de aterrizaje.",
+      "kq_h4_size": "¿Más o menos de qué tamaño es?",
+      "kq_h4_terrain": "¿Cómo es el terreno? ¿Es plano, inclinado, blando o disparejo?",
+      "kq_h4_obstacles": "¿Qué obstáculos encontrará la aeronave al aterrizar o despegar?",
+      "kq_h4_wind": "¿Hacia dónde sopla el viento ahí?",
+      "kq_h4_marking": "¿Cómo se va a marcar la zona de aterrizaje?",
+      "kq_h4_approach": "¿Cuál es la mejor aproximación?",
+      "kq_h4_relative": "¿Dónde queda la zona de aterrizaje respecto al incidente?",
+      "pd_h4_keep_clear": "Mantenga a todas las personas y vehículos fuera de la zona de aterrizaje hasta que la tripulación les indique acercarse.",
+      "pd_h4_secure_loose": "Asegure todo lo que esté suelto cerca: el viento del rotor lo levantará.",
+      "pd_h4_stay_on_line": "Quédese en la línea y dígame de inmediato si algo cambia en la zona de aterrizaje.",
+      "note_h4_prompts": "Preguntas de apoyo: llame a los proveedores locales de transporte aeromédico; notifique a bomberos, rescate y policía sobre el sitio de aterrizaje; si hay materiales peligrosos, ubique la zona de aterrizaje a un kilómetro y medio de explosivos, gases venenosos o químicos en riesgo de explotar.",
+      "note_h4_report": "Reporte breve: contacto en tierra, ubicación específica, descripción y tamaño, obstáculos, dirección del viento, señalización de la zona, mejor aproximación, ubicación respecto al incidente, cualquier otro dato pertinente.",
+      "note_h4_criteria_time": "Considere el transporte aéreo cuando: el tiempo de traslado terrestre a un hospital adecuado amenace la supervivencia o la recuperación; el clima, el estado del camino o el tránsito retrasen seriamente el acceso a soporte vital avanzado; o se necesite personal y equipo de cuidados críticos durante el traslado.",
+      "note_h4_criteria_mechanism": "Criterios de mecanismo: caídas de seis metros o más; una colisión a 30 km/h o más sin cinturón, o una volcadura; desplazamiento hacia atrás del frente del vehículo de 50 cm, o del eje delantero; intrusión en el compartimento de pasajeros; expulsión del vehículo; deformación de un punto de contacto como el volante, el parabrisas o el tablero; muerte de un ocupante del mismo vehículo; peatón atropellado a 30 km/h o más.",
+      "note_h4_criteria_clinical": "Criterios clínicos: inconsciente o con nivel de conciencia en descenso; presión sistólica menor de 90; frecuencia respiratoria menor de 10 o mayor de 30; escala de coma de Glasgow menor de 10; vía aérea comprometida; herida penetrante en tórax, abdomen, cabeza, cuello o ingle; dos o más fracturas de huesos largos; tórax inestable; amputación de una extremidad; parálisis o lesión medular; quemaduras graves."
     },
     "fr": {
       "greeting": "Neuf-un-un.",
@@ -14784,7 +15438,51 @@
       "i8b_breathing": "Le bébé respire-t-il ?",
       "i8b_stimulate": "Frottez le dos du bébé, ou tapotez doucement la plante de ses pieds. Si le bébé ne se met pas à respirer tout de suite, revenez au téléphone.",
       "i8b_wrap": "Enveloppez le bébé dans une couverture ou une serviette sèche — ce que vous avez sous la main — et placez-le entre les jambes de la mère, au sol. Massez très doucement le bas-ventre de la mère.",
-      "i8b_placenta": "Quand le placenta sort — le tissu de l'autre côté du cordon — enveloppez-le et gardez-le au niveau du bébé ou légèrement au-dessus. Cela peut prendre jusqu'à vingt minutes après le bébé. Restez en ligne avec moi."
+      "i8b_placenta": "Quand le placenta sort — le tissu de l'autre côté du cordon — enveloppez-le et gardez-le au niveau du bébé ou légèrement au-dessus. Cela peut prendre jusqu'à vingt minutes après le bébé. Restez en ligne avec moi.",
+      "kq_h1_caller": "Quel est votre nom, et à quelle place êtes-vous ?",
+      "kq_h1_flight": "Quelle compagnie et quel numéro de vol, d'où êtes-vous parti et où allez-vous ?",
+      "kq_h1_cell": "Quel est le numéro de portable depuis lequel vous appelez ?",
+      "kq_h1_intent": "Savez-vous ce qu'ils comptent faire, ou quelle est leur cible ?",
+      "kq_h1_injured": "Y a-t-il des blessés ?",
+      "kq_h1_can_help": "Êtes-vous en mesure de les aider ?",
+      "pd_h1_stay_calm": "Restez calme. Si cela est sans danger, restez en ligne et continuez à me dire ce qui se passe.",
+      "pd_h1_help_hurt": "Si quelqu'un est blessé et que vous pouvez l'atteindre sans danger, dites-le-moi et je vous donnerai des instructions.",
+      "note_h1_notify": "Avisez le secteur de défense aérienne local et transférez l'appel si nécessaire. Utilisez la liste de contacts à jour de votre centre : la carte source précise que ces numéros changent et doivent être vérifiés avant usage, ils ne sont donc pas fournis ici.",
+      "note_h1_when_to_call": "Quand appeler : un appel d'urgence depuis un aéronef en vol ; un objet ou un aéronef suspect en vol ; un vol d'aéronef en cours ou venant de se produire. En cas de doute — appelez.",
+      "note_h1_when_not": "Quand ne pas appeler : plaintes concernant des bangs soniques ; bruit d'aéronefs près des aéroports ; un avion épandeur traitant un champ ; des aéronefs militaires dans une zone d'opérations militaires habituelle.",
+      "note_h1_report": "Rapport bref : vol et compagnie, départ et destination, nom et place de l'appelant, numéro de portable, intentions ou cible si connues, nombre et nature des blessés, autres organismes avisés.",
+      "kq_h3_exact": "Où exactement se trouve l'urgence ?",
+      "kq_h3_direction": "Dans quelle direction cela se déplace-t-il ?",
+      "kq_h3_access": "Quel est le meilleur itinéraire d'accès ?",
+      "kq_h3_safe": "Êtes-vous dans un endroit sûr ?",
+      "kq_h3_hazard": "De quel type de danger s'agit-il ?",
+      "kq_h3_injuries": "Y a-t-il des blessés ?",
+      "kq_h3_material": "Connaissez-vous le nom ou le numéro d'identification de la matière ?",
+      "kq_h3_state": "La matière est-elle solide, liquide ou gazeuse ?",
+      "pd_h3_leave": "Si vous n'êtes pas en lieu sûr, quittez la zone immédiatement et rappelez une fois en sécurité.",
+      "pd_h3_gather_info": "Si vous pouvez le faire sans danger, rassemblez les informations sur les matières concernées, y compris la fiche de données de sécurité.",
+      "pd_h3_deny_entry": "Interdisez l'accès à la zone touchée. Si cela est sans danger, sécurisez les lieux et isolez la zone.",
+      "pd_h3_isolate_injured": "Si cela est sans danger, éloignez les blessés des lieux.",
+      "note_h3_prompts": "Relances : quantité déversée ou rejetée ; taille et type de contenant ; rejet continu, intermittent, confiné, atteignant un cours d'eau ou un égout pluvial ; personnel évacué ou non ; présence d'intervenants ou d'une équipe matières dangereuses et leur identité ; disponibilité des informations chimiques pour les intervenants ; direction du vent.",
+      "note_h3_report": "Rapport bref : lieu précis, itinéraire d'accès, type d'incident, nombre et nature des blessés, type de rejet, direction du vent et météo, autres organismes intervenants.",
+      "note_h3_agencies": "Avisez tous les organismes locaux, départementaux et provinciaux concernés. Orientez les blessés vers la carte de blessure traumatique appropriée.",
+      "kq_h4_where": "Où sera située la zone d'atterrissage ?",
+      "kq_h4_describe": "Décrivez-moi la zone d'atterrissage.",
+      "kq_h4_size": "Quelle est sa taille approximative ?",
+      "kq_h4_terrain": "Comment est le terrain — plat, en pente, mou ou irrégulier ?",
+      "kq_h4_obstacles": "Quels obstacles l'aéronef rencontrera-t-il à l'atterrissage ou au décollage ?",
+      "kq_h4_wind": "Dans quelle direction souffle le vent ?",
+      "kq_h4_marking": "Comment la zone d'atterrissage sera-t-elle balisée ?",
+      "kq_h4_approach": "Quelle est la meilleure approche ?",
+      "kq_h4_relative": "Où se situe la zone d'atterrissage par rapport à l'incident ?",
+      "pd_h4_keep_clear": "Tenez toutes les personnes et tous les véhicules à l'écart de la zone d'atterrissage jusqu'à ce que l'équipage vous fasse signe.",
+      "pd_h4_secure_loose": "Fixez tout ce qui est mobile à proximité — le souffle du rotor l'emportera.",
+      "pd_h4_stay_on_line": "Restez en ligne et dites-moi tout de suite si quelque chose change dans la zone d'atterrissage.",
+      "note_h4_prompts": "Relances : appelez les transporteurs héliportés locaux ; avisez les pompiers, les secours et la police pour le site d'atterrissage ; en cas de matières dangereuses, placez la zone à un mille des explosifs, gaz toxiques ou produits chimiques risquant d'exploser.",
+      "note_h4_report": "Rapport bref : contact au sol, lieu précis, description et taille, obstacles, direction du vent, balisage, meilleure approche, position par rapport à l'incident, tout autre élément pertinent.",
+      "note_h4_criteria_time": "Envisagez le transport aérien lorsque : le délai de transport terrestre vers un établissement approprié menace la survie ou le rétablissement ; la météo, l'état des routes ou la circulation retarderaient sérieusement l'accès aux soins avancés ; ou du personnel et du matériel de soins critiques sont nécessaires pendant le transport.",
+      "note_h4_criteria_mechanism": "Critères de mécanisme : chutes de six mètres ou plus ; collision à 30 km/h ou plus sans ceinture, ou tonneau ; recul de l'avant du véhicule de 50 cm, ou de l'essieu avant ; intrusion dans l'habitacle ; éjection du véhicule ; déformation d'un point de contact comme le volant, le pare-brise ou le tableau de bord ; décès d'un occupant du même véhicule ; piéton heurté à 30 km/h ou plus.",
+      "note_h4_criteria_clinical": "Critères cliniques : inconscient ou niveau de conscience en baisse ; tension systolique inférieure à 90 ; fréquence respiratoire inférieure à 10 ou supérieure à 30 ; score de Glasgow inférieur à 10 ; voies respiratoires compromises ; plaie pénétrante au thorax, à l'abdomen, à la tête, au cou ou à l'aine ; deux fractures d'os longs ou plus ; volet thoracique ; amputation d'un membre ; paralysie ou lésion médullaire ; brûlures graves."
     }
   },
   "scripts": [

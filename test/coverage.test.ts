@@ -221,9 +221,18 @@ test('the flagship pack clears both rubrics comfortably', () => {
 test('known gaps stay visible: no proximity question, no persistence phrasing', () => {
   assert.equal(req(maine, openises, 'ME-II-2-A-8').status, 'unmet');
   assert.equal(req(maine, openises, 'ME-II-2-A-23g').status, 'unmet');
-  // v0.3 gave the schema a place for EMD-facing notes; no pack fills it yet, so
-  // this reads as a content gap now rather than a schema one.
+});
+
+test('a requirement reported as unrepresentable can be closed, and shows its evidence', () => {
+  // NHTSA-CARD-D was unrepresentable until v0.3 added dispatcherNotes, then a
+  // content gap until the H cards filled it. Now it cites the cards that do.
   const cardD = req(nhtsa, openises, 'NHTSA-CARD-D');
-  assert.equal(cardD.status, 'unmet');
-  assert.match(cardD.detail!, /no protocol carries dispatcher-facing notes/);
+  assert.equal(cardD.status, 'met');
+  assert.ok(cardD.evidence.some((e) => e.startsWith('h4_helicopter_landing_zone')));
+  assert.ok(cardD.evidence.some((e) => /3 useful-information lines/.test(e)));
+  // …while a pack with no such notes still reports the gap plainly.
+  const nj = packs.find((p) => p.id === 'us-nj-emd')!;
+  const njCardD = req(nhtsa, nj, 'NHTSA-CARD-D');
+  assert.equal(njCardD.status, 'unmet');
+  assert.match(njCardD.detail!, /no protocol carries dispatcher-facing notes/);
 });

@@ -378,10 +378,12 @@ function evaluateCheck(
         status: carrying.length >= need ? 'met' : carrying.length ? 'partial' : 'unmet',
         evidence: carrying.map((p) => {
           const n = p.dispatcherNotes!;
+          const count = (xs: string[] | undefined, label: string) =>
+            xs?.length ? [`${xs.length} ${label}${xs.length === 1 ? '' : 's'}`] : [];
           const parts = [
-            ...(n.prompts ? [`${n.prompts.length} prompts`] : []),
-            ...(n.shortReport ? [`${n.shortReport.length} short-report lines`] : []),
-            ...(n.useful ? [`${n.useful.length} useful-information lines`] : []),
+            ...count(n.prompts, 'prompt'),
+            ...count(n.shortReport, 'short-report line'),
+            ...count(n.useful, 'useful-information line'),
           ];
           return `${p.id}: ${parts.join(', ')}`;
         }),
