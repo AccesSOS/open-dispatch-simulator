@@ -24,14 +24,24 @@ external input (a permission reply, a decision from Kevin, a records request).
       and ordering, complaint coverage, per-card slot/decision-slot/response-level/jump diffs,
       `--json`. Cards align by id, then through the coverage taxonomy — so NJ `chest_pain` lines
       up with MX `inc10314_infarto` across languages. Response level names are never mapped.
-- [ ] **Schema v0.3 — interactive scripting.** Minimal design to support the OpenISES procedure
+- [x] **Schema v0.3 — interactive scripting.** Minimal design to support the OpenISES procedure
       cards (H1/H3/H4) and instruction scripts (I1, I3–I8) that were skipped by design (C1
       already embeds the I2 CPR script; use that as the fidelity bar). v0.1/0.2 packs must remain
       valid. Then digitize those cards trilingual (en/es/fr) into `packs/us-openises-emd`, GFDL
       attribution in SOURCE.md as before.
+      → *Done*, across five commits. `13d0228` schema v0.3 (`scripts` of say/ask/stay steps,
+      `postDispatchScripts`, `dispatcherNotes`; scripts must be a DAG so termination is
+      structural; `npm run sim` sweeps every walk and fails on an unreachable step).
+      `e4653b8` I1/I2/I5 adult, `92afb65` I3/I4/I6/I7 paediatric routed by age, `c2d6c92` I8
+      childbirth, `262fc0e` H1/H3/H4 procedure cards. 37 cards, 27 scripts, 172 steps,
+      trilingual; only I9/I10 (airway control) remain. Coverage moved 31/37 → 33/37 (Maine) and
+      17/19 → 18/19 with nothing unmet (NHTSA).
 - [ ] **Slot value extraction.** Dispatch read-backs currently interpolate whole caller
       sentences. Add deterministic extractors (regex/structured, per slot type — age, counts,
       yes/no, addresses) so read-backs echo values. No LLM. Verify via the sim sweep.
+      *Now also a routing concern:* C1/C2 pick the infant, child or adult instruction deck from
+      the age slot, and "six months old" currently extracts as 6, so an infant described that
+      way takes the child deck.
 - [ ] **Fire call-taking deck source hunt (ONE bounded round).** Verify the leads already
       recorded in PROTOCOL-SOURCES.md (state-admin-code edicts, MuckRock released records,
       obxairwaves stray cards — verify authorship/license before touching, could be an APCO
