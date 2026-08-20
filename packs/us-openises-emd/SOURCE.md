@@ -19,7 +19,9 @@ All Callers Interrogation and cards **M5** (Chest Pain/Heart Problems), **C1** (
 Arrest), **C6** (Unconscious/Fainting), and **M17** (Unknown/Man Down) into the machine-readable
 protocol-pack format defined by `schema/pack.schema.json`. Substantive digitization decisions are
 recorded in the pack's `provenance.notes`; the remaining cards in the source set are not yet
-digitized.
+digitized. The Spanish and French catalogs (added 2026-08-20) are translations by the Open
+Dispatch Simulator project, not part of the English-only source document — flag translation
+issues as bugs.
 
 ## Operational warning (from the source, and from us)
 

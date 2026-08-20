@@ -25,10 +25,86 @@ function run(caseAnswers: string[], bySlot: Record<string, string>) {
 
 const CASE_OK = ['12 Pine St', '555-0100', 'my husband has chest pain', 'one', '58', 'yes', 'yes', 'male', 'Ana'];
 
-test('openises pack loads: single-locale, jurisdiction response taxonomy', () => {
-  assert.deepEqual(pack.locales, ['en']);
+test('openises pack loads: trilingual, jurisdiction response taxonomy', () => {
+  assert.deepEqual(pack.locales, ['en', 'es', 'fr']);
   assert.equal(pack.fallbackProtocol, 'm17_unknown_man_down');
   assert.equal(pack.provenance.license, 'GFDL-1.2-or-later');
+});
+
+test('spanish call: chest pain with cardiac history → CODE_RED, all es strings', () => {
+  const s = new DispatchSession(pack, { locale: 'es' });
+  const texts: string[] = s.start().map((u) => u.text);
+  const answers = [
+    'Calle Reforma 10',
+    '555-0100',
+    'mi esposo tiene dolor de pecho',
+    'una',
+    '58',
+    'sí',
+    'sí, respira',
+    'hombre',
+    'Ana',
+    'sí, alerta',
+    'sí, normalmente',
+    'no',
+    'no',
+    'no',
+    'en el centro del pecho',
+    'no',
+    'nada más',
+    'una hora',
+    'sí, tuvo un infarto',
+    'no',
+  ];
+  for (const a of answers) {
+    if (s.isDone()) break;
+    texts.push(...s.answer(a).map((u) => u.text));
+  }
+  assert.ok(s.isDone());
+  const r = s.result();
+  assert.equal(r.protocolId, 'm5_chest_pain');
+  assert.equal(r.determinantId, 'm5_red_cardiac_history');
+  assert.equal(r.response, 'CODE_RED');
+  const esCatalog = Object.values(pack.strings['es']!).flatMap((t) => (Array.isArray(t) ? t : [t]));
+  for (const t of texts) {
+    assert.ok(
+      esCatalog.some((c) => t === c || (c.includes('{') && t.startsWith(c.split('{')[0]!))),
+      `"${t}" not from the es catalog`,
+    );
+  }
+});
+
+test('french call: fainted but recovered → CODE_YELLOW via C6', () => {
+  const s = new DispatchSession(pack, { locale: 'fr' });
+  s.start();
+  const answers = [
+    '10 rue Sainte-Catherine',
+    '514-555-0100',
+    "ma mère s'est évanouie mais elle a repris connaissance",
+    'une',
+    '45',
+    'oui',
+    'oui, elle respire',
+    'femme',
+    'Chantal',
+    'oui, alerte',
+    'oui, normalement',
+    'oui, première fois',
+    'oui',
+    'non',
+    'elle préparait le souper',
+    'aucune plainte',
+    'non, pas de bracelet',
+  ];
+  for (const a of answers) {
+    if (s.isDone()) break;
+    s.answer(a);
+  }
+  assert.ok(s.isDone());
+  const r = s.result();
+  assert.equal(r.protocolId, 'c6_unconscious_fainting');
+  assert.equal(r.determinantId, 'c6_yellow_recovered');
+  assert.equal(r.response, 'CODE_YELLOW');
 });
 
 test('M5: cardiac history makes chest pain a CODE_RED (card criterion)', () => {
