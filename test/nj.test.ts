@@ -54,14 +54,18 @@ test('unconscious + breathing "unsure" jumps to the CARDIAC ARREST/DOA card (v0.
   assert.equal(r.determinantId, 'ca_als_arrest');
 });
 
-test('conscious + breathing "unsure" stays on the complaint card and dispatches', () => {
+test('conscious + breathing "unsure" routes to the BREATHING PROBLEMS card (All Caller chart)', () => {
   const s = new DispatchSession(pack);
   s.start();
   for (const a of ['12 Grove St', '609-555-0100', 'chest pain', 'Ana', '58', 'male', 'yes']) s.answer(a);
   const out = s.answer("I'm not sure, maybe");
-  assert.equal(out[0]!.stringId, 'dispatch_confirm');
+  assert.equal(out[0]!.stringId, 'kq_bp_asthma_meds', 'Breathing Problems card takes over');
+  s.answer('yes, she uses an inhaler for asthma'); // asthma history -> ALS per the card
+  let guard = 0;
+  while (!s.isDone() && guard++ < 30) s.answer('nothing else');
   const r = s.result();
-  assert.equal(r.determinantId, 'cp_als_breathing_unsure');
+  assert.equal(r.protocolId, 'breathing_problems');
+  assert.equal(r.determinantId, 'bp_als_asthma');
   assert.equal(r.response, 'SIMULTANEOUS_ALS_BLS');
 });
 

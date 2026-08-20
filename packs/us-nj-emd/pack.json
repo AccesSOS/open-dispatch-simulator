@@ -14,7 +14,7 @@
     "url": "https://www.nj.gov/911/documents/resource/EMD%20Guidecards%202022%20elec%20proj%20Ebola.pdf",
     "license": "state-published-permission-pending",
     "digitizedDate": "2026-08-20",
-    "notes": "Written-permission request tracked at AccesSOS/infra#8; the source PDF carries no copyright notice or terms, is published for free download, and is state-mandated for PSAPs (strong government-edicts posture), but state works are not automatically public domain — this pack ships under an explicit permission-pending marker until the reply lands. Digitized: All Caller Interrogation + CHEST PAIN/HEART PROBLEMS, CARDIAC ARREST/DOA, UNCONSCIOUS/FAINTING, UNKNOWN/PERSON DOWN (fallback), with NJ's own dispatch tiers (SIMULTANEOUS ALS/BLS, BLS DISPATCH, FOLLOW LOCAL PROTOCOL). Digitization decisions: (1) cross-card jumps (CPR cards, OD/POISONING, BREATHING PROBLEMS, AIRWAY CONTROL) are flattened into determinants — v0.1 cannot jump protocols mid-call; (2) the age criterion 'chest pain over 35' is not expressible (no numeric predicates), so chest pain defaults to SIMULTANEOUS ALS/BLS — age-unknown is treated as over 35, the safety-first reading, which makes the card's under-35 BLS tier unreachable in this digitization; (3) 'Determine age and sex of patient' is split into two scripted questions; (4) greeting, location/phone confirmations, dispatch confirmation, and closing are editorial (the cards do not script them); (5) the UNCERTAIN branch of 'Is the patient breathing NORMALLY?' is modeled as a third choice option that short-circuits to dispatch, per the card's flow to CPR/CARDIAC ARREST. SIMULATION ONLY — never for live call-taking. Schema v0.2 (2026-08-20): the All Caller flow's card jumps are modeled faithfully — an unconscious patient with abnormal/uncertain breathing routes to the CARDIAC ARREST/DOA card; the over/under-35 chest-pain tiers and single-faint-over-50 criterion are numeric age conditions (age unknown still defaults to the higher tier). Conscious callers with abnormal breathing dispatch directly: the BREATHING PROBLEMS card is not yet digitized."
+    "notes": "Written-permission request tracked at AccesSOS/infra#8; the source PDF carries no copyright notice or terms, is published for free download, and is state-mandated for PSAPs (strong government-edicts posture), but state works are not automatically public domain — this pack ships under an explicit permission-pending marker until the reply lands. Digitized: All Caller Interrogation + CHEST PAIN/HEART PROBLEMS, CARDIAC ARREST/DOA, UNCONSCIOUS/FAINTING, UNKNOWN/PERSON DOWN (fallback), with NJ's own dispatch tiers (SIMULTANEOUS ALS/BLS, BLS DISPATCH, FOLLOW LOCAL PROTOCOL). Digitization decisions: (1) cross-card jumps (CPR cards, OD/POISONING, BREATHING PROBLEMS, AIRWAY CONTROL) are flattened into determinants — v0.1 cannot jump protocols mid-call; (2) the age criterion 'chest pain over 35' is not expressible (no numeric predicates), so chest pain defaults to SIMULTANEOUS ALS/BLS — age-unknown is treated as over 35, the safety-first reading, which makes the card's under-35 BLS tier unreachable in this digitization; (3) 'Determine age and sex of patient' is split into two scripted questions; (4) greeting, location/phone confirmations, dispatch confirmation, and closing are editorial (the cards do not script them); (5) the UNCERTAIN branch of 'Is the patient breathing NORMALLY?' is modeled as a third choice option that short-circuits to dispatch, per the card's flow to CPR/CARDIAC ARREST. SIMULATION ONLY — never for live call-taking. Schema v0.2 (2026-08-20): the All Caller flow's card jumps are modeled faithfully — an unconscious patient with abnormal/uncertain breathing routes to the CARDIAC ARREST/DOA card; the over/under-35 chest-pain tiers and single-faint-over-50 criterion are numeric age conditions (age unknown still defaults to the higher tier). Conscious callers with abnormal breathing dispatch directly: the BREATHING PROBLEMS card is not yet digitized. 2026-08-20 (2): added the BREATHING PROBLEMS card; per the All Caller chart, conscious patients with abnormal/uncertain breathing now route there (unconscious ones to CARDIAC ARREST/DOA). This card's ALS column reads 'any patient complaining of breathing or respiratory difficulty, examples may include...' — so it defaults SIMULTANEOUS_ALS_BLS; the BLS column (cold symptoms, stuffy nose, empty oxygen bottle, patient assist, long-term no change) describes benign presentations the schema cannot parse from free text and is unreachable in this digitization."
   },
   "locales": [
     "en"
@@ -165,6 +165,32 @@
             }
           ],
           "gotoProtocol": "cardiac_arrest_doa"
+        },
+        {
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "yes"
+            },
+            {
+              "slot": "breathing_normally",
+              "option": "no"
+            }
+          ],
+          "gotoProtocol": "breathing_problems"
+        },
+        {
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "yes"
+            },
+            {
+              "slot": "breathing_normally",
+              "option": "unsure"
+            }
+          ],
+          "gotoProtocol": "breathing_problems"
         },
         {
           "whenOption": "no",
@@ -868,6 +894,326 @@
       ]
     },
     {
+      "id": "breathing_problems",
+      "name": {
+        "en": "Breathing Problems"
+      },
+      "keywords": {
+        "en": [
+          "can't breathe",
+          "cannot breathe",
+          "trouble breathing",
+          "short of breath",
+          "difficulty breathing",
+          "breathing problem",
+          "wheezing",
+          "asthma attack"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_bp_asthma_meds",
+          "slot": "bp_asthma_meds",
+          "stringId": "kq_bp_asthma_meds",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "asthma",
+                    "inhaler",
+                    "nebulizer"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_bp_full_sentences",
+          "slot": "bp_full_sentences",
+          "stringId": "kq_bp_full_sentences",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "full sentences",
+                    "talking"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_bp_drooling",
+          "slot": "bp_drooling",
+          "stringId": "kq_bp_drooling",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "drooling",
+                    "swallow"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_bp_what_changed",
+          "slot": "bp_what_changed",
+          "stringId": "kq_bp_what_changed"
+        },
+        {
+          "id": "kq_bp_had_before",
+          "slot": "bp_had_before",
+          "stringId": "kq_bp_had_before",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "before",
+                    "happens"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_bp_duration",
+          "slot": "bp_duration",
+          "stringId": "kq_bp_duration"
+        },
+        {
+          "id": "kq_bp_sit_up",
+          "slot": "bp_sit_up",
+          "stringId": "kq_bp_sit_up",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "sit up",
+                    "sitting"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_bp_doing_prior",
+          "slot": "bp_doing_prior",
+          "stringId": "kq_bp_doing_prior"
+        },
+        {
+          "id": "kq_bp_history",
+          "slot": "bp_history",
+          "stringId": "kq_bp_history"
+        },
+        {
+          "id": "kq_bp_allergies",
+          "slot": "bp_allergies",
+          "stringId": "kq_bp_allergies"
+        },
+        {
+          "id": "kq_bp_recent_hosp",
+          "slot": "bp_recent_hosp",
+          "stringId": "kq_bp_recent_hosp",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "hospitalized",
+                    "childbirth",
+                    "broken leg"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_bp_birth_control",
+          "slot": "bp_birth_control",
+          "stringId": "kq_bp_birth_control",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "birth control",
+                    "the pill"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "bp_als_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "SIMULTANEOUS_ALS_BLS"
+        },
+        {
+          "id": "bp_als_cant_speak",
+          "when": [
+            {
+              "slot": "bp_full_sentences",
+              "option": "no"
+            }
+          ],
+          "response": "SIMULTANEOUS_ALS_BLS"
+        },
+        {
+          "id": "bp_als_asthma",
+          "when": [
+            {
+              "slot": "bp_asthma_meds",
+              "option": "yes"
+            }
+          ],
+          "response": "SIMULTANEOUS_ALS_BLS"
+        },
+        {
+          "id": "bp_als_drooling",
+          "when": [
+            {
+              "slot": "bp_drooling",
+              "option": "yes"
+            }
+          ],
+          "response": "SIMULTANEOUS_ALS_BLS"
+        },
+        {
+          "id": "bp_als_recent_hosp",
+          "when": [
+            {
+              "slot": "bp_recent_hosp",
+              "option": "yes"
+            }
+          ],
+          "response": "SIMULTANEOUS_ALS_BLS"
+        },
+        {
+          "id": "bp_als_default",
+          "response": "SIMULTANEOUS_ALS_BLS"
+        }
+      ],
+      "postDispatch": [
+        "pd_cp_calm",
+        "pd_bp_sit",
+        "pd_bp_no_exert",
+        "pd_gather_meds",
+        "pd_callback"
+      ]
+    },
+    {
       "id": "unknown_person_down",
       "name": {
         "en": "Unknown / Person Down"
@@ -1058,7 +1404,21 @@
       "pd_up_approach": "If there is no danger and you feel comfortable approaching, go to the patient safely and see if they are awake, breathing normally, or moving at all.",
       "pd_up_direct": "If you can, wait for emergency services and direct the emergency personnel to the patient.",
       "pd_gather_meds": "Gather the patient's medications, if any.",
-      "pd_callback": "If the patient's condition changes, call me back."
+      "pd_callback": "If the patient's condition changes, call me back.",
+      "kq_bp_asthma_meds": "Is the patient on asthma medication, or have they ever used it?",
+      "kq_bp_full_sentences": "Is the patient able to speak in full sentences?",
+      "kq_bp_drooling": "Is the patient drooling or having a hard time swallowing?",
+      "kq_bp_what_changed": "What has changed about their breathing to prompt you to call?",
+      "kq_bp_had_before": "Has the patient ever had this problem before?",
+      "kq_bp_duration": "How long has this been going on?",
+      "kq_bp_sit_up": "Does the patient have to sit up to breathe?",
+      "kq_bp_doing_prior": "What was the patient doing just prior to when they became short of breath?",
+      "kq_bp_history": "Does the patient have any other medical or surgical history?",
+      "kq_bp_allergies": "Does the patient have any allergies?",
+      "kq_bp_recent_hosp": "Has the patient been hospitalized recently, for childbirth or a broken leg?",
+      "kq_bp_birth_control": "If the patient is female — does she take medication for birth control?",
+      "pd_bp_sit": "The patient may be more comfortable sitting up.",
+      "pd_bp_no_exert": "Tell the patient not to exert themselves."
     }
   }
 }

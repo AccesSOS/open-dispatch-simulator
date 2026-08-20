@@ -276,6 +276,57 @@ test('T8: penetrating trauma always defaults to CODE_RED (documented safety-firs
   assert.equal(r.response, 'CODE_RED');
 });
 
+test('M4: conscious + not breathing routes to Breathing Problems; chest pain chains to M5', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of ['12 Pine St', '555-0100', 'she is wheezing badly', 'one', '60', 'yes', 'no']) s.answer(a);
+  // conscious=yes + breathing=no -> M4 takes over
+  assert.equal(s.pending()?.protocolId, 'm4_breathing_problems');
+  s.answer('yes, alert');
+  s.answer('no, wheezing hard');
+  s.answer('about an hour');
+  const out = s.answer('yes, her chest hurts too'); // M4 card Q4 -> jump to M5
+  assert.equal(out[0]!.stringId, 'kq_alert', 'M5 card starts from its own key questions');
+  let guard = 0;
+  while (!s.isDone() && guard++ < 30) s.answer('no');
+  const r = s.result();
+  assert.equal(r.protocolId, 'm5_chest_pain');
+});
+
+test('M4: abnormal breathing needs a factor for CODE_RED; benign defaults CODE_YELLOW', () => {
+  const base = ['12 Pine St', '555-0100', 'he is having trouble breathing', 'one', '40', 'yes', 'no'];
+  const withAsthma = run(base, {
+    m4_alert: 'yes, alert',
+    m4_breathing_normal: 'no',
+    m4_chest_pain: 'no',
+    m4_full_sentences: 'yes, full sentences',
+    m4_sit_up: 'no',
+    m4_drooling: 'no',
+    m4_asthma: 'yes, he has asthma',
+    m4_recent_hosp: 'no',
+    m4_birth_control: 'no',
+    m4_oxygen: 'no',
+  });
+  assert.equal(withAsthma.protocolId, 'm4_breathing_problems');
+  assert.equal(withAsthma.determinantId, 'm4_red_bn_asthma');
+  assert.equal(withAsthma.response, 'CODE_RED');
+
+  const benign = run(base, {
+    m4_alert: 'yes, alert',
+    m4_breathing_normal: 'no',
+    m4_chest_pain: 'no',
+    m4_full_sentences: 'yes, full sentences',
+    m4_sit_up: 'no',
+    m4_drooling: 'no',
+    m4_asthma: 'no',
+    m4_recent_hosp: 'no',
+    m4_birth_control: 'no',
+    m4_oxygen: 'no',
+  });
+  assert.equal(benign.determinantId, 'm4_yellow_benign', 'the card requires abnormal breathing PLUS a factor for RED');
+  assert.equal(benign.response, 'CODE_YELLOW');
+});
+
 test('unclear complaint falls back to M17 Unknown/Man Down', () => {
   const r = run(
     ['12 Pine St', '555-0100', 'there is somebody lying on the sidewalk', 'one', 'unknown', 'yes', 'yes', 'unknown', 'Ana'],
