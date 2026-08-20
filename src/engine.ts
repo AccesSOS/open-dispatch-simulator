@@ -10,11 +10,22 @@ import type {
   Utterance,
 } from './types.js';
 
+/** Keyword matching on word boundaries (Unicode-aware): the keyword "no"
+ * matches "no, he isn't" but never "not" or "know"; phrases like
+ * "not breathing" match as whole-word sequences. */
+const normalize = (s: string): string =>
+  ' ' + s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() + ' ';
+const containsKeyword = (text: string, keyword: string): boolean =>
+  normalize(text).includes(normalize(keyword));
+
 export interface SessionOptions {
   locale?: Locale;
   /** Live narration of the session's walk through the decision tree —
    * nodeIds match packGraph(), so visualizers can animate the call. */
   onEvent?: (event: SessionEvent) => void;
+  /** How many times an unmatched answer to a choice question is met with a
+   * clarify-and-re-ask before the dispatcher moves on (default 1). */
+  clarifyAttempts?: number;
 }
 
 /**
@@ -38,10 +49,13 @@ export class DispatchSession {
   private current: Question | null = null;
 
   private readonly onEvent: ((event: SessionEvent) => void) | undefined;
+  private readonly clarifyAttempts: number;
+  private clarifies = 0;
 
   constructor(private readonly pack: ProtocolPack, options: SessionOptions = {}) {
     this.locale = options.locale ?? pack.defaultLocale;
     this.onEvent = options.onEvent;
+    this.clarifyAttempts = options.clarifyAttempts ?? 1;
     if (!pack.locales.includes(this.locale)) {
       throw new Error(`Pack "${pack.id}" does not support locale "${this.locale}"`);
     }
@@ -66,11 +80,19 @@ export class DispatchSession {
     const q = this.current;
     if (!q) throw new Error('No question is pending');
     this.transcript.push({ role: 'caller', text });
-    this.answers[q.slot] = text;
     if (q.expect) {
       const matched = this.matchOption(q, text);
+      if (!matched && this.clarifies < this.clarifyAttempts) {
+        // A real dispatcher doesn't shrug at an unintelligible yes/no answer:
+        // clarify and re-ask, then move on if it still doesn't parse.
+        this.clarifies++;
+        this.emit({ type: 'clarify', nodeId: this.nodeIdFor(q), questionId: q.id, attempt: this.clarifies });
+        return [this.say('clarify'), this.say(q.stringId)];
+      }
       if (matched) this.choices[q.slot] = matched;
     }
+    this.clarifies = 0;
+    this.answers[q.slot] = text;
     this.emit({
       type: 'answer',
       nodeId: this.nodeIdFor(q),
@@ -104,6 +126,17 @@ export class DispatchSession {
 
   isDone(): boolean {
     return this.phase === 'done';
+  }
+
+  /** The question awaiting an answer, or null (call not started / complete). */
+  pending(): { questionId: string; slot: string; protocolId: string | null } | null {
+    const q = this.current;
+    if (!q) return null;
+    return {
+      questionId: q.id,
+      slot: q.slot,
+      protocolId: this.phase === 'key_questions' ? this.protocol?.id ?? null : null,
+    };
   }
 
   result(): SessionResult {
@@ -207,19 +240,17 @@ export class DispatchSession {
   }
 
   private matchOption(q: Question, text: string): string | undefined {
-    const normalized = text.toLowerCase();
     for (const option of q.expect?.options ?? []) {
       const keywords = option.keywords[this.locale] ?? [];
-      if (keywords.some((k) => normalized.includes(k.toLowerCase()))) return option.id;
+      if (keywords.some((k) => containsKeyword(text, k))) return option.id;
     }
     return undefined;
   }
 
   private selectProtocol(complaint: string): Protocol {
-    const normalized = complaint.toLowerCase();
     for (const p of this.pack.protocols) {
       const keywords = p.keywords[this.locale] ?? [];
-      if (keywords.some((k) => normalized.includes(k.toLowerCase()))) {
+      if (keywords.some((k) => containsKeyword(complaint, k))) {
         this.emit({ type: 'protocol_selected', protocolId: p.id, via: 'keywords' });
         return p;
       }

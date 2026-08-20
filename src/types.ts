@@ -106,6 +106,7 @@ export type SessionEvent =
       determinantId: string;
       response: string;
     }
+  | { type: 'clarify'; nodeId: string; questionId: string; attempt: number }
   | { type: 'utterance'; stringId: string; text: string };
 
 /** A pack rendered as a graph for visualization. */

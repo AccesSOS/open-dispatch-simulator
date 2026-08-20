@@ -8,4 +8,6 @@ export {
   DISPATCH_NODE_ID,
 } from './graph.js';
 export { loadPack, loadPackFromFile, PackValidationError, REQUIRED_STRING_IDS } from './loader.js';
+export { runCall, runBatch, sweepScripts } from './sim.js';
+export type { CallerScript, CallMetrics, BatchReport } from './sim.js';
 export type * from './types.js';

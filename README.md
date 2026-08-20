@@ -31,7 +31,8 @@ schema keeps those concerns apart so both can grow independently.
 
 ```bash
 npm install
-npm test
+npm test        # engine + simulator suites (keyless)
+npm run sim     # branch-sweep every pack in every locale, enforce invariants
 ```
 
 ### Live decision-tree demo
@@ -73,6 +74,16 @@ console.log(call.result());             // protocol, determinant, response level
 The loader (`loadPack`) enforces the grounding contract up front: every referenced string must
 exist in **every** declared locale, templates may only interpolate collected slots, every edge and
 determinant must reference real questions and options. A pack that loads is safe to execute.
+
+## Caller simulation at scale
+
+`runCall` / `runBatch` / `sweepScripts` (see [`src/sim.ts`](src/sim.ts)) drive scripted callers
+through a pack and score the outcomes: turns to dispatch, clarify rate, and the distribution of
+protocols, determinants, and response levels. `sweepScripts` enumerates **every combination of
+choice options per protocol**, and `npm run sim` (also a CI gate) enforces the simulator's core
+invariant: *every call reaches dispatch with a response level*, in every locale. Dispatchers also
+clarify-and-re-ask when a choice answer doesn't parse (`clarifyAttempts`, default 1), and keyword
+matching is Unicode word-boundary aware — "I do not know" is not a "no".
 
 ## Content policy
 

@@ -9,7 +9,7 @@ const ajv = new Ajv2020({ allErrors: true, formats: { date: true } });
 const validateSchema = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')));
 
 /** Engine-required string ids that every locale catalog must define. */
-export const REQUIRED_STRING_IDS = ['greeting', 'closing', 'dispatch_confirm'] as const;
+export const REQUIRED_STRING_IDS = ['greeting', 'closing', 'dispatch_confirm', 'clarify'] as const;
 
 export class PackValidationError extends Error {
   constructor(packRef: string, public readonly problems: string[]) {

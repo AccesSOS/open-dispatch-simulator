@@ -21,6 +21,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run validate:packs
+      - run: npm run sim
       - run: npm run build
 
   # The whole point of this project is that packs are grounded and licensed.
