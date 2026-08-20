@@ -185,6 +185,72 @@ test('C6: recovered faint with no critical symptoms is CODE_YELLOW', () => {
   assert.equal(r.response, 'CODE_YELLOW');
 });
 
+test('M13: mental-health crisis routes to the psychiatric card, CODE_YELLOW when airway is fine', () => {
+  const r = run(
+    ['12 Pine St', '555-0100', 'my brother is in a mental health crisis and talking about hurting himself', 'one', '28', 'yes', 'yes', 'male', 'Ana'],
+    {
+      m13_alert: 'yes, alert',
+      m13_breathing_normal: 'yes, normally',
+      m13_harmed: 'no, but he might',
+      m13_substances: 'no',
+      m13_diabetic: 'no',
+      m13_injured: 'no',
+      m13_bleeding: 'no',
+    },
+  );
+  assert.equal(r.protocolId, 'm13_psychiatric');
+  assert.equal(r.determinantId, 'm13_yellow_behavioral');
+  assert.equal(r.response, 'CODE_YELLOW');
+});
+
+test('H2: smoke complaint routes to CO/Inhalation; multiple patients → CODE_RED MCI', () => {
+  const r = run(
+    ['12 Pine St', '555-0100', 'there is smoke coming from my kitchen and the smoke alarm is going off', 'one', '40', 'yes', 'yes', 'female', 'Ana'],
+    {
+      h2_alert: 'yes, alert',
+      h2_breathing_normal: 'yes, normally',
+      h2_removed: 'yes, everyone is outside',
+      h2_co_detector: 'no',
+      h2_multiple: 'yes, two of us feel dizzy',
+    },
+  );
+  assert.equal(r.protocolId, 'h2_co_inhalation');
+  assert.equal(r.determinantId, 'h2_red_mci');
+  assert.equal(r.response, 'CODE_RED');
+});
+
+test('T4: burns with airway involvement short-circuits to CODE_RED', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of ['12 Pine St', '555-0100', 'she burned her face on the stove', 'one', '35', 'yes', 'yes', 'female', 'Ana']) s.answer(a);
+  s.answer('on the stove, a grease flare');
+  s.answer('no, nothing still burning');
+  s.answer('it was not a chemical');
+  const out = s.answer('yes, it hurts to breathe'); // airway -> immediate dispatch
+  assert.equal(out[0]!.stringId, 'dispatch_confirm');
+  const r = s.result();
+  assert.equal(r.protocolId, 't4_burns');
+  assert.equal(r.determinantId, 't4_red_airway_breath');
+  assert.equal(r.response, 'CODE_RED');
+});
+
+test('T8: penetrating trauma always defaults to CODE_RED (documented safety-first)', () => {
+  const r = run(
+    ['12 Pine St', '555-0100', 'my neighbor was stabbed', 'one', '30', 'yes', 'yes', 'male', 'Ana'],
+    {
+      t8_assailant: 'no, he ran off',
+      t8_safe: 'yes, I am safe',
+      t8_weapon: 'no',
+      t8_alert: 'yes, alert',
+      t8_breathing_normal: 'yes, normally',
+      t8_bleeding: 'no',
+    },
+  );
+  assert.equal(r.protocolId, 't8_stabbing_gunshot');
+  assert.equal(r.determinantId, 't8_red_penetrating');
+  assert.equal(r.response, 'CODE_RED');
+});
+
 test('unclear complaint falls back to M17 Unknown/Man Down', () => {
   const r = run(
     ['12 Pine St', '555-0100', 'there is somebody lying on the sidewalk', 'one', 'unknown', 'yes', 'yes', 'unknown', 'Ana'],
