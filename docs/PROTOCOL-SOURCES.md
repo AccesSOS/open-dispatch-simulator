@@ -34,6 +34,15 @@ license, or written permission — with provenance recorded in the pack and enfo
 - **Phoenix Regional SOPs M.P. 205.01, La Verne Fire Dispatch Manual** — real public documents,
   but dispatch/radio-side (alarm levels, unit assignment, command); no caller interrogation.
 - **Open ISES SourceForge** — no police/fire card sets (their other product is Tickets CAD).
+- **Criteria Based Dispatch (King County EMS / Seattle)** — the third major US protocol family,
+  but King County states the guidelines are **not available for licensing outside King County**.
+  Permission-ask-only (their Dispatch Working Group is the contact); do not chase public copies.
+- **Resuscitation Academy T-CPR Toolkit** (© 2017, mycares.net) — excellent free QI training on
+  T-CPR *principles* (compression-only emphasis; push hard/fast/don't stop; 100–120/min; never
+  interrupt), but no verbatim caller script and no open license → background/verification
+  source only. The shippable scripts are the OpenISES **I-cards** (GFDL) — I2 Adult CPR is now
+  wired into the C1 card; I1/I3–I8 (AED, child/infant CPR, choking, childbirth) remain.
+- **Wisconsin / North Carolina / Pennsylvania** — no state-published guidecards found.
 
 ## Permission-pending / in flight
 
@@ -59,6 +68,14 @@ license, or written permission — with provenance recorded in the pack and enfo
   in many states. A structured records-request campaign is the scalable corpus play (and a good
   cohort-team project): request, digitize, tag `state/city-published-permission-pending` or the
   granted license.
+- **Unverified stray leads** — `obxairwaves.com/EMD-Cards.pdf` (an NC-area EMD card set of
+  unknown authorship/license — verify before touching: could be an APCO copy); ECU EMS policy
+  manual (university EMS dispatch/pre-arrival appendix).
+- **State admin codes as edicts** — some states incorporate dispatch standards into regulation
+  (e.g. NJ NJAC 17:24). Cards embedded *in* the administrative code itself would be
+  government-edict material (strongest tier). Worth a systematic pass of state 911 regs.
+- **MuckRock** — completed public-records requests are browsable; search for released PSAP
+  guidecards/SOPs before filing new requests.
 - **988 / crisis lines** — SAMHSA publications are federal PD; the Lifeline's clinical safety
   assessment is not. Treat as future work with clinical review, not a quick pack.
 

@@ -16,7 +16,7 @@
     "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
     "license": "GFDL-1.2-or-later",
     "digitizedDate": "2026-08-20",
-    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier."
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier. 2026-08-20 (4): C1's post-dispatch now reads the actual I2 Adult CPR script lines (GFDL source, Sections A/D) as a COMPRESSION-ONLY linearization — the card's branching phone-logistics and mouth-to-mouth paths need interactive scripting (future work), and compression-only is the card's own entry point and the modern T-CPR emphasis (cf. Resuscitation Academy toolkit: push hard, push fast, don't stop). I3/I4 (child/infant CPR), I5-I7 (choking), I1 (AED), and I8 (childbirth) scripts remain undigitized."
   },
   "locales": [
     "en",
@@ -1057,9 +1057,12 @@
         }
       ],
       "postDispatch": [
-        "pd_c1_cpr",
-        "pd_gather_meds",
-        "pd_lock_pets",
+        "pd_cpr_listen",
+        "pd_cpr_position",
+        "pd_cpr_hands",
+        "pd_cpr_push",
+        "pd_cpr_continue",
+        "pd_cpr_stay",
         "pd_c1_callback"
       ]
     },
@@ -6936,7 +6939,13 @@
       "pd_t10_calm": "Keep the person calm and still.",
       "kq_c2_speak": "Is the person able to speak, or to cry?",
       "kq_c2_blue": "Is the person turning blue or changing color?",
-      "pd_c2_instructions": "I am going to give you choking instructions appropriate for the person’s age. Follow them until responders arrive."
+      "pd_c2_instructions": "I am going to give you choking instructions appropriate for the person’s age. Follow them until responders arrive.",
+      "pd_cpr_listen": "Listen carefully. I'll tell you what to do.",
+      "pd_cpr_position": "Get the person flat on their back on the floor. If someone is with you, have them help you gently roll or slide the person to the floor.",
+      "pd_cpr_hands": "Put the heel of your hand on the center of their chest, right between the nipples. Put your other hand on top of that hand.",
+      "pd_cpr_push": "Push down on the heels of your hands, about two inches. Push hard and push fast, and do not stop.",
+      "pd_cpr_continue": "Keep pumping the chest. Keep doing it until help arrives and can take over.",
+      "pd_cpr_stay": "I'll stay on the line with you until they get there."
     },
     "es": {
       "greeting": "Nueve-uno-uno.",
@@ -7086,7 +7095,13 @@
       "pd_t10_calm": "Mantenga a la persona calmada y quieta.",
       "kq_c2_speak": "¿Puede la persona hablar o llorar?",
       "kq_c2_blue": "¿Se está poniendo azul o cambiando de color la persona?",
-      "pd_c2_instructions": "Voy a darle instrucciones para atragantamiento apropiadas para la edad de la persona. Sígalas hasta que lleguen los servicios de emergencia."
+      "pd_c2_instructions": "Voy a darle instrucciones para atragantamiento apropiadas para la edad de la persona. Sígalas hasta que lleguen los servicios de emergencia.",
+      "pd_cpr_listen": "Escuche con atención. Le voy a decir qué hacer.",
+      "pd_cpr_position": "Ponga a la persona boca arriba en el piso. Si alguien está con usted, que le ayude a rodarla o deslizarla suavemente al piso.",
+      "pd_cpr_hands": "Ponga el talón de su mano en el centro del pecho, justo entre los pezones. Ponga la otra mano encima de esa mano.",
+      "pd_cpr_push": "Empuje hacia abajo con el talón de las manos, unos cinco centímetros. Empuje fuerte y rápido, y no se detenga.",
+      "pd_cpr_continue": "Siga bombeando el pecho. Siga haciéndolo hasta que llegue la ayuda y pueda relevarlo.",
+      "pd_cpr_stay": "Me quedaré en la línea con usted hasta que lleguen."
     },
     "fr": {
       "greeting": "Neuf-un-un.",
@@ -7236,7 +7251,13 @@
       "pd_t10_calm": "Gardez la personne calme et immobile.",
       "kq_c2_speak": "La personne peut-elle parler, ou pleurer?",
       "kq_c2_blue": "La personne devient-elle bleue ou change-t-elle de couleur?",
-      "pd_c2_instructions": "Je vais vous donner les instructions d'étouffement adaptées à l'âge de la personne. Suivez-les jusqu'à l'arrivée des secours."
+      "pd_c2_instructions": "Je vais vous donner les instructions d'étouffement adaptées à l'âge de la personne. Suivez-les jusqu'à l'arrivée des secours.",
+      "pd_cpr_listen": "Écoutez bien. Je vais vous dire quoi faire.",
+      "pd_cpr_position": "Mettez la personne à plat sur le dos, sur le sol. Si quelqu'un est avec vous, faites-vous aider pour la rouler ou la glisser doucement au sol.",
+      "pd_cpr_hands": "Placez le talon de votre main au centre de sa poitrine, juste entre les mamelons. Placez votre autre main par-dessus.",
+      "pd_cpr_push": "Appuyez avec le talon des mains, environ cinq centimètres. Appuyez fort et vite, et n'arrêtez pas.",
+      "pd_cpr_continue": "Continuez à pomper la poitrine. Continuez jusqu'à ce que les secours arrivent et prennent le relais.",
+      "pd_cpr_stay": "Je reste en ligne avec vous jusqu'à leur arrivée."
     }
   }
 }
