@@ -132,6 +132,12 @@ answers produce the same protocol, determinant, and response level under every s
   Cardiac Arrest/DOA, Unconscious/Fainting, and Unknown/Person Down, with New Jersey's own
   dispatch tiers (`SIMULTANEOUS_ALS_BLS` / `BLS_DISPATCH` / `FOLLOW_LOCAL_PROTOCOL`). License
   status: written permission pending — see [SOURCE.md](packs/us-nj-emd/SOURCE.md).
+- [`packs/mx-cnie-911`](packs/mx-cnie-911/pack.json) grounds a Spanish-language Mexico pack on
+  the **Catálogo Nacional de Incidentes de Emergencia v3.0** (SESNSP, official June 2024 — the
+  normative classification for every Mexican 9-1-1 center): verbatim incident codes,
+  definitions, and `ALTA`/`MEDIA` priorities, with card jumps implementing the catalog's own
+  reclassification-by-definition. Open-use license (Libre Uso MX) — see
+  [SOURCE.md](packs/mx-cnie-911/SOURCE.md).
 
 ## Roadmap
 

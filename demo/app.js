@@ -3,7 +3,7 @@
 import { DispatchSession } from '../dist/engine.js';
 import { packGraph, DISPATCH_NODE_ID } from '../dist/graph.js';
 
-const PACKS = ['us-nhtsa-emd', 'us-openises-emd', 'us-nj-emd'];
+const PACKS = ['us-nhtsa-emd', 'us-openises-emd', 'us-nj-emd', 'mx-cnie-911'];
 
 const RESPONSE_LABELS = {
   ALS_HOT: '🚑 Advanced Life Support — lights & siren',
@@ -14,6 +14,9 @@ const RESPONSE_LABELS = {
   SIMULTANEOUS_ALS_BLS: '🚨 Simultaneous ALS & BLS dispatch',
   BLS_DISPATCH: '🚑 BLS dispatch',
   FOLLOW_LOCAL_PROTOCOL: '📋 Follow local protocol',
+  ALTA: '🚨 Prioridad ALTA',
+  MEDIA: '🚑 Prioridad MEDIA',
+  BAJA: '🚗 Prioridad BAJA',
 };
 
 const SLOT_LABELS = {
