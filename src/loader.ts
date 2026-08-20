@@ -56,6 +56,43 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
     p.keyQuestions.forEach(collectQuestion);
     p.postDispatch.forEach((id) => stringIds.add(id));
   }
+  for (const script of pack.scripts ?? []) {
+    for (const step of script.steps) {
+      stringIds.add(step.stringId);
+      if (step.slot) slots.add(step.slot);
+    }
+  }
+
+  // v0.3 dispatcher-facing content. Kept in its own set: these strings must
+  // exist in every locale like any other, but the engine must have no path to
+  // speaking them, so they may never double as a spoken id.
+  const noteStringIds = new Set<string>();
+  for (const p of pack.protocols) {
+    const notes = p.dispatcherNotes;
+    if (!notes) continue;
+    for (const id of [...(notes.prompts ?? []), ...(notes.shortReport ?? []), ...(notes.useful ?? [])]) {
+      if (stringIds.has(id)) {
+        problems.push(
+          `protocol "${p.id}" dispatcherNotes string "${id}" is also spoken to the caller`,
+        );
+      }
+      noteStringIds.add(id);
+    }
+  }
+
+  // v0.3 features must not appear in a pack that declares an older schema:
+  // an old engine reading them would silently skip the instructions.
+  if (pack.schemaVersion !== '0.3') {
+    if (pack.scripts?.length) problems.push(`scripts require schemaVersion 0.3 (pack declares ${pack.schemaVersion})`);
+    for (const p of pack.protocols) {
+      if (p.postDispatchScripts?.length) {
+        problems.push(`protocol "${p.id}" postDispatchScripts requires schemaVersion 0.3`);
+      }
+      if (p.dispatcherNotes) {
+        problems.push(`protocol "${p.id}" dispatcherNotes requires schemaVersion 0.3`);
+      }
+    }
+  }
 
   // Every stringId must exist in every declared locale — the "grounded or
   // silent" property is enforced here, at load time, not at runtime.
@@ -65,7 +102,7 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
       problems.push(`missing string catalog for locale "${locale}"`);
       continue;
     }
-    for (const id of stringIds) {
+    for (const id of [...stringIds, ...noteStringIds]) {
       if (catalog[id] === undefined) {
         problems.push(`locale "${locale}" is missing string "${id}"`);
       }
@@ -161,6 +198,148 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
     const last = p.determinants[p.determinants.length - 1];
     if (last && last.when?.length) {
       problems.push(`protocol "${p.id}" has no default determinant (last rule must omit "when")`);
+    }
+  }
+
+  // --- v0.3 instruction scripts ---
+
+  // Conditions inside scripts may reference any slot the pack collects, so
+  // they resolve against a pack-wide option registry rather than one card's.
+  const globalOptions = new Map<string, Set<string>>();
+  const registerOptions = (q: { slot: string; expect?: { options: { id: string }[] } }) => {
+    if (!q.expect) return;
+    const set = globalOptions.get(q.slot) ?? new Set<string>();
+    for (const o of q.expect.options) set.add(o.id);
+    globalOptions.set(q.slot, set);
+  };
+  pack.caseEntry.forEach(registerOptions);
+  for (const p of pack.protocols) p.keyQuestions.forEach(registerOptions);
+  for (const script of pack.scripts ?? []) {
+    for (const step of script.steps) {
+      if (step.slot && step.expect) registerOptions({ slot: step.slot, expect: step.expect });
+    }
+  }
+
+  const checkGlobalCondition = (cond: Condition, where: string) => {
+    if ('option' in cond) {
+      const options = globalOptions.get(cond.slot);
+      if (!options) problems.push(`${where} references slot "${cond.slot}" with no choice question`);
+      else if (!options.has(cond.option)) {
+        problems.push(`${where} references unknown option "${cond.option}" on slot "${cond.slot}"`);
+      }
+    } else if (!extractNumberSlots.has(cond.slot)) {
+      problems.push(
+        `${where} has a numeric condition on slot "${cond.slot}" but no question declares extract: "number" for it`,
+      );
+    }
+  };
+
+  const scripts = pack.scripts ?? [];
+  const scriptIds = new Set<string>();
+  for (const script of scripts) {
+    if (scriptIds.has(script.id)) problems.push(`duplicate script id "${script.id}"`);
+    scriptIds.add(script.id);
+    for (const locale of pack.locales) {
+      if (script.name[locale] === undefined) {
+        problems.push(`script "${script.id}" name missing locale "${locale}"`);
+      }
+    }
+    const stepIds = new Set<string>();
+    for (const step of script.steps) {
+      if (stepIds.has(step.id)) problems.push(`script "${script.id}" has duplicate step id "${step.id}"`);
+      stepIds.add(step.id);
+    }
+    for (const step of script.steps) {
+      for (const o of step.expect?.options ?? []) {
+        for (const locale of pack.locales) {
+          if (!o.keywords[locale]?.length) {
+            problems.push(
+              `script "${script.id}" step "${step.id}" option "${o.id}" has no keywords for locale "${locale}"`,
+            );
+          }
+        }
+      }
+      for (const edge of step.next ?? []) {
+        const where = `script "${script.id}" step "${step.id}" edge`;
+        if ((edge.goto === undefined) === (edge.gotoScript === undefined)) {
+          problems.push(`${where} must have exactly one of goto/gotoScript`);
+        }
+        if (edge.goto !== undefined && edge.goto !== '$end' && !stepIds.has(edge.goto)) {
+          problems.push(`${where} targets unknown step "${edge.goto}"`);
+        }
+        if (edge.whenOption && !step.expect?.options.some((o) => o.id === edge.whenOption)) {
+          problems.push(`${where} uses unknown option "${edge.whenOption}"`);
+        }
+        for (const cond of edge.when ?? []) checkGlobalCondition(cond, where);
+      }
+    }
+  }
+  for (const script of scripts) {
+    for (const step of script.steps) {
+      for (const edge of step.next ?? []) {
+        if (edge.gotoScript !== undefined && !scriptIds.has(edge.gotoScript)) {
+          problems.push(
+            `script "${script.id}" step "${step.id}" jumps to unknown script "${edge.gotoScript}"`,
+          );
+        }
+      }
+    }
+  }
+  for (const p of pack.protocols) {
+    for (const entry of p.postDispatchScripts ?? []) {
+      if (!scriptIds.has(entry.script)) {
+        problems.push(`protocol "${p.id}" postDispatchScripts references unknown script "${entry.script}"`);
+      }
+      for (const cond of entry.when ?? []) {
+        checkGlobalCondition(cond, `protocol "${p.id}" postDispatchScripts entry "${entry.script}"`);
+      }
+    }
+  }
+
+  // Scripts must be a DAG. Termination is then structural rather than a
+  // runtime step budget: a pack that loads cannot loop the caller forever.
+  if (!problems.length && scripts.length) {
+    const byId = new Map(scripts.map((s) => [s.id, s]));
+    const key = (scriptId: string, stepId: string) => `${scriptId}#${stepId}`;
+    const successors = (scriptId: string, index: number): string[] => {
+      const script = byId.get(scriptId)!;
+      const step = script.steps[index]!;
+      const out: string[] = [];
+      let hasDefault = false;
+      for (const edge of step.next ?? []) {
+        if (edge.whenOption === undefined && !edge.when?.length) hasDefault = true;
+        if (edge.gotoScript !== undefined) {
+          const target = byId.get(edge.gotoScript);
+          if (target?.steps[0]) out.push(key(target.id, target.steps[0].id));
+        } else if (edge.goto !== undefined && edge.goto !== '$end') {
+          out.push(key(scriptId, edge.goto));
+        }
+      }
+      const nextInSequence = script.steps[index + 1];
+      if (!hasDefault && step.kind !== 'stay' && nextInSequence) {
+        out.push(key(scriptId, nextInSequence.id));
+      }
+      return out;
+    };
+    const index = new Map<string, [string, number]>();
+    for (const script of scripts) {
+      script.steps.forEach((step, i) => index.set(key(script.id, step.id), [script.id, i]));
+    }
+    const state = new Map<string, 'open' | 'closed'>();
+    const walk = (node: string, trail: string[]): void => {
+      const seen = state.get(node);
+      if (seen === 'closed') return;
+      if (seen === 'open') {
+        problems.push(`instruction scripts contain a cycle: ${[...trail, node].join(' → ')}`);
+        return;
+      }
+      state.set(node, 'open');
+      const at = index.get(node);
+      if (at) for (const next of successors(at[0], at[1])) walk(next, [...trail, node]);
+      state.set(node, 'closed');
+    };
+    for (const script of scripts) {
+      if (script.steps[0]) walk(key(script.id, script.steps[0].id), []);
     }
   }
 

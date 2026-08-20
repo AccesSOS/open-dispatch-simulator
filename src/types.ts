@@ -1,4 +1,4 @@
-/** Types mirroring schema/pack.schema.json (v0.1). */
+/** Types mirroring schema/pack.schema.json (v0.3). */
 
 export type Locale = string;
 
@@ -67,6 +67,61 @@ export interface DeterminantRule {
   response: string;
 }
 
+/** v0.3: an edge inside an instruction script. */
+export interface ScriptEdge {
+  whenOption?: string;
+  when?: Condition[];
+  /** A step id within the same script, or '$end'. */
+  goto?: string;
+  /** Hand off to another script ("jump to I1: AED Instructions"). */
+  gotoScript?: string;
+}
+
+/**
+ * v0.3: one line of an interactive instruction script. `say` reads and moves
+ * on; `ask` captures the caller's answer and branches on it; `stay` is the
+ * terminal line the dispatcher holds on ("keep doing it until help arrives").
+ */
+export interface ScriptStep {
+  id: string;
+  kind: 'say' | 'ask' | 'stay';
+  stringId: string;
+  slot?: string;
+  expect?: Expectation;
+  next?: ScriptEdge[];
+}
+
+/**
+ * v0.3: a telephone procedure the dispatcher reads out and steers by the
+ * caller's answers — CPR, choking, childbirth, AED. Scripts form a DAG (the
+ * loader rejects cycles), so every run terminates.
+ */
+export interface InstructionScript {
+  id: string;
+  name: LocalizedText;
+  /** The card this digitizes, e.g. "I2: Adult CPR Instructions". */
+  source?: string;
+  steps: ScriptStep[];
+}
+
+/** v0.3: which script a card hands off to, and when. First match wins. */
+export interface PostDispatchScript {
+  script: string;
+  when?: Condition[];
+}
+
+/**
+ * v0.3: content for the dispatcher that is never spoken — the cards' "Call
+ * Taker Prompts", "Dispatcher Short Report" and "Useful Information". The
+ * loader keeps these stringIds disjoint from everything the engine can say,
+ * so the grounding contract stays a structural guarantee rather than a habit.
+ */
+export interface DispatcherNotes {
+  prompts?: string[];
+  shortReport?: string[];
+  useful?: string[];
+}
+
 export interface Protocol {
   id: string;
   name: LocalizedText;
@@ -74,10 +129,12 @@ export interface Protocol {
   keyQuestions: Question[];
   determinants: DeterminantRule[];
   postDispatch: string[];
+  postDispatchScripts?: PostDispatchScript[];
+  dispatcherNotes?: DispatcherNotes;
 }
 
 export interface ProtocolPack {
-  schemaVersion: '0.1';
+  schemaVersion: '0.1' | '0.2' | '0.3';
   id: string;
   name: LocalizedText;
   jurisdiction: Jurisdiction;
@@ -87,6 +144,7 @@ export interface ProtocolPack {
   caseEntry: Question[];
   protocols: Protocol[];
   fallbackProtocol: string;
+  scripts?: InstructionScript[];
   strings: Record<Locale, Record<string, StringTemplate>>;
 }
 
@@ -111,7 +169,7 @@ export interface Utterance {
   text: string;
 }
 
-export type Phase = 'idle' | 'case_entry' | 'key_questions' | 'done';
+export type Phase = 'idle' | 'case_entry' | 'key_questions' | 'instructions' | 'done';
 
 /**
  * Live narration of a session's walk through the decision tree, for
@@ -139,14 +197,18 @@ export type SessionEvent =
       response: string;
     }
   | { type: 'clarify'; nodeId: string; questionId: string; attempt: number }
+  | { type: 'script_entered'; scriptId: string; via: 'protocol' | 'jump' }
+  | { type: 'script_step'; nodeId: string; scriptId: string; stepId: string; kind: ScriptStep['kind'] }
   | { type: 'utterance'; stringId: string; text: string };
 
 /** A pack rendered as a graph for visualization. */
 export interface GraphNode {
   id: string;
-  kind: 'case_entry' | 'key_question' | 'determine' | 'dispatch';
+  kind: 'case_entry' | 'key_question' | 'determine' | 'dispatch' | 'script_step';
   protocolId?: string;
+  scriptId?: string;
   questionId?: string;
+  stepKind?: ScriptStep['kind'];
   slot?: string;
   stringId?: string;
 }
@@ -171,5 +233,7 @@ export interface SessionResult {
   choices: Record<string, string>;
   /** Numbers captured by extract: 'number' questions. */
   numbers: Record<string, number>;
+  /** v0.3: instruction scripts entered after dispatch, in order. */
+  scripts: string[];
   transcript: { role: 'dispatcher' | 'caller'; text: string }[];
 }

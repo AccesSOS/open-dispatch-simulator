@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadPackFromFile } from '../src/loader.js';
-import { runBatch, sweepScripts } from '../src/sim.js';
+import { runBatch, sweepInstructionScripts, sweepScripts } from '../src/sim.js';
 
 /**
  * Branch-sweep every pack in every declared locale and enforce the simulator
@@ -38,6 +38,30 @@ for (const dir of readdirSync(packsDir)) {
       failed = true;
       console.error(`  ✗ NO RESPONSE LEVEL: ${noResponse.map((m) => m.scriptId).join(', ')}`);
     }
+    }
+
+    // v0.3: instruction scripts are swept separately — one caller per walk
+    // through the script DAG. Every walk must still end the call, and every
+    // step must be reached by some walk, or the deck has dead lines in it.
+    if (pack.scripts?.length) {
+      const sweep = sweepInstructionScripts(pack, locale);
+      const report = runBatch(pack, sweep.scripts);
+      const steps = pack.scripts.reduce((n, s) => n + s.steps.length, 0);
+      console.log(
+        `  instruction scripts [${locale}]: ${report.total} walks over ${pack.scripts.length} scripts / ${steps} steps` +
+          `  avg turns: ${report.avgTurns.toFixed(1)}`,
+      );
+      if (report.incomplete.length) {
+        failed = true;
+        console.error(`  ✗ INSTRUCTION WALKS DID NOT CLOSE: ${report.incomplete.slice(0, 5).join(', ')}`);
+      }
+      if (sweep.unreachable.length) {
+        failed = true;
+        console.error(`  ✗ UNREACHABLE SCRIPT STEPS: ${sweep.unreachable.join(', ')}`);
+      }
+      if (sweep.capped.length) {
+        console.error(`  ! path enumeration capped (coverage not exhaustive): ${sweep.capped.join(', ')}`);
+      }
     }
   }
 }

@@ -19,7 +19,7 @@
   ],
   "additionalProperties": false,
   "properties": {
-    "schemaVersion": { "enum": ["0.1", "0.2"] },
+    "schemaVersion": { "enum": ["0.1", "0.2", "0.3"] },
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "name": { "$ref": "#/$defs/localizedText" },
     "jurisdiction": {
@@ -66,6 +66,11 @@
     "fallbackProtocol": {
       "type": "string",
       "description": "Protocol id used when the chief complaint matches no protocol's keywords."
+    },
+    "scripts": {
+      "type": "array",
+      "description": "v0.3: interactive instruction scripts — the telephone procedures an EMD reads out and steers by the caller's answers (CPR, choking, childbirth, AED). Unlike postDispatch, a script may ask questions and branch. Scripts must form a DAG: no step may be reachable from itself, directly or through another script, so every run terminates.",
+      "items": { "$ref": "#/$defs/instructionScript" }
     },
     "strings": {
       "type": "object",
@@ -234,7 +239,96 @@
           "type": "array",
           "description": "stringIds of instructions read to the caller after responders are dispatched.",
           "items": { "type": "string" }
+        },
+        "postDispatchScripts": {
+          "type": "array",
+          "description": "v0.3: interactive instruction scripts to run after the postDispatch strings. Ordered; the first entry whose conditions all hold is the one that runs, so a card can route by age (infant / child / adult CPR) exactly as the printed cards do.",
+          "items": {
+            "type": "object",
+            "required": ["script"],
+            "additionalProperties": false,
+            "properties": {
+              "script": { "type": "string", "description": "An id in the pack's top-level scripts." },
+              "when": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/condition" },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "dispatcherNotes": {
+          "type": "object",
+          "description": "v0.3: content for the dispatcher, never spoken to the caller — the cards' 'Call Taker Prompts', 'Dispatcher Short Report' and 'Useful Information' sections. These stringIds must not appear anywhere the engine can speak them, and the loader rejects a pack that reuses one.",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "prompts": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+            "shortReport": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+            "useful": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+          }
         }
+      }
+    },
+    "instructionScript": {
+      "type": "object",
+      "required": ["id", "name", "steps"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "$ref": "#/$defs/localizedText" },
+        "source": { "type": "string", "description": "The card this script digitizes, e.g. 'I2: Adult CPR Instructions'." },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/scriptStep" }
+        }
+      }
+    },
+    "scriptStep": {
+      "type": "object",
+      "required": ["id", "kind", "stringId"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "kind": {
+          "enum": ["say", "ask", "stay"],
+          "description": "'say' reads a line and moves on. 'ask' reads a line, captures the caller's answer into a slot, and branches. 'stay' reads a final line and holds the line — the script's terminal step ('keep doing it until help arrives; I will stay on the line')."
+        },
+        "stringId": { "type": "string" },
+        "slot": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$", "description": "Required for 'ask' steps; the slot the answer lands in." },
+        "expect": { "$ref": "#/$defs/expectation" },
+        "next": {
+          "type": "array",
+          "description": "Conditional edges evaluated after this step. Without a matching edge, flow continues to the next step in sequence. Forbidden on 'stay' steps.",
+          "items": { "$ref": "#/$defs/scriptEdge" },
+          "minItems": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "ask" } }, "required": ["kind"] },
+          "then": { "required": ["slot", "expect"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "stay" } }, "required": ["kind"] },
+          "then": { "not": { "required": ["next"] } }
+        }
+      ]
+    },
+    "scriptEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [{ "required": ["goto"] }, { "required": ["gotoScript"] }],
+      "properties": {
+        "whenOption": { "type": "string", "description": "Take this edge when this step's answered option id matches. An edge with neither whenOption nor when is the default." },
+        "when": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/condition" },
+          "minItems": 1
+        },
+        "goto": { "type": "string", "description": "A step id within the same script, or the sentinel '$end' to finish the script." },
+        "gotoScript": { "type": "string", "description": "Hand off to another script ('jump to I1: AED Instructions'). The target runs to its own end." }
       }
     }
   }

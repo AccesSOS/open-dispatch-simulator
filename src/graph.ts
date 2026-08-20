@@ -9,6 +9,9 @@ export const keyQuestionNodeId = (protocolId: string, q: Question): string =>
 export const determineNodeId = (protocolId: string): string => `${protocolId}:$determine`;
 /** Terminal node shared by every path: responders dispatched. */
 export const DISPATCH_NODE_ID = '$dispatch';
+/** v0.3: graph node id for a step of an instruction script. */
+export const scriptStepNodeId = (scriptId: string, stepId: string): string =>
+  `${scriptId}#${stepId}`;
 
 /**
  * Render a pack's decision structure as nodes and edges for visualization.
@@ -104,5 +107,52 @@ export function packGraph(pack: ProtocolPack): PackGraph {
   }
 
   nodes.push({ id: DISPATCH_NODE_ID, kind: 'dispatch' });
+
+  // v0.3: instruction scripts hang off the dispatch node — everything here
+  // happens after responders are already rolling.
+  for (const script of pack.scripts ?? []) {
+    script.steps.forEach((step, i) => {
+      const selfId = scriptStepNodeId(script.id, step.id);
+      nodes.push({
+        id: selfId,
+        kind: 'script_step',
+        scriptId: script.id,
+        questionId: step.id,
+        stepKind: step.kind,
+        stringId: step.stringId,
+        ...(step.slot !== undefined && { slot: step.slot }),
+      });
+      let hasDefault = false;
+      for (const e of step.next ?? []) {
+        if (e.whenOption === undefined && !e.when?.length) hasDefault = true;
+        const target =
+          e.gotoScript !== undefined
+            ? scriptEntryNodeId(pack, e.gotoScript)
+            : e.goto === '$end'
+              ? null
+              : scriptStepNodeId(script.id, e.goto!);
+        if (!target) continue;
+        const label = edgeLabel(e as never);
+        edges.push({ from: selfId, to: target, ...(label !== undefined && { label }) });
+      }
+      const nextStep = script.steps[i + 1];
+      if (!hasDefault && step.kind !== 'stay' && nextStep) {
+        edges.push({ from: selfId, to: scriptStepNodeId(script.id, nextStep.id) });
+      }
+    });
+  }
+  for (const p of pack.protocols) {
+    for (const entry of p.postDispatchScripts ?? []) {
+      const to = scriptEntryNodeId(pack, entry.script);
+      if (to) edges.push({ from: determineNodeId(p.id), to, label: entry.script });
+    }
+  }
+
   return { nodes, edges };
+}
+
+/** First step of a script, as a graph node id. */
+function scriptEntryNodeId(pack: ProtocolPack, scriptId: string): string | null {
+  const script = pack.scripts?.find((s) => s.id === scriptId);
+  return script?.steps[0] ? scriptStepNodeId(script.id, script.steps[0].id) : null;
 }

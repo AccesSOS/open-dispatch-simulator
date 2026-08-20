@@ -6,9 +6,10 @@ export {
   keyQuestionNodeId,
   determineNodeId,
   DISPATCH_NODE_ID,
+  scriptStepNodeId,
 } from './graph.js';
 export { loadPack, loadPackFromFile, PackValidationError, REQUIRED_STRING_IDS } from './loader.js';
-export { runCall, runBatch, sweepScripts } from './sim.js';
+export { runCall, runBatch, sweepScripts, sweepInstructionScripts } from './sim.js';
 export { coverage, loadRubric, loadRubricFromFile, matchTaxonomy, RubricValidationError } from './coverage.js';
 export { diffPacks } from './diff.js';
 export type { PackDiffResult, ProtocolPairDiff, CaseEntryDiff, SetDiff, DiffOptions } from './diff.js';
@@ -21,5 +22,5 @@ export type {
   Check,
   Status,
 } from './coverage.js';
-export type { CallerScript, CallMetrics, BatchReport, RunOptions } from './sim.js';
+export type { CallerScript, CallMetrics, BatchReport, RunOptions, ScriptSweep } from './sim.js';
 export type * from './types.js';

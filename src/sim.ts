@@ -1,5 +1,14 @@
 import { DispatchSession } from './engine.js';
-import type { Locale, Persona, ProtocolPack, Question, SessionResult } from './types.js';
+import type {
+  Condition,
+  InstructionScript,
+  Locale,
+  Persona,
+  ProtocolPack,
+  Question,
+  ScriptStep,
+  SessionResult,
+} from './types.js';
 
 /**
  * Caller simulation: run scripted callers through a pack at scale and score
@@ -26,6 +35,8 @@ export interface CallMetrics {
   clarifies: number;
   /** True when the call reached dispatch (the invariant every call must hit). */
   completed: boolean;
+  /** v0.3: instruction-script steps read, as "<scriptId>#<stepId>". */
+  scriptSteps: string[];
 }
 
 export interface BatchReport {
@@ -49,11 +60,13 @@ export interface RunOptions {
 export function runCall(pack: ProtocolPack, script: CallerScript, options: RunOptions = {}): CallMetrics {
   const maxTurns = options.maxTurns ?? 100;
   let clarifies = 0;
+  const scriptSteps: string[] = [];
   const session = new DispatchSession(pack, {
     locale: script.locale,
     ...(options.persona && { persona: options.persona }),
     onEvent: (e) => {
       if (e.type === 'clarify') clarifies++;
+      if (e.type === 'script_step') scriptSteps.push(`${e.scriptId}#${e.stepId}`);
     },
   });
   session.start();
@@ -71,6 +84,7 @@ export function runCall(pack: ProtocolPack, script: CallerScript, options: RunOp
     turns,
     clarifies,
     completed: session.isDone(),
+    scriptSteps,
   };
 }
 
@@ -148,4 +162,172 @@ export function sweepScripts(pack: ProtocolPack, locale: Locale): CallerScript[]
     }
   }
   return scripts;
+}
+
+/** Result of a script-path sweep: the caller scripts, plus what was skipped. */
+export interface ScriptSweep {
+  scripts: CallerScript[];
+  /** Steps the sweep could not reach, as "<scriptId>#<stepId>". */
+  unreachable: string[];
+  /** Entries whose path enumeration hit the cap — coverage is not exhaustive. */
+  capped: string[];
+}
+
+/** Paths kept per (protocol, script) pair. Overrun is reported, never silent. */
+const MAX_PATHS_PER_ENTRY = 400;
+
+/** A concrete value that makes `cond` hold, drawn from the pack's own vocabulary. */
+function slotValueFor(pack: ProtocolPack, cond: Condition, locale: Locale): string | undefined {
+  if ('option' in cond) {
+    const questions: (Question | ScriptStep)[] = [
+      ...pack.caseEntry,
+      ...pack.protocols.flatMap((p) => p.keyQuestions),
+      ...(pack.scripts ?? []).flatMap((s) => s.steps),
+    ];
+    for (const q of questions) {
+      if (q.slot !== cond.slot) continue;
+      const option = q.expect?.options.find((o) => o.id === cond.option);
+      const keyword = option?.keywords[locale]?.[0];
+      if (keyword) return keyword;
+    }
+    return undefined;
+  }
+  if (cond.lt !== undefined) return String(cond.lt - 1);
+  if (cond.lte !== undefined) return String(cond.lte);
+  if (cond.gt !== undefined) return String(cond.gt + 1);
+  if (cond.gte !== undefined) return String(cond.gte);
+  return undefined;
+}
+
+/**
+ * Every root-to-terminal walk through an instruction script, as the option
+ * answers a caller would have to give to take it.
+ *
+ * Scripts are a DAG (the loader guarantees it), so this terminates. Edge
+ * `when` conditions are treated as satisfiable rather than solved, so a few
+ * walks may be unreachable in practice — the same stance sweepScripts takes,
+ * and the reason the sweep reports which steps it never actually reached
+ * rather than assuming it reached them all.
+ */
+function scriptPaths(
+  pack: ProtocolPack,
+  entryScriptId: string,
+  locale: Locale,
+  cap: number,
+): { answers: Record<string, string>[]; capped: boolean } {
+  const byId = new Map((pack.scripts ?? []).map((s) => [s.id, s]));
+  const out: Record<string, string>[] = [];
+  let capped = false;
+
+  const walk = (script: InstructionScript, index: number, answers: Record<string, string>): void => {
+    if (out.length >= cap) {
+      capped = true;
+      return;
+    }
+    const step = script.steps[index];
+    if (!step || step.kind === 'stay') {
+      out.push(answers);
+      return;
+    }
+    const edges = step.next ?? [];
+    const hasDefault = edges.some((e) => e.whenOption === undefined && !e.when?.length);
+    const follow = (edge: (typeof edges)[number] | null, withAnswers: Record<string, string>) => {
+      if (!edge) {
+        const nextStep = script.steps[index + 1];
+        if (!nextStep) out.push(withAnswers);
+        else walk(script, index + 1, withAnswers);
+        return;
+      }
+      if (edge.gotoScript !== undefined) {
+        const target = byId.get(edge.gotoScript);
+        if (target) walk(target, 0, withAnswers);
+        else out.push(withAnswers);
+        return;
+      }
+      if (edge.goto === '$end') {
+        out.push(withAnswers);
+        return;
+      }
+      const at = script.steps.findIndex((s) => s.id === edge.goto);
+      if (at < 0) out.push(withAnswers);
+      else walk(script, at, withAnswers);
+    };
+
+    if (step.kind === 'ask' && step.slot) {
+      for (const option of step.expect?.options ?? []) {
+        const answer = option.keywords[locale]?.[0] ?? option.id;
+        const edge =
+          edges.find((e) => e.whenOption === option.id) ??
+          edges.find((e) => e.whenOption === undefined) ??
+          null;
+        follow(edge, { ...answers, [step.slot]: answer });
+      }
+      return;
+    }
+    if (!edges.length) {
+      follow(null, answers);
+      return;
+    }
+    for (const edge of edges) follow(edge, answers);
+    if (!hasDefault) follow(null, answers);
+  };
+
+  const entry = byId.get(entryScriptId);
+  if (entry) walk(entry, 0, {});
+  return { answers: out, capped };
+}
+
+/**
+ * Branch sweep for v0.3 instruction scripts: one caller per walk through each
+ * script a protocol can hand off to, with the slot values needed to route into
+ * that protocol and select that script.
+ *
+ * Kept separate from sweepScripts on purpose. Multiplying protocol branches by
+ * instruction branches would put the sweep into the millions of calls for no
+ * extra coverage — each family exercises its own decision surface.
+ */
+export function sweepInstructionScripts(pack: ProtocolPack, locale: Locale): ScriptSweep {
+  const scripts: CallerScript[] = [];
+  const capped: string[] = [];
+  const selector = pack.caseEntry.find((q) => q.selectsProtocol);
+  const reached = new Set<string>();
+
+  for (const p of pack.protocols) {
+    for (const entry of p.postDispatchScripts ?? []) {
+      const base: Record<string, string> = { ...FREE_SLOT_DEFAULTS };
+      if (selector) {
+        base[selector.slot] =
+          p.id === pack.fallbackProtocol
+            ? 'zzz unmatched complaint zzz'
+            : p.keywords[locale]?.[0] ?? p.id;
+      }
+      for (const cond of entry.when ?? []) {
+        const value = slotValueFor(pack, cond, locale);
+        if (value !== undefined) base[cond.slot] = value;
+      }
+      const { answers, capped: hitCap } = scriptPaths(pack, entry.script, locale, MAX_PATHS_PER_ENTRY);
+      if (hitCap) capped.push(`${p.id}/${entry.script}`);
+      answers.forEach((path, i) => {
+        scripts.push({
+          id: `${p.id}/${entry.script}/path${i}`,
+          locale,
+          slots: { ...base, ...path },
+          fallbackAnswer: 'unknown',
+        });
+      });
+    }
+  }
+
+  // Which steps the sweep actually reaches is a fact, not an assumption.
+  for (const m of scripts.map((s) => runCall(pack, s))) {
+    for (const step of m.scriptSteps) reached.add(step);
+  }
+  const unreachable: string[] = [];
+  for (const script of pack.scripts ?? []) {
+    for (const step of script.steps) {
+      const id = `${script.id}#${step.id}`;
+      if (!reached.has(id)) unreachable.push(id);
+    }
+  }
+  return { scripts, unreachable, capped };
 }

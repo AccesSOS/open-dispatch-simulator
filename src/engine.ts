@@ -1,12 +1,14 @@
-import { determineNodeId, keyQuestionNodeId } from './graph.js';
+import { determineNodeId, keyQuestionNodeId, scriptStepNodeId } from './graph.js';
 import type {
   Condition,
+  InstructionScript,
   Locale,
   Persona,
   Phase,
   Protocol,
   ProtocolPack,
   Question,
+  ScriptStep,
   SessionEvent,
   SessionResult,
   Utterance,
@@ -61,6 +63,11 @@ export class DispatchSession {
   private response: string | null = null;
   private queue: Question[] = [];
   private current: Question | null = null;
+  /** v0.3: the instruction script being read, and where in it we are. */
+  private script: InstructionScript | null = null;
+  private stepIndex = 0;
+  private currentStep: ScriptStep | null = null;
+  private readonly scriptsEntered: string[] = [];
 
   private readonly onEvent: ((event: SessionEvent) => void) | undefined;
   private readonly clarifyAttempts: number;
@@ -92,6 +99,7 @@ export class DispatchSession {
 
   /** Feed the caller's reply; returns the dispatcher's next utterances. */
   answer(text: string): Utterance[] {
+    if (this.phase === 'instructions') return this.answerStep(text);
     if (this.phase !== 'case_entry' && this.phase !== 'key_questions') {
       throw new Error(`Cannot answer in phase "${this.phase}"`);
     }
@@ -181,6 +189,11 @@ export class DispatchSession {
 
   /** The question awaiting an answer, or null (call not started / complete). */
   pending(): { questionId: string; slot: string; protocolId: string | null } | null {
+    if (this.phase === 'instructions') {
+      const step = this.currentStep;
+      if (!step?.slot) return null;
+      return { questionId: step.id, slot: step.slot, protocolId: this.protocol?.id ?? null };
+    }
     const q = this.current;
     if (!q) return null;
     return {
@@ -198,6 +211,7 @@ export class DispatchSession {
       answers: { ...this.answers },
       choices: { ...this.choices },
       numbers: { ...this.numbers },
+      scripts: [...this.scriptsEntered],
       transcript: [...this.transcript],
     };
   }
@@ -266,12 +280,149 @@ export class DispatchSession {
       determinantId: rule.id,
       response: rule.response,
     });
+    const out = [this.say('dispatch_confirm'), ...protocol.postDispatch.map((id) => this.say(id))];
+
+    // v0.3: a card may hand off to an interactive instruction script — the
+    // call is not over when the ambulance is rolling.
+    const handoff = protocol.postDispatchScripts?.find((entry) =>
+      (entry.when ?? []).every((c) => this.condHolds(c)),
+    );
+    if (handoff) {
+      this.phase = 'instructions';
+      this.emit({ type: 'phase', phase: 'instructions' });
+      out.push(...this.enterScript(handoff.script, 'protocol'));
+      return out;
+    }
+
+    this.phase = 'done';
     this.emit({ type: 'phase', phase: 'done' });
-    return [
-      this.say('dispatch_confirm'),
-      ...protocol.postDispatch.map((id) => this.say(id)),
-      this.say('closing'),
-    ];
+    out.push(this.say('closing'));
+    return out;
+  }
+
+  // --- v0.3 instruction scripts ---
+
+  /** Point the reader at a script's first step. Reads nothing by itself. */
+  private beginScript(scriptId: string, via: 'protocol' | 'jump'): void {
+    const script = this.pack.scripts?.find((s) => s.id === scriptId);
+    if (!script) throw new Error(`Script "${scriptId}" not found`); // loader prevents this
+    this.script = script;
+    this.stepIndex = 0;
+    this.scriptsEntered.push(script.id);
+    this.emit({ type: 'script_entered', scriptId: script.id, via });
+  }
+
+  /** Begin a script and read until a step needs an answer or the call closes. */
+  private enterScript(scriptId: string, via: 'protocol' | 'jump'): Utterance[] {
+    this.beginScript(scriptId, via);
+    return this.runSteps();
+  }
+
+  /**
+   * Read consecutive steps until one asks a question, the script ends, or a
+   * `stay` step holds the line. Termination is structural: the loader rejects
+   * a pack whose scripts contain a cycle.
+   */
+  private runSteps(): Utterance[] {
+    const out: Utterance[] = [];
+    for (;;) {
+      const script = this.script;
+      const step = script?.steps[this.stepIndex];
+      if (!script || !step) return [...out, ...this.finishScripts()];
+      this.currentStep = step;
+      out.push(this.say(step.stringId));
+      this.emit({
+        type: 'script_step',
+        nodeId: scriptStepNodeId(script.id, step.id),
+        scriptId: script.id,
+        stepId: step.id,
+        kind: step.kind,
+      });
+      if (step.kind === 'ask') return out;
+      if (step.kind === 'stay') {
+        // The dispatcher stays on the line; the protocol has nothing further
+        // to say, so the call closes here.
+        return [...out, ...this.finishScripts()];
+      }
+      if (this.followStepEdge(step) === 'ended') return [...out, ...this.finishScripts()];
+    }
+  }
+
+  /** Apply a step's edges, moving the reader. Reads nothing itself. */
+  private followStepEdge(step: ScriptStep): 'moved' | 'ended' {
+    const script = this.script!;
+    const edge = step.next?.find(
+      (e) =>
+        (e.whenOption === undefined || e.whenOption === this.choices[step.slot ?? '']) &&
+        (e.when ?? []).every((c) => this.condHolds(c)),
+    );
+    if (!edge) {
+      this.stepIndex += 1;
+      return 'moved';
+    }
+    const from = scriptStepNodeId(script.id, step.id);
+    if (edge.gotoScript !== undefined) {
+      const target = this.pack.scripts?.find((s) => s.id === edge.gotoScript);
+      if (target?.steps[0]) {
+        this.emit({ type: 'edge', from, to: scriptStepNodeId(target.id, target.steps[0].id) });
+      }
+      this.beginScript(edge.gotoScript, 'jump');
+      return 'moved';
+    }
+    if (edge.goto === '$end') return 'ended';
+    const index = script.steps.findIndex((s) => s.id === edge.goto);
+    if (index < 0) throw new Error(`Script step "${edge.goto}" not found`); // loader prevents this
+    this.emit({ type: 'edge', from, to: scriptStepNodeId(script.id, script.steps[index]!.id) });
+    this.stepIndex = index;
+    return 'moved';
+  }
+
+  /** Answer the pending script step and continue reading. */
+  private answerStep(text: string): Utterance[] {
+    const step = this.currentStep;
+    if (!step || step.kind !== 'ask') throw new Error('No instruction step is pending');
+    this.transcript.push({ role: 'caller', text });
+    const matched = this.matchStepOption(step, text);
+    if (!matched && this.clarifies < this.clarifyAttempts) {
+      this.clarifies++;
+      this.emit({
+        type: 'clarify',
+        nodeId: scriptStepNodeId(this.script!.id, step.id),
+        questionId: step.id,
+        attempt: this.clarifies,
+      });
+      return [this.say('clarify'), this.say(step.stringId)];
+    }
+    this.clarifies = 0;
+    if (matched && step.slot) this.choices[step.slot] = matched;
+    if (step.slot) this.answers[step.slot] = text;
+    this.emit({
+      type: 'answer',
+      nodeId: scriptStepNodeId(this.script!.id, step.id),
+      questionId: step.id,
+      slot: step.slot ?? '',
+      text,
+      option: matched ?? null,
+    });
+    if (this.followStepEdge(step) === 'ended') return this.finishScripts();
+    return this.runSteps();
+  }
+
+  /** Close the call once no script has anything left to read. */
+  private finishScripts(): Utterance[] {
+    this.script = null;
+    this.currentStep = null;
+    this.phase = 'done';
+    this.emit({ type: 'phase', phase: 'done' });
+    return [this.say('closing')];
+  }
+
+  private matchStepOption(step: ScriptStep, text: string): string | undefined {
+    for (const option of step.expect?.options ?? []) {
+      const keywords = option.keywords[this.locale] ?? [];
+      if (keywords.some((k) => containsKeyword(text, k))) return option.id;
+    }
+    return undefined;
   }
 
   /** Render a template from the active locale's catalog. Grounding guard:

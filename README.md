@@ -69,6 +69,8 @@ console.log(call.result());             // protocol, determinant, response level
 | `protocols[].keyQuestions` | The decision tree: choice questions with conditional edges |
 | `protocols[].determinants` | Ordered rules mapping answers to a neutral response level |
 | `protocols[].postDispatch` | Instructions read after responders are dispatched |
+| `scripts` | v0.3: interactive instruction scripts (CPR, choking, childbirth) a card hands off to |
+| `protocols[].dispatcherNotes` | v0.3: content for the dispatcher, structurally never spoken |
 | `strings.<locale>` | Every utterance template, per locale — validated complete at load time |
 | `provenance` | Where the playbook came from and its redistribution license |
 
@@ -79,6 +81,24 @@ to whichever tier the pack lists as default); edges gain `when` (compound condit
 slots) and `gotoProtocol` — faithful **card jumps**, e.g. both bundled real packs now route an
 unconscious, non-breathing patient to their Cardiac Arrest card mid-case-entry, exactly as the
 printed flow charts direct.
+
+Schema **v0.3** adds **interactive instruction scripts** — the part of a card the dispatcher
+*performs* rather than reads. `postDispatch` is a list of lines; a script is a small graph of
+`say` / `ask` / `stay` steps that branches on what the caller answers, hands off to other scripts
+("jump to I1: AED Instructions"), and ends by holding the line. A card selects one with
+`postDispatchScripts`, ordered and conditional, so the same card routes an infant, a child, and an
+adult to different CPR scripts exactly as the printed decks do. The call no longer ends when the
+ambulance is rolling: the response level is fixed at dispatch, and everything after it is the
+caller being talked through what to do.
+
+Scripts must form a **DAG** — the loader rejects a pack whose scripts can reach themselves, so a
+pack that loads cannot trap a caller in a loop. Termination is a property of the content, not a
+runtime step budget.
+
+v0.3 also adds `dispatcherNotes`: the cards' "Call Taker Prompts", "Dispatcher Short Report" and
+"Useful Information" — content for the call-taker that is **never spoken**. Those string ids are
+kept disjoint from every spoken id, so "never said to the caller" is enforced by the loader rather
+than trusted.
 
 The loader (`loadPack`) enforces the grounding contract up front: every referenced string must
 exist in **every** declared locale, templates may only interpolate collected slots, every edge and
