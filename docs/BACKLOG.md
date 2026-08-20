@@ -11,7 +11,7 @@ external input (a permission reply, a decision from Kevin, a records request).
       producing a per-pack requirements-coverage report. This is the public, safe comparison
       story — "covers every element the state requires" — per
       [PRIVATE-PACKS.md](PRIVATE-PACKS.md).
-      → *Done.* `schema/rubric.schema.json` + `rubrics/us-me-emdprs.json` (40 requirements) and
+      → *Done* (a127e1f). `schema/rubric.schema.json` + `rubrics/us-me-emdprs.json` (40 requirements) and
       `rubrics/us-nhtsa-emd-curriculum.json` (21, plus the 32-chief-complaint taxonomy Maine
       §II.2.A.27 cites); `npm run coverage` scores every pack with per-finding evidence. Flagship
       pack: 31/37 Maine, 17/19 NHTSA. Two gaps are schema gaps (`notRepresentable`), which feeds
