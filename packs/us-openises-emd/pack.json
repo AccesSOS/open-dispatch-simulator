@@ -16,7 +16,7 @@
     "url": "https://archive.org/download/files-all/cards911.zip/EMD_Card_Version_0.26.2.pdf",
     "license": "GFDL-1.2-or-later",
     "digitizedDate": "2026-08-20",
-    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled."
+    "notes": "Faithful digitization of the All Callers Interrogation plus cards M5 (Chest Pain/Heart Problems), C1 (Cardiac/Respiratory Arrest), C6 (Unconscious/Fainting), and M17 (Unknown/Man Down, used as fallback). Digitization decisions: (1) cross-card jumps ('go to the C1 card') are flattened into determinants, since v0.1 packs cannot jump between protocols mid-call; (2) a critical answer dispatches immediately rather than after all key questions, per guidecard practice; (3) the source instructs 'Confirm location/phone' without scripts — the confirm read-back wordings are editorial; (4) the age-based criterion 'persons <35 without critical symptoms' is not yet expressible (no numeric comparisons in v0.1) and is subsumed by the default CODE_YELLOW; (5) free-text key questions are asked and recorded but do not branch. SIMULATION ONLY — the source itself requires medical-director approval before operational use. 2026-08-20: added cards M13 (Psychiatric/Behavioral), H2 (CO/Inhalation/HazMat), T4 (Burns), and T8 (Stabbing/Gunshot Victim), same digitization conventions; T8 has no reachable CODE_YELLOW — the card limits YELLOW to wounds below the knee/elbow, which needs free-text anatomy the schema cannot branch on, so penetrating trauma defaults to CODE_RED (safety-first). Schema v0.2 (2026-08-20): the card's cross-card jumps are now modeled faithfully — All Callers conscious=no routes to C1 (not breathing) or C6 (breathing); the under-35 CODE_YELLOW criterion on M5 and the single-faint-over-50 CODE_RED on C6 are expressed as numeric age conditions (age unknown falls to the safer tier). Conscious callers with abnormal breathing still dispatch directly: the BREATHING PROBLEMS card (M4) is not yet digitized. 2026-08-20 (2): added M4 (Breathing Problems) with its card-faithful semantics — CODE_RED requires abnormal breathing PLUS a factor (compound conditions), benign presentations default CODE_YELLOW; the card's Q4 chest-pain jump to M5 is modeled; conscious callers with abnormal breathing now route to M4 from the All Callers card. The RED criterion \"tingling/numbness, age >35\" has no corresponding key question on the card and is not modeled. 2026-08-20 (3): added cards M16 (Stroke/CVA), M14 (Seizures/Convulsions), M6 (Diabetic Problems), M11 (Overdose/Poisonings/Ingestions), T10 (Motor Vehicle Collisions), and C2 (Choking), same conventions; the M16 pain question and M11 cocaine chest-pain line jump to M5 per the cards; M14 Q6 says \"consider Jump to M6\" and is modeled as a determinant criterion rather than a jump (the card makes it discretionary); T10/T8-style anatomy criteria and MCI counts remain free-text and default to the safer tier."
   },
   "locales": [
     "en",
@@ -3640,6 +3640,2875 @@
       ]
     },
     {
+      "id": "m16_stroke",
+      "name": {
+        "en": "M16: Stroke/CVA",
+        "es": "M16: Derrame cerebral / EVC",
+        "fr": "M16 : AVC"
+      },
+      "keywords": {
+        "en": [
+          "stroke",
+          "cva",
+          "slurred speech",
+          "slurring",
+          "facial droop",
+          "face drooping",
+          "face is drooping",
+          "can't move one side",
+          "one side of the body"
+        ],
+        "es": [
+          "derrame",
+          "derrame cerebral",
+          "embolia",
+          "habla arrastrada",
+          "arrastra las palabras",
+          "cara caída",
+          "cara caida",
+          "no puede mover un lado"
+        ],
+        "fr": [
+          "avc",
+          "accident vasculaire",
+          "parole confuse",
+          "difficulté à parler",
+          "visage affaissé",
+          "visage affaisse",
+          "ne peut pas bouger un côté"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_m16_alert",
+          "slot": "m16_alert",
+          "stringId": "kq_alert",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alerta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alerte"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m16_breathing_normal"
+            }
+          ]
+        },
+        {
+          "id": "kq_m16_breathing_normal",
+          "slot": "m16_breathing_normal",
+          "stringId": "kq_breathing_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal",
+                    "normally"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normal",
+                    "normalement"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m16_unusual"
+            }
+          ]
+        },
+        {
+          "id": "kq_m16_unusual",
+          "slot": "m16_unusual",
+          "stringId": "kq_m16_unusual"
+        },
+        {
+          "id": "kq_m16_speech",
+          "slot": "m16_speech",
+          "stringId": "kq_m16_speech",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "slurred",
+                    "slurring",
+                    "garbled"
+                  ],
+                  "es": [
+                    "no",
+                    "arrastrada",
+                    "arrastra",
+                    "confusa"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas",
+                    "confuse",
+                    "difficile",
+                    "pâteuse"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normale",
+                    "normal"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m16_one_side",
+          "slot": "m16_one_side",
+          "stringId": "kq_m16_one_side",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "weak",
+                    "weakness",
+                    "paralysis",
+                    "one side"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "débil",
+                    "debil",
+                    "parálisis",
+                    "paralisis",
+                    "un lado"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "faible",
+                    "faiblesse",
+                    "paralysie",
+                    "un côté",
+                    "un cote"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m16_droop",
+          "slot": "m16_droop",
+          "stringId": "kq_m16_droop",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "droop",
+                    "drooping"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "caída",
+                    "caida",
+                    "caído",
+                    "caido"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "affaissé",
+                    "affaisse",
+                    "tombe"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m16_pain",
+          "slot": "m16_pain",
+          "stringId": "kq_m16_pain",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "chest"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "pecho"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "poitrine"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "gotoProtocol": "m5_chest_pain"
+            },
+            {
+              "goto": "kq_m16_headache"
+            }
+          ]
+        },
+        {
+          "id": "kq_m16_headache",
+          "slot": "m16_headache",
+          "stringId": "kq_m16_headache",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "headache",
+                    "head hurts"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "dolor de cabeza",
+                    "le duele la cabeza"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "mal de tête",
+                    "mal de tete"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m16_prior",
+          "slot": "m16_prior",
+          "stringId": "kq_m16_prior",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "before",
+                    "previous stroke"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "antes",
+                    "otro derrame"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "déjà",
+                    "deja",
+                    "avant"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "m16_red_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m16_red_not_alert",
+          "when": [
+            {
+              "slot": "m16_alert",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m16_red_breathing_abnormal",
+          "when": [
+            {
+              "slot": "m16_breathing_normal",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m16_red_speech",
+          "when": [
+            {
+              "slot": "m16_speech",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m16_red_one_side",
+          "when": [
+            {
+              "slot": "m16_one_side",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m16_red_droop",
+          "when": [
+            {
+              "slot": "m16_droop",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m16_yellow_prior_no_change",
+          "response": "CODE_YELLOW"
+        }
+      ],
+      "postDispatch": [
+        "pd_m16_neck",
+        "pd_nothing_by_mouth_str",
+        "pd_m16_still",
+        "pd_gather_meds",
+        "pd_lock_pets",
+        "pd_callback_changes"
+      ]
+    },
+    {
+      "id": "m14_seizures",
+      "name": {
+        "en": "M14: Seizures/Convulsions",
+        "es": "M14: Convulsiones",
+        "fr": "M14 : Convulsions"
+      },
+      "keywords": {
+        "en": [
+          "seizure",
+          "seizing",
+          "convulsion",
+          "convulsions",
+          "convulsing",
+          "epileptic"
+        ],
+        "es": [
+          "convulsión",
+          "convulsion",
+          "convulsiones",
+          "convulsionando",
+          "ataque epiléptico",
+          "ataque epileptico",
+          "epilepsia"
+        ],
+        "fr": [
+          "convulsion",
+          "convulsions",
+          "convulse",
+          "crise d'épilepsie",
+          "crise d'epilepsie",
+          "épileptique",
+          "epileptique"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_m14_alert",
+          "slot": "m14_alert",
+          "stringId": "kq_alert",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alerta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alerte"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m14_breathing_normal"
+            }
+          ]
+        },
+        {
+          "id": "kq_m14_breathing_normal",
+          "slot": "m14_breathing_normal",
+          "stringId": "kq_breathing_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal",
+                    "normally"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normal",
+                    "normalement"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m14_still"
+            }
+          ]
+        },
+        {
+          "id": "kq_m14_still",
+          "slot": "m14_still",
+          "stringId": "kq_m14_still",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "stopped"
+                  ],
+                  "es": [
+                    "no",
+                    "ya pasó",
+                    "ya paso",
+                    "terminó",
+                    "termino"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas",
+                    "arrêté",
+                    "arrete",
+                    "fini"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "still",
+                    "seizing"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "sigue",
+                    "todavía",
+                    "todavia"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "encore",
+                    "toujours"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m14_how_long",
+          "slot": "m14_how_long",
+          "stringId": "kq_m14_how_long"
+        },
+        {
+          "id": "kq_m14_before",
+          "slot": "m14_before",
+          "stringId": "kq_m14_before",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "first"
+                  ],
+                  "es": [
+                    "no",
+                    "primera"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas",
+                    "première",
+                    "premiere"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "before",
+                    "epileptic"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "antes",
+                    "epiléptico",
+                    "epileptico"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "déjà",
+                    "deja",
+                    "épileptique"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m14_diabetic",
+          "slot": "m14_diabetic",
+          "stringId": "kq_m13_diabetic",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "diabetic",
+                    "diabetes"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "diabético",
+                    "diabetico",
+                    "diabetes"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "diabétique",
+                    "diabète",
+                    "diabete"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m14_pregnant",
+          "slot": "m14_pregnant",
+          "stringId": "kq_m14_pregnant",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "pregnant"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "embarazada"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "enceinte"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m14_head_injury",
+          "slot": "m14_head_injury",
+          "stringId": "kq_m14_head_injury",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "head",
+                    "hit"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "cabeza",
+                    "se golpeó",
+                    "se golpeo"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "tête",
+                    "tete",
+                    "cogné"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m14_taken",
+          "slot": "m14_taken",
+          "stringId": "kq_m14_taken",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "drugs",
+                    "pills",
+                    "alcohol"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "drogas",
+                    "pastillas",
+                    "alcohol"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "drogues",
+                    "pilules",
+                    "alcool"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m14_medic_alert",
+          "slot": "m14_medic_alert",
+          "stringId": "kq_c6_medic_alert"
+        }
+      ],
+      "determinants": [
+        {
+          "id": "m14_red_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_not_alert",
+          "when": [
+            {
+              "slot": "m14_alert",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_breathing_abnormal",
+          "when": [
+            {
+              "slot": "m14_breathing_normal",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_still_seizing",
+          "when": [
+            {
+              "slot": "m14_still",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_first_or_unknown",
+          "when": [
+            {
+              "slot": "m14_before",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_diabetic",
+          "when": [
+            {
+              "slot": "m14_diabetic",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_pregnant",
+          "when": [
+            {
+              "slot": "m14_pregnant",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_head_injury",
+          "when": [
+            {
+              "slot": "m14_head_injury",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_red_od",
+          "when": [
+            {
+              "slot": "m14_taken",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m14_yellow_known_single",
+          "response": "CODE_YELLOW"
+        }
+      ],
+      "postDispatch": [
+        "pd_m14_clear",
+        "pd_m14_no_restrain",
+        "pd_m14_mouth",
+        "pd_m14_after",
+        "pd_gather_meds",
+        "pd_lock_pets",
+        "pd_callback_changes"
+      ]
+    },
+    {
+      "id": "m6_diabetic",
+      "name": {
+        "en": "M6: Diabetic Problems",
+        "es": "M6: Problemas diabéticos",
+        "fr": "M6 : Problèmes diabétiques"
+      },
+      "keywords": {
+        "en": [
+          "diabetic",
+          "diabetes",
+          "insulin",
+          "blood sugar",
+          "sugar is low",
+          "sugar is high"
+        ],
+        "es": [
+          "diabético",
+          "diabetico",
+          "diabética",
+          "diabetica",
+          "diabetes",
+          "insulina",
+          "azúcar",
+          "azucar"
+        ],
+        "fr": [
+          "diabétique",
+          "diabetique",
+          "diabète",
+          "diabete",
+          "insuline",
+          "glycémie",
+          "glycemie",
+          "sucre"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_m6_alert",
+          "slot": "m6_alert",
+          "stringId": "kq_alert",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alerta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alerte"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m6_breathing_normal"
+            }
+          ]
+        },
+        {
+          "id": "kq_m6_breathing_normal",
+          "slot": "m6_breathing_normal",
+          "stringId": "kq_breathing_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal",
+                    "normally"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normal",
+                    "normalement"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m6_oriented"
+            }
+          ]
+        },
+        {
+          "id": "kq_m6_oriented",
+          "slot": "m6_oriented",
+          "stringId": "kq_m6_oriented",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "knows"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "sabe"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "sait"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m6_manner",
+          "slot": "m6_manner",
+          "stringId": "kq_m6_manner",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not",
+                    "strange",
+                    "acting weird",
+                    "unusual",
+                    "confused"
+                  ],
+                  "es": [
+                    "no",
+                    "raro",
+                    "rara",
+                    "extraño",
+                    "extrano",
+                    "confundido"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas",
+                    "bizarre",
+                    "étrange",
+                    "etrange",
+                    "confus"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normale",
+                    "normal"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m6_pain",
+          "slot": "m6_pain",
+          "stringId": "kq_m6_pain"
+        },
+        {
+          "id": "kq_m6_dizzy",
+          "slot": "m6_dizzy",
+          "stringId": "kq_m5_weak",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "dizzy",
+                    "weak",
+                    "faint"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "mareado",
+                    "mareada",
+                    "débil",
+                    "debil"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "étourdi",
+                    "etourdi",
+                    "faible"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m6_seizure",
+          "slot": "m6_seizure",
+          "stringId": "kq_m6_seizure",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "seizure",
+                    "convulsion"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "convulsión",
+                    "convulsion"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "convulsion",
+                    "crise"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m6_sweating",
+          "slot": "m6_sweating",
+          "stringId": "kq_m5_sweating",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "sweating",
+                    "sweaty"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "sudando",
+                    "sudoroso"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "transpire",
+                    "en sueur"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m6_insulin",
+          "slot": "m6_insulin",
+          "stringId": "kq_m6_insulin",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "insulin"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "insulina"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "insuline"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m6_last_ate",
+          "slot": "m6_last_ate",
+          "stringId": "kq_m6_last_ate"
+        }
+      ],
+      "determinants": [
+        {
+          "id": "m6_red_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m6_red_not_alert",
+          "when": [
+            {
+              "slot": "m6_alert",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m6_red_breathing_abnormal",
+          "when": [
+            {
+              "slot": "m6_breathing_normal",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m6_red_unusual_behavior",
+          "when": [
+            {
+              "slot": "m6_manner",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m6_red_sweating",
+          "when": [
+            {
+              "slot": "m6_sweating",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m6_red_seizure",
+          "when": [
+            {
+              "slot": "m6_seizure",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m6_yellow_alert",
+          "response": "CODE_YELLOW"
+        }
+      ],
+      "postDispatch": [
+        "pd_m6_mouth",
+        "pd_m6_juice",
+        "pd_m6_position",
+        "pd_gather_meds",
+        "pd_lock_pets",
+        "pd_callback_changes"
+      ]
+    },
+    {
+      "id": "m11_od_poisoning",
+      "name": {
+        "en": "M11: Overdose/Poisonings/Ingestions",
+        "es": "M11: Sobredosis / Envenenamientos / Ingestiones",
+        "fr": "M11 : Surdose / Empoisonnements / Ingestions"
+      },
+      "keywords": {
+        "en": [
+          "overdose",
+          "overdosed",
+          "poisoned",
+          "poisoning",
+          "took pills",
+          "swallowed something",
+          "ate something"
+        ],
+        "es": [
+          "sobredosis",
+          "se envenenó",
+          "se enveneno",
+          "veneno",
+          "tomó pastillas",
+          "tomo pastillas",
+          "se tragó",
+          "se trago"
+        ],
+        "fr": [
+          "surdose",
+          "overdose",
+          "empoisonné",
+          "empoisonne",
+          "poison",
+          "avalé des pilules",
+          "avale des pilules",
+          "a avalé"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_m11_alert",
+          "slot": "m11_alert",
+          "stringId": "kq_alert",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alerta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alerte"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m11_breathing_normal"
+            }
+          ]
+        },
+        {
+          "id": "kq_m11_breathing_normal",
+          "slot": "m11_breathing_normal",
+          "stringId": "kq_breathing_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal",
+                    "normally"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normal",
+                    "normalement"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_m11_manner"
+            }
+          ]
+        },
+        {
+          "id": "kq_m11_manner",
+          "slot": "m11_manner",
+          "stringId": "kq_m11_manner"
+        },
+        {
+          "id": "kq_m11_what",
+          "slot": "m11_what",
+          "stringId": "kq_m11_what"
+        },
+        {
+          "id": "kq_m11_alcohol",
+          "slot": "m11_alcohol",
+          "stringId": "kq_m11_alcohol",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alcohol",
+                    "drinking"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alcohol",
+                    "bebiendo"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alcool",
+                    "bu"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m11_chest_pain",
+          "slot": "m11_chest_pain",
+          "stringId": "kq_m4_chest_pain",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "chest pain",
+                    "chest hurts"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "dolor de pecho",
+                    "le duele el pecho"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "douleur à la poitrine",
+                    "mal à la poitrine"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "gotoProtocol": "m5_chest_pain"
+            },
+            {
+              "goto": "kq_m11_swallowing"
+            }
+          ]
+        },
+        {
+          "id": "kq_m11_swallowing",
+          "slot": "m11_swallowing",
+          "stringId": "kq_t4_swallowing",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "difficulty",
+                    "hard to swallow"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "dificultad",
+                    "le cuesta tragar"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "difficulté",
+                    "difficulte",
+                    "du mal à avaler"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_m11_vomited",
+          "slot": "m11_vomited",
+          "stringId": "kq_m11_vomited",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "vomited",
+                    "threw up"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "vomitó",
+                    "vomito"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "vomi"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "m11_red_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m11_red_not_alert",
+          "when": [
+            {
+              "slot": "m11_alert",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m11_red_breathing_abnormal",
+          "when": [
+            {
+              "slot": "m11_breathing_normal",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m11_red_combined_alcohol",
+          "when": [
+            {
+              "slot": "m11_alcohol",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m11_red_swallowing",
+          "when": [
+            {
+              "slot": "m11_swallowing",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "m11_yellow_no_critical",
+          "response": "CODE_YELLOW"
+        }
+      ],
+      "postDispatch": [
+        "pd_m11_mouth",
+        "pd_m11_keep_area",
+        "pd_m11_no_coffee",
+        "pd_m11_container",
+        "pd_gather_meds",
+        "pd_lock_pets",
+        "pd_callback_changes"
+      ]
+    },
+    {
+      "id": "t10_mvc",
+      "name": {
+        "en": "T10: Motor Vehicle Collisions",
+        "es": "T10: Accidentes vehiculares",
+        "fr": "T10 : Collisions de véhicules"
+      },
+      "keywords": {
+        "en": [
+          "car accident",
+          "car crash",
+          "vehicle accident",
+          "collision",
+          "crashed",
+          "wreck",
+          "hit by a car",
+          "motorcycle accident"
+        ],
+        "es": [
+          "accidente de coche",
+          "accidente de carro",
+          "choque",
+          "chocó",
+          "choco",
+          "atropellado",
+          "atropellada",
+          "accidente de moto"
+        ],
+        "fr": [
+          "accident de voiture",
+          "collision",
+          "percuté",
+          "percute",
+          "renversé par une voiture",
+          "accident de moto"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_t10_hazards",
+          "slot": "t10_hazards",
+          "stringId": "kq_t10_hazards",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "fire",
+                    "water",
+                    "wires",
+                    "hazmat",
+                    "leaking"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "fuego",
+                    "agua",
+                    "cables",
+                    "fuga"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "feu",
+                    "eau",
+                    "fils",
+                    "fuite"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_t10_alert",
+          "slot": "t10_alert",
+          "stringId": "kq_alert",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alerta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alerte"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_t10_breathing_normal"
+            }
+          ]
+        },
+        {
+          "id": "kq_t10_breathing_normal",
+          "slot": "t10_breathing_normal",
+          "stringId": "kq_breathing_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal",
+                    "normally"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normal",
+                    "normalement"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_t10_trapped"
+            }
+          ]
+        },
+        {
+          "id": "kq_t10_trapped",
+          "slot": "t10_trapped",
+          "stringId": "kq_t10_trapped",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "trapped",
+                    "stuck",
+                    "pinned"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "atrapado",
+                    "atrapada",
+                    "prensado"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "coincé",
+                    "coince",
+                    "piégé",
+                    "piege"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_t10_thrown",
+          "slot": "t10_thrown",
+          "stringId": "kq_t10_thrown",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "thrown",
+                    "ejected"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "salió volando",
+                    "salio volando",
+                    "expulsado"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "éjecté",
+                    "ejecte",
+                    "projeté"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "kq_t10_injuries",
+          "slot": "t10_injuries",
+          "stringId": "kq_t10_injuries"
+        },
+        {
+          "id": "kq_t10_bleeding",
+          "slot": "t10_bleeding",
+          "stringId": "kq_m13_bleeding",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "bleeding",
+                    "blood"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "sangrando",
+                    "sangre"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "saigne",
+                    "sang"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "determinants": [
+        {
+          "id": "t10_red_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "t10_red_not_alert",
+          "when": [
+            {
+              "slot": "t10_alert",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "t10_red_breathing_abnormal",
+          "when": [
+            {
+              "slot": "t10_breathing_normal",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "t10_red_trapped",
+          "when": [
+            {
+              "slot": "t10_trapped",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "t10_red_ejected",
+          "when": [
+            {
+              "slot": "t10_thrown",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "t10_yellow_no_critical",
+          "response": "CODE_YELLOW"
+        }
+      ],
+      "postDispatch": [
+        "pd_t10_no_move",
+        "pd_t10_wires",
+        "pd_t10_calm",
+        "pd_callback_changes"
+      ]
+    },
+    {
+      "id": "c2_choking",
+      "name": {
+        "en": "C2: Choking",
+        "es": "C2: Atragantamiento",
+        "fr": "C2 : Étouffement"
+      },
+      "keywords": {
+        "en": [
+          "choking",
+          "choked",
+          "something stuck in",
+          "stuck in his throat",
+          "stuck in her throat",
+          "can't cough"
+        ],
+        "es": [
+          "atragantado",
+          "atragantada",
+          "se atraganta",
+          "se atragantó",
+          "se atraganto",
+          "atorado en la garganta"
+        ],
+        "fr": [
+          "s'étouffe",
+          "s'etouffe",
+          "étouffement",
+          "etouffement",
+          "avalé de travers",
+          "coincé dans la gorge"
+        ]
+      },
+      "keyQuestions": [
+        {
+          "id": "kq_c2_alert",
+          "slot": "c2_alert",
+          "stringId": "kq_alert",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "alert"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "alerta"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "alerte"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_c2_breathing_normal"
+            }
+          ]
+        },
+        {
+          "id": "kq_c2_breathing_normal",
+          "slot": "c2_breathing_normal",
+          "stringId": "kq_breathing_normal",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "normal",
+                    "normally"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "normal",
+                    "normalmente"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "normal",
+                    "normalement"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_c2_speak"
+            }
+          ]
+        },
+        {
+          "id": "kq_c2_speak",
+          "slot": "c2_speak",
+          "stringId": "kq_c2_speak",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "talk",
+                    "speak",
+                    "cry",
+                    "crying"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "habla",
+                    "hablar",
+                    "llora",
+                    "llorar"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "parle",
+                    "parler",
+                    "pleure",
+                    "pleurer"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "no",
+              "goto": "$determine"
+            },
+            {
+              "goto": "kq_c2_blue"
+            }
+          ]
+        },
+        {
+          "id": "kq_c2_blue",
+          "slot": "c2_blue",
+          "stringId": "kq_c2_blue",
+          "expect": {
+            "type": "choice",
+            "options": [
+              {
+                "id": "no",
+                "keywords": {
+                  "en": [
+                    "no",
+                    "not"
+                  ],
+                  "es": [
+                    "no"
+                  ],
+                  "fr": [
+                    "non",
+                    "pas"
+                  ]
+                }
+              },
+              {
+                "id": "yes",
+                "keywords": {
+                  "en": [
+                    "yes",
+                    "yeah",
+                    "blue",
+                    "turning blue",
+                    "changing color"
+                  ],
+                  "es": [
+                    "sí",
+                    "si",
+                    "azul",
+                    "morado",
+                    "morada",
+                    "cambiando de color"
+                  ],
+                  "fr": [
+                    "oui",
+                    "ouais",
+                    "bleu",
+                    "bleue",
+                    "change de couleur"
+                  ]
+                }
+              }
+            ]
+          },
+          "next": [
+            {
+              "whenOption": "yes",
+              "goto": "$determine"
+            }
+          ]
+        }
+      ],
+      "determinants": [
+        {
+          "id": "c2_red_unconscious",
+          "when": [
+            {
+              "slot": "conscious",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "c2_red_not_alert",
+          "when": [
+            {
+              "slot": "c2_alert",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "c2_red_breathing_abnormal",
+          "when": [
+            {
+              "slot": "c2_breathing_normal",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "c2_red_cant_speak",
+          "when": [
+            {
+              "slot": "c2_speak",
+              "option": "no"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "c2_red_turning_blue",
+          "when": [
+            {
+              "slot": "c2_blue",
+              "option": "yes"
+            }
+          ],
+          "response": "CODE_RED"
+        },
+        {
+          "id": "c2_yellow_air_exchange",
+          "response": "CODE_YELLOW"
+        }
+      ],
+      "postDispatch": [
+        "pd_c2_instructions",
+        "pd_gather_meds",
+        "pd_lock_pets",
+        "pd_c1_callback"
+      ]
+    },
+    {
       "id": "m17_unknown_man_down",
       "name": {
         "en": "M17: Unknown/Man Down",
@@ -4020,7 +6889,54 @@
       "kq_m4_birth_control": "If the person is female — does she take birth control pills?",
       "kq_m4_oxygen": "Is the person on oxygen?",
       "kq_m4_history": "Does the person have any other medical or surgical history?",
-      "pd_m4_position": "Place the person in the most comfortable position, probably sitting up."
+      "pd_m4_position": "Place the person in the most comfortable position, probably sitting up.",
+      "kq_m16_unusual": "Is the person acting unusual? What is different — speech, numbness, or movement problems?",
+      "kq_m16_speech": "Does the person's speech sound normal?",
+      "kq_m16_one_side": "Does the person have weakness or paralysis on one side of the body?",
+      "kq_m16_droop": "Does the person have a facial droop?",
+      "kq_m16_pain": "Is the person complaining of any pain — for example chest pain?",
+      "kq_m16_headache": "Does the person have a headache?",
+      "kq_m16_prior": "Has the person ever had a stroke before?",
+      "pd_m16_neck": "If the person has difficulty breathing, keep the neck straight and remove any pillows.",
+      "pd_nothing_by_mouth_str": "Do not give the person anything to eat or drink.",
+      "pd_m16_still": "Do not allow the person to move around.",
+      "kq_m14_still": "Is the person still seizing?",
+      "kq_m14_how_long": "How long has the person been seizing?",
+      "kq_m14_before": "Has the person had a seizure before?",
+      "kq_m14_pregnant": "If the person is a woman — is she pregnant?",
+      "kq_m14_head_injury": "Has the person had a recent head injury?",
+      "kq_m14_taken": "Has the person taken anything, including any type of drugs?",
+      "pd_m14_clear": "Clear the area around the person so they do not hurt themselves.",
+      "pd_m14_no_restrain": "Do not try to restrain the person.",
+      "pd_m14_mouth": "Do not put anything in the person's mouth.",
+      "pd_m14_after": "When the seizure stops, check that the person is breathing and place them on their side.",
+      "kq_m6_oriented": "Does the person know who they are and where they are?",
+      "kq_m6_manner": "Is the person acting in their normal manner?",
+      "kq_m6_pain": "Does the person feel pain anywhere? If yes, where?",
+      "kq_m6_seizure": "Has the person had a seizure?",
+      "kq_m6_insulin": "Is the person on insulin?",
+      "kq_m6_last_ate": "When did the person last eat?",
+      "pd_m6_mouth": "Do not give the person anything to eat or drink unless they can take it by themselves.",
+      "pd_m6_juice": "If the person can eat and drink on their own, give them juice with about two to three teaspoons of sugar in it.",
+      "pd_m6_position": "Place the person in the most comfortable position.",
+      "kq_m11_manner": "Is the person acting in their normal manner? If not, what is different — are they violent, do they have access to a weapon?",
+      "kq_m11_what": "Do you know what the person took? What is it called, and how much did they take?",
+      "kq_m11_alcohol": "Did they take it with alcohol?",
+      "kq_m11_vomited": "Has the person vomited?",
+      "pd_m11_mouth": "Do not give the person anything to eat or drink unless advised by Poison Control.",
+      "pd_m11_keep_area": "If it is safe to do so, keep the person in the area.",
+      "pd_m11_no_coffee": "Do not give the person coffee or place the person in the shower.",
+      "pd_m11_container": "If you are at the scene, get the container of the substance the person took.",
+      "kq_t10_hazards": "Are there any hazards present — fire, water, hazardous materials, or wires down?",
+      "kq_t10_trapped": "Is anyone trapped in the vehicle?",
+      "kq_t10_thrown": "Was anyone thrown from the vehicle?",
+      "kq_t10_injuries": "What injuries does the person have?",
+      "pd_t10_no_move": "If no life-threatening hazards are present, do not move the person.",
+      "pd_t10_wires": "If power lines are around the vehicle, do not touch the vehicle, and tell the occupants to stay inside it.",
+      "pd_t10_calm": "Keep the person calm and still.",
+      "kq_c2_speak": "Is the person able to speak, or to cry?",
+      "kq_c2_blue": "Is the person turning blue or changing color?",
+      "pd_c2_instructions": "I am going to give you choking instructions appropriate for the person’s age. Follow them until responders arrive."
     },
     "es": {
       "greeting": "Nueve-uno-uno.",
@@ -4123,7 +7039,54 @@
       "kq_m4_birth_control": "Si la persona es mujer, ¿toma pastillas anticonceptivas?",
       "kq_m4_oxygen": "¿Usa la persona oxígeno?",
       "kq_m4_history": "¿Tiene la persona algún otro antecedente médico o quirúrgico?",
-      "pd_m4_position": "Coloque a la persona en la posición más cómoda, probablemente sentada."
+      "pd_m4_position": "Coloque a la persona en la posición más cómoda, probablemente sentada.",
+      "kq_m16_unusual": "¿Está la persona actuando de forma inusual? ¿Qué es diferente: el habla, entumecimiento o problemas de movimiento?",
+      "kq_m16_speech": "¿Suena normal el habla de la persona?",
+      "kq_m16_one_side": "¿Tiene la persona debilidad o parálisis en un lado del cuerpo?",
+      "kq_m16_droop": "¿Tiene la persona la cara caída de un lado?",
+      "kq_m16_pain": "¿Se queja la persona de algún dolor, por ejemplo dolor de pecho?",
+      "kq_m16_headache": "¿Tiene la persona dolor de cabeza?",
+      "kq_m16_prior": "¿Ha tenido la persona un derrame cerebral antes?",
+      "pd_m16_neck": "Si la persona tiene dificultad para respirar, mantenga el cuello recto y retire las almohadas.",
+      "pd_nothing_by_mouth_str": "No le dé nada de comer ni de beber.",
+      "pd_m16_still": "No permita que la persona se mueva de un lado a otro.",
+      "kq_m14_still": "¿Sigue convulsionando la persona?",
+      "kq_m14_how_long": "¿Cuánto tiempo lleva convulsionando?",
+      "kq_m14_before": "¿Ha tenido la persona convulsiones antes?",
+      "kq_m14_pregnant": "Si la persona es mujer, ¿está embarazada?",
+      "kq_m14_head_injury": "¿Ha tenido la persona un golpe en la cabeza recientemente?",
+      "kq_m14_taken": "¿Ha tomado la persona algo, incluido cualquier tipo de droga?",
+      "pd_m14_clear": "Despeje el área alrededor de la persona para que no se lastime.",
+      "pd_m14_no_restrain": "No intente sujetar a la persona.",
+      "pd_m14_mouth": "No le meta nada en la boca.",
+      "pd_m14_after": "Cuando termine la convulsión, verifique que la persona respire y colóquela de lado.",
+      "kq_m6_oriented": "¿Sabe la persona quién es y dónde está?",
+      "kq_m6_manner": "¿Está la persona actuando de manera normal?",
+      "kq_m6_pain": "¿Siente la persona dolor en alguna parte? Si es así, ¿dónde?",
+      "kq_m6_seizure": "¿Ha tenido la persona una convulsión?",
+      "kq_m6_insulin": "¿Usa la persona insulina?",
+      "kq_m6_last_ate": "¿Cuándo comió la persona por última vez?",
+      "pd_m6_mouth": "No le dé nada de comer ni de beber a menos que pueda tomarlo por sí misma.",
+      "pd_m6_juice": "Si la persona puede comer y beber por su cuenta, dele jugo con dos o tres cucharaditas de azúcar.",
+      "pd_m6_position": "Coloque a la persona en la posición más cómoda.",
+      "kq_m11_manner": "¿Está la persona actuando de manera normal? Si no, ¿qué es diferente? ¿Está violenta? ¿Tiene acceso a un arma?",
+      "kq_m11_what": "¿Sabe qué tomó la persona? ¿Cómo se llama y cuánto tomó?",
+      "kq_m11_alcohol": "¿Lo tomó con alcohol?",
+      "kq_m11_vomited": "¿Ha vomitado la persona?",
+      "pd_m11_mouth": "No le dé nada de comer ni de beber a menos que lo indique el centro de control de envenenamientos.",
+      "pd_m11_keep_area": "Si es seguro hacerlo, mantenga a la persona en el área.",
+      "pd_m11_no_coffee": "No le dé café ni meta a la persona a la regadera.",
+      "pd_m11_container": "Si está en el lugar, consiga el envase de la sustancia que tomó la persona.",
+      "kq_t10_hazards": "¿Hay peligros presentes: fuego, agua, materiales peligrosos o cables caídos?",
+      "kq_t10_trapped": "¿Hay alguien atrapado en el vehículo?",
+      "kq_t10_thrown": "¿Alguien salió proyectado del vehículo?",
+      "kq_t10_injuries": "¿Qué lesiones tiene la persona?",
+      "pd_t10_no_move": "Si no hay peligros que amenacen la vida, no mueva a la persona.",
+      "pd_t10_wires": "Si hay cables eléctricos alrededor del vehículo, no toque el vehículo y diga a los ocupantes que permanezcan dentro.",
+      "pd_t10_calm": "Mantenga a la persona calmada y quieta.",
+      "kq_c2_speak": "¿Puede la persona hablar o llorar?",
+      "kq_c2_blue": "¿Se está poniendo azul o cambiando de color la persona?",
+      "pd_c2_instructions": "Voy a darle instrucciones para atragantamiento apropiadas para la edad de la persona. Sígalas hasta que lleguen los servicios de emergencia."
     },
     "fr": {
       "greeting": "Neuf-un-un.",
@@ -4226,7 +7189,54 @@
       "kq_m4_birth_control": "Si la personne est une femme — prend-elle des pilules contraceptives?",
       "kq_m4_oxygen": "La personne est-elle sous oxygène?",
       "kq_m4_history": "La personne a-t-elle d'autres antécédents médicaux ou chirurgicaux?",
-      "pd_m4_position": "Installez la personne dans la position la plus confortable, probablement assise."
+      "pd_m4_position": "Installez la personne dans la position la plus confortable, probablement assise.",
+      "kq_m16_unusual": "La personne agit-elle de façon inhabituelle? Qu'est-ce qui est différent : la parole, un engourdissement ou des problèmes de mouvement?",
+      "kq_m16_speech": "La parole de la personne semble-t-elle normale?",
+      "kq_m16_one_side": "La personne a-t-elle une faiblesse ou une paralysie d'un côté du corps?",
+      "kq_m16_droop": "Le visage de la personne est-il affaissé d’un côté?",
+      "kq_m16_pain": "La personne se plaint-elle d’une douleur, par exemple à la poitrine?",
+      "kq_m16_headache": "La personne a-t-elle mal à la tête?",
+      "kq_m16_prior": "La personne a-t-elle déjà eu un AVC?",
+      "pd_m16_neck": "Si la personne a de la difficulté à respirer, gardez le cou droit et retirez les oreillers.",
+      "pd_nothing_by_mouth_str": "Ne lui donnez rien à manger ni à boire.",
+      "pd_m16_still": "Ne laissez pas la personne se déplacer.",
+      "kq_m14_still": "La personne convulse-t-elle encore?",
+      "kq_m14_how_long": "Depuis combien de temps convulse-t-elle?",
+      "kq_m14_before": "La personne a-t-elle déjà eu des convulsions?",
+      "kq_m14_pregnant": "Si la personne est une femme — est-elle enceinte?",
+      "kq_m14_head_injury": "La personne s’est-elle récemment blessée à la tête?",
+      "kq_m14_taken": "La personne a-t-elle pris quelque chose, y compris des drogues?",
+      "pd_m14_clear": "Dégagez la zone autour de la personne pour qu’elle ne se blesse pas.",
+      "pd_m14_no_restrain": "N'essayez pas de retenir la personne.",
+      "pd_m14_mouth": "Ne mettez rien dans la bouche de la personne.",
+      "pd_m14_after": "Quand la convulsion cesse, vérifiez que la personne respire et placez-la sur le côté.",
+      "kq_m6_oriented": "La personne sait-elle qui elle est et où elle se trouve?",
+      "kq_m6_manner": "La personne agit-elle normalement?",
+      "kq_m6_pain": "La personne a-t-elle mal quelque part? Si oui, où?",
+      "kq_m6_seizure": "La personne a-t-elle eu une convulsion?",
+      "kq_m6_insulin": "La personne prend-elle de l'insuline?",
+      "kq_m6_last_ate": "Quand la personne a-t-elle mangé pour la dernière fois?",
+      "pd_m6_mouth": "Ne lui donnez rien à manger ni à boire à moins qu’elle puisse le prendre elle-même.",
+      "pd_m6_juice": "Si la personne peut manger et boire seule, donnez-lui du jus avec deux à trois cuillères à café de sucre.",
+      "pd_m6_position": "Installez la personne dans la position la plus confortable.",
+      "kq_m11_manner": "La personne agit-elle normalement? Sinon, qu'est-ce qui est différent? Est-elle violente? A-t-elle accès à une arme?",
+      "kq_m11_what": "Savez-vous ce que la personne a pris? Comment cela s’appelle-t-il, et combien en a-t-elle pris?",
+      "kq_m11_alcohol": "L'a-t-elle pris avec de l'alcool?",
+      "kq_m11_vomited": "La personne a-t-elle vomi?",
+      "pd_m11_mouth": "Ne lui donnez rien à manger ni à boire sauf avis du centre antipoison.",
+      "pd_m11_keep_area": "Si c'est sécuritaire, gardez la personne sur place.",
+      "pd_m11_no_coffee": "Ne lui donnez pas de café et ne la mettez pas sous la douche.",
+      "pd_m11_container": "Si vous êtes sur place, récupérez le contenant de la substance prise.",
+      "kq_t10_hazards": "Y a-t-il des dangers présents : feu, eau, matières dangereuses ou fils électriques tombés?",
+      "kq_t10_trapped": "Quelqu’un est-il coincé dans le véhicule?",
+      "kq_t10_thrown": "Quelqu’un a-t-il été éjecté du véhicule?",
+      "kq_t10_injuries": "Quelles blessures la personne a-t-elle?",
+      "pd_t10_no_move": "S'il n'y a pas de danger mortel, ne déplacez pas la personne.",
+      "pd_t10_wires": "Si des fils électriques entourent le véhicule, ne touchez pas au véhicule et dites aux occupants de rester à l’intérieur.",
+      "pd_t10_calm": "Gardez la personne calme et immobile.",
+      "kq_c2_speak": "La personne peut-elle parler, ou pleurer?",
+      "kq_c2_blue": "La personne devient-elle bleue ou change-t-elle de couleur?",
+      "pd_c2_instructions": "Je vais vous donner les instructions d'étouffement adaptées à l'âge de la personne. Suivez-les jusqu'à l'arrivée des secours."
     }
   }
 }

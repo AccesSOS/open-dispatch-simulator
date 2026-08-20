@@ -327,6 +327,122 @@ test('M4: abnormal breathing needs a factor for CODE_RED; benign defaults CODE_Y
   assert.equal(benign.response, 'CODE_YELLOW');
 });
 
+test('M16: FAST signs (slurred speech / one-sided weakness / droop) are CODE_RED; old stroke no changes is YELLOW', () => {
+  const base = ['12 Pine St', '555-0100', 'I think my mom is having a stroke', 'one', '72', 'yes', 'yes', 'female', 'Ana'];
+  const red = run(base, {
+    m16_alert: 'yes, alert',
+    m16_breathing_normal: 'yes, normally',
+    m16_speech: 'no, it is slurred',
+    m16_one_side: 'no',
+    m16_droop: 'no',
+    m16_pain: 'no',
+    m16_headache: 'no',
+    m16_prior: 'no',
+  });
+  assert.equal(red.protocolId, 'm16_stroke');
+  assert.equal(red.determinantId, 'm16_red_speech');
+  assert.equal(red.response, 'CODE_RED');
+
+  const yellow = run(base, {
+    m16_alert: 'yes, alert',
+    m16_breathing_normal: 'yes, normally',
+    m16_speech: 'yes, normal',
+    m16_one_side: 'no',
+    m16_droop: 'no',
+    m16_pain: 'no',
+    m16_headache: 'no',
+    m16_prior: 'yes, she had one before',
+  });
+  assert.equal(yellow.determinantId, 'm16_yellow_prior_no_change');
+  assert.equal(yellow.response, 'CODE_YELLOW');
+});
+
+test('M16: chest-pain answer on the stroke card jumps to M5', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of ['12 Pine St', '555-0100', 'she might be having a stroke', 'one', '72', 'yes', 'yes', 'female', 'Ana']) s.answer(a);
+  s.answer('yes, alert');
+  s.answer('yes, normally');
+  s.answer('she seems confused about words');
+  s.answer('yes, normal');
+  s.answer('no');
+  s.answer('no');
+  const out = s.answer('yes, she says her chest hurts'); // m16 pain -> M5
+  assert.equal(out[0]!.stringId, 'kq_alert', 'M5 card takes over');
+  let guard = 0;
+  while (!s.isDone() && guard++ < 30) s.answer('no');
+  assert.equal(s.result().protocolId, 'm5_chest_pain');
+});
+
+test('M14: known epileptic with a single finished seizure is the card YELLOW', () => {
+  const r = run(
+    ['12 Pine St', '555-0100', 'my son had a seizure', 'one', '19', 'yes', 'yes', 'male', 'Ana'],
+    {
+      m14_alert: 'yes, alert',
+      m14_breathing_normal: 'yes, normally',
+      m14_still: 'no, it stopped',
+      m14_before: 'yes, he is epileptic and has them before',
+      m14_diabetic: 'no',
+      m14_pregnant: 'no',
+      m14_head_injury: 'no',
+      m14_taken: 'no',
+    },
+  );
+  assert.equal(r.protocolId, 'm14_seizures');
+  assert.equal(r.determinantId, 'm14_yellow_known_single');
+  assert.equal(r.response, 'CODE_YELLOW');
+});
+
+test('M6: diabetic acting strange is CODE_RED per the card', () => {
+  const r = run(
+    ['12 Pine St', '555-0100', 'my husband is diabetic and something is wrong', 'one', '55', 'yes', 'yes', 'male', 'Ana'],
+    {
+      m6_alert: 'yes, alert',
+      m6_breathing_normal: 'yes, normally',
+      m6_oriented: 'yes, he knows',
+      m6_manner: 'no, he is acting really strange',
+      m6_dizzy: 'no',
+      m6_seizure: 'no',
+      m6_sweating: 'no',
+      m6_insulin: 'yes, insulin',
+    },
+  );
+  assert.equal(r.protocolId, 'm6_diabetic');
+  assert.equal(r.determinantId, 'm6_red_unusual_behavior');
+  assert.equal(r.response, 'CODE_RED');
+});
+
+test('T10: occupant trapped in the vehicle is CODE_RED', () => {
+  const r = run(
+    ['Route 9 near the mill', '555-0100', 'there was a car crash outside', 'two', '30', 'yes', 'yes', 'unknown', 'Ana'],
+    {
+      t10_hazards: 'no',
+      t10_alert: 'yes, alert',
+      t10_breathing_normal: 'yes, normally',
+      t10_trapped: 'yes, the driver is trapped',
+      t10_thrown: 'no',
+      t10_bleeding: 'no',
+    },
+  );
+  assert.equal(r.protocolId, 't10_mvc');
+  assert.equal(r.determinantId, 't10_red_trapped');
+  assert.equal(r.response, 'CODE_RED');
+});
+
+test('C2: choking victim who cannot speak short-circuits to CODE_RED', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of ['12 Pine St', '555-0100', 'my dad is choking on food', 'one', '68', 'yes', 'yes', 'male', 'Ana']) s.answer(a);
+  s.answer('yes, alert');
+  s.answer('yes, breathing normally');
+  const out = s.answer('no, he cannot talk at all'); // unable to talk -> immediate RED
+  assert.equal(out[0]!.stringId, 'dispatch_confirm');
+  const r = s.result();
+  assert.equal(r.protocolId, 'c2_choking');
+  assert.equal(r.determinantId, 'c2_red_cant_speak');
+  assert.equal(r.response, 'CODE_RED');
+});
+
 test('unclear complaint falls back to M17 Unknown/Man Down', () => {
   const r = run(
     ['12 Pine St', '555-0100', 'there is somebody lying on the sidewalk', 'one', 'unknown', 'yes', 'yes', 'unknown', 'Ana'],
