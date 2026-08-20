@@ -174,6 +174,94 @@ test('M2: known severe reaction history is CODE_RED; localized first-time is YEL
   assert.equal(mild.determinantId, 'm2_yellow_localized');
 });
 
+test('M9: equipment answers jump per the card — ventilator to C1, defibrillator to M5', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of OK('her ventilator is failing')) s.answer(a);
+  const out = s.answer('it is the ventilator, the breathing machine stopped');
+  assert.equal(out[0]!.stringId, 'kq_alert', 'C1 card takes over on ventilator failure');
+  let guard = 0;
+  while (!s.isDone() && guard++ < 20) s.answer('no, not expected');
+  assert.equal(s.result().protocolId, 'c1_cardiac_arrest');
+
+  const s2 = new DispatchSession(pack);
+  s2.start();
+  for (const a of OK('his medical equipment is going off')) s2.answer(a);
+  const out2 = s2.answer('his implanted defibrillator keeps firing');
+  assert.equal(s2.pending()?.protocolId, 'm5_chest_pain', 'defibrillator firing -> M5');
+  void out2;
+});
+
+test('M10: unsure whether the person died jumps to C1; confirmed death is YELLOW', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of OK('I think my father has passed away')) s.answer(a);
+  s.answer('I am not sure, maybe, I just found him');
+  assert.equal(s.pending()?.protocolId, 'c1_cardiac_arrest', 'unsure -> resuscitation path');
+
+  const r = run(OK('my father has passed away, he is on hospice'), {
+    m10_how_know: 'he is cold and stiff, it was an expected hospice death',
+  });
+  assert.equal(r.protocolId, 'm10_obvious_death');
+  assert.equal(r.determinantId, 'm10_yellow_confirmed');
+});
+
+test('T5: chemical eye injury jumps to the T4 Burns card', () => {
+  const s = new DispatchSession(pack);
+  s.start();
+  for (const a of OK('he got something in his eye')) s.answer(a);
+  s.answer('yes, alert');
+  s.answer('yes, normally');
+  s.answer('it was a chemical, bleach splashed in it');
+  assert.equal(s.pending()?.protocolId, 't4_burns', 'chemical -> T4 per the card');
+});
+
+test('M7: sudden-onset headache is CODE_RED; known-migraine gradual is YELLOW', () => {
+  const red = run(OK('she has a terrible headache'), {
+    m7_alert: 'yes, alert',
+    m7_breathing_normal: 'yes, normally',
+    m7_oriented: 'yes, she knows',
+    m7_manner: 'yes, normal',
+    m7_different: 'no',
+    m7_onset: 'it came on suddenly, out of nowhere',
+    m7_history: 'no',
+  });
+  assert.equal(red.protocolId, 'm7_headache');
+  assert.equal(red.determinantId, 'm7_red_sudden_onset');
+
+  const yellow = run(OK('he has a bad headache'), {
+    m7_alert: 'yes, alert',
+    m7_breathing_normal: 'yes, normally',
+    m7_oriented: 'yes',
+    m7_manner: 'yes, normal',
+    m7_different: 'no',
+    m7_onset: 'it built up gradually over the day',
+    m7_history: 'yes, he gets migraines',
+  });
+  assert.equal(yellow.determinantId, 'm7_yellow_no_critical');
+});
+
+test('T1: venomous bite is CODE_RED; minor dog bite on the arm is YELLOW', () => {
+  const snake = run(OK('he was bitten by a rattlesnake'), {
+    t1_animal_where: 'it slithered off',
+    t1_type: 'a rattlesnake',
+    t1_breath: 'no',
+    t1_part: 'on the ankle',
+    t1_bleeding: 'no',
+  });
+  assert.equal(snake.protocolId, 't1_animal_bites');
+  assert.equal(snake.determinantId, 't1_red_poisonous');
+
+  const dog = run(OK('a dog bit her'), {
+    t1_animal_where: 'the owner leashed it',
+    t1_type: 'a dog',
+    t1_breath: 'no',
+    t1_part: 'on the arm',
+    t1_bleeding: 'no',
+  });
+  assert.equal(dog.determinantId, 't1_yellow_minor');
+});
+
 test('M15: sick person with nothing critical is the benign YELLOW; complaint routes off M17', () => {
   const r = run(OK('my mom has the flu and a fever'), {
     m15_alert: 'yes, alert',

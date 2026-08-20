@@ -12,7 +12,7 @@ license, or written permission — with provenance recorded in the pack and enfo
 
 | Source | License | Pack | Notes |
 | --- | --- | --- | --- |
-| Open ISES Project EMD Guide Cards v0.26.2 (2008) | GFDL-1.2-or-later (verified in the PDF) | `us-openises-emd` | **23 of ~34 cards digitized**, trilingual; I2 CPR + I11 bleeding scripts wired in. Remainder: M3, M7–M10, M12, T1, T5, T7, T9, C4, H1/H3–H5, and I-scripts I1/I3–I8. Source: archive.org `files-all/cards911.zip`. |
+| Open ISES Project EMD Guide Cards v0.26.2 (2008) | GFDL-1.2-or-later (verified in the PDF) | `us-openises-emd` | **DECK COMPLETE: all 34 interrogation cards digitized** (M1–M17, T1–T10, C1–C6, H2/H5), trilingual, with I2 CPR + I11 bleeding scripts wired in. Deliberately skipped: H1/H3/H4 (procedure cards, no caller interrogation) and scripted cards I1/I3–I8 (need interactive scripting). Source: archive.org `files-all/cards911.zip`. |
 | State of New Jersey EMD Guidecards ("Updated May 2026") | `state-published-permission-pending` — AccesSOS/infra#8 | `us-nj-emd` | Official statewide cards, no copyright notice, state-mandated (strong government-edicts posture). NJ publishes EMD only — no fire/police guidecards. |
 | Alameda PD Public Safety Dispatcher Training Manual (2020) | `city-published-permission-pending` — AccesSOS/infra#9 | `us-alameda-police` | First police pack. Training prose condensed to cards (pages cited in SOURCE.md). |
 | México CNIE v3.0 (SESNSP, junio 2024) | Libre-Uso-MX (gob.mx open-use terms) | `mx-cnie-911` | National classification catalog: codes/definitions/priorities verbatim; interrogation editorial. |
