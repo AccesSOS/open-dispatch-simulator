@@ -98,7 +98,7 @@ the five fails.
 2. **Investigation / commission reports reproducing full 911 transcripts.** Searches returned
    mass-shooting commission reports (Parkland, Uvalde) and terror-attack reviews — not medical.
    A medical-dispatch failure review that prints the full call does exist in news coverage (e.g. a
-   2022 Palo Alto dispatcher review; NYC DOI's Ariel Russo report) but the reports themselves were
+   2022 Palo Alto dispatcher review; a 2013 NYC Department of Investigation report on an EMS response) but the reports themselves were
    not located in this round. Worth a targeted pass by a person with news-archive access.
 3. **News-station pages hosting released audio** — they exist for notable calls (e.g. a 2026
    driver medical-emergency call) but each is one call, often edited. Last resort per the design;
