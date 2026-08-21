@@ -203,6 +203,29 @@ against a pack. This is deliberately the **only** comparison we publish; see
 [docs/PRIVATE-PACKS.md](docs/PRIVATE-PACKS.md) for why we never publish similarity claims against
 proprietary systems.
 
+## Driving it from another process
+
+The library is only reachable from JavaScript, and an AI caller, a crash-detection client or a
+practice UI is usually neither in this process nor in this language. `npm run serve` puts the
+dispatcher behind three endpoints — no new dependencies, just `node:http`:
+
+```bash
+npm run serve                                  # http://127.0.0.1:4180
+curl -s localhost:4180/calls -H 'content-type: application/json' \
+     -d '{"pack":"us-openises-emd","locale":"es"}'
+curl -s localhost:4180/calls/$ID/answer -H 'content-type: application/json' \
+     -d '{"text":"Calle Reforma 10"}'
+```
+
+Each response carries what the dispatcher said, the question now pending, and — once the call is
+over — the same `result()` the library returns: protocol, determinant, response level, transcript.
+`GET /packs` lists the corpus with its provenance, and `GET /packs/:id/graph` serves the decision
+tree a visualizer needs.
+
+> It binds to **loopback** and has **no authentication**, because it is a test fixture. Every
+> response says so in a `notice` field. Don't put it on a public interface, and don't wire it to
+> anything that answers real calls.
+
 ## Scoring a call
 
 `npm run sim` answers *did the call reach dispatch*. That is the floor, not the bar.

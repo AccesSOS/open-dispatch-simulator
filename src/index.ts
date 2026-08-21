@@ -16,6 +16,8 @@ export { runCall, runBatch, sweepScripts, sweepInstructionScripts } from './sim.
 export { coverage, loadRubric, loadRubricFromFile, matchTaxonomy, RubricValidationError } from './coverage.js';
 export { diffPacks } from './diff.js';
 export { scoreCall } from './score.js';
+export { createDispatchServer, ENDPOINTS, SIMULATION_NOTICE } from './server.js';
+export type { ServerOptions } from './server.js';
 export type { CallScore, ScoreAxis, AxisStatus } from './score.js';
 export type { PackDiffResult, ProtocolPairDiff, CaseEntryDiff, SetDiff, DiffOptions } from './diff.js';
 export type {

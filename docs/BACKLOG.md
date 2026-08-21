@@ -91,10 +91,14 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       deliberate fast-track to dispatch as a skipped interrogation. Corpus is clean; the failure
       paths are proven on deliberately broken packs rather than asserted. It also turned up the
       "I do not know" reading recorded under answer matching below.
-- [ ] **Serve the dispatcher.** `npm run serve`: a `node:http` JSON API (no new dependencies) so a
+- [x] **Serve the dispatcher.** `npm run serve`: a `node:http` JSON API (no new dependencies) so a
       process in any language can hold a call — start a session, post an answer, read the
       utterances and the result. This is what an AI caller, a crash-detection client or an alarm
       integration needs to test against a realistic dispatcher without linking the library.
+      → *Done.* `src/server.ts` + `npm run serve`. Eight endpoints including `/packs` (with
+      provenance) and `/packs/:id/graph` for visualizers. Loopback-only and unauthenticated by
+      design, with the simulation notice on every response; held calls are capped and idle-swept
+      so a forgotten client cannot grow the heap.
 - [ ] **Hold a call from the terminal.** `npm run call -- <pack> [--locale es]`: an interactive
       REPL call. The practice/rehearsal use case in its smallest honest form, and the fastest way
       to sanity-check a pack you are writing.
