@@ -34,17 +34,26 @@ test('unmatched choice answer triggers clarify-and-re-ask, then moves on', () =>
   assert.equal(out3[0]!.stringId, 'kq_cp_alert');
 });
 
-test('word-boundary matching: "I do not know" is not a "no"', () => {
+test('"I do not know" is recorded as not knowing, not as a "no"', () => {
   const s = new DispatchSession(pack);
   s.start();
   s.answer('9 Elm Ave');
   s.answer('555-0111');
   s.answer('chest pain');
   s.answer('50');
-  const out = s.answer('I do not know'); // "not"/"know" must NOT match keyword "no"
-  assert.deepEqual(out.map((u) => u.stringId), ['clarify', 'q_conscious']);
-  const out2 = s.answer('no, he passed out'); // a real "no" still matches
-  assert.equal(out2[0]!.stringId, 'q_breathing');
+  // "not" and "know" must not match the keyword "no" — and beyond that, saying
+  // you don't know is its own answer, so the dispatcher moves on rather than
+  // asking the same question again.
+  const out = s.answer('I do not know');
+  assert.deepEqual(out.map((u) => u.stringId), ['q_breathing']);
+  assert.equal(s.result().choices['conscious'], undefined);
+  assert.deepEqual(s.result().unknowns, ['conscious']);
+
+  // A real "no" still matches — here it is the breathing question, which this
+  // card fast-tracks straight to dispatch.
+  const out2 = s.answer('no, he is not breathing');
+  assert.equal(s.result().choices['breathing'], 'no');
+  assert.equal(out2[0]!.stringId, 'dispatch_confirm');
 });
 
 test('branch sweep enumerates every option combination per protocol', () => {

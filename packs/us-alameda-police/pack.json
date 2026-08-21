@@ -119,8 +119,7 @@
                 "fled",
                 "nope",
                 "negative",
-                "none",
-                "never"
+                "none"
               ]
             }
           },
@@ -159,8 +158,7 @@
                 "none",
                 "unarmed",
                 "nope",
-                "negative",
-                "never"
+                "negative"
               ]
             }
           },
@@ -441,8 +439,7 @@
                     "cannot",
                     "nope",
                     "negative",
-                    "none",
-                    "never"
+                    "none"
                   ]
                 }
               },
@@ -591,8 +588,7 @@
                     "no one hurt",
                     "nope",
                     "negative",
-                    "none",
-                    "never"
+                    "none"
                   ]
                 }
               },
@@ -637,8 +633,7 @@
                     "parking lot",
                     "nope",
                     "negative",
-                    "none",
-                    "never"
+                    "none"
                   ]
                 }
               },

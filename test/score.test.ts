@@ -20,7 +20,7 @@ function score(pack: ProtocolPack, slots: Record<string, string>, locale: Locale
   while (!s.isDone() && guard++ < 80) {
     const pending = s.pending();
     if (!pending) break;
-    s.answer(slots[pending.slot] ?? 'hard to say');
+    s.answer(slots[pending.slot] ?? 'mmhm the thing by the porch');
   }
   return scoreCall(pack, locale, events, s.result());
 }
@@ -94,7 +94,9 @@ test('information capture is scored separately from compliance', () => {
 });
 
 test('an unparsed answer is clarified, and that is what compliance measures', () => {
-  const sc = score(openises, { ...CHEST_PAIN, m5_alert: 'hard to say' });
+  // Unintelligible, not "I don't know" — the latter is its own answer and is
+  // deliberately not re-asked.
+  const sc = score(openises, { ...CHEST_PAIN, m5_alert: 'mmhm the thing by the porch' });
   assert.ok(sc.clarifies > 0);
   assert.equal(axis(sc, 'complaint-questions').status, 'pass');
   assert.match(axis(sc, 'complaint-questions').detail, /clarified/);

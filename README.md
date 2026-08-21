@@ -151,10 +151,23 @@ protocols, determinants, and response levels. `sweepScripts` enumerates **every 
 choice options per protocol**, and `npm run sim` (also a CI gate) enforces the simulator's core
 invariant: *every call reaches dispatch with a response level*, in every locale. Dispatchers also
 clarify-and-re-ask when a choice answer doesn't parse (`clarifyAttempts`, default 1), and keyword
-matching is Unicode word-boundary aware, so "know" never matches the keyword "no". Whether *"I do
-not know"* itself reads as a negative is the pack's call, not the engine's: the reference pack
-does not list "not" as a negative, the OpenISES pack does. Giving "I don't know" an outcome of its
-own, distinct from an answer that simply didn't parse, is on the roadmap.
+matching is Unicode word-boundary aware, so "know" never matches the keyword "no".
+
+**"I don't know" is its own answer.** It contains the word *not*; *"no sé"* contains *no*; *"je ne
+sais pas"* contains *pas* — and all three are negative keywords in the flagship pack, so a caller
+who couldn't answer was being recorded as one who answered in the negative. Those phrases now
+resolve to an `unknowns` outcome distinct from both a yes/no and an answer that didn't parse, and
+the dispatcher **moves on rather than asking again**: re-asking someone who just said they don't
+know is the antipattern every call-taking guideline warns about.
+
+A pack can still mean it — the OpenISES M10 card offers *"not sure"* as a real answer to how the
+caller knows the person is dead — so the longer match wins and a tie goes to the pack, whose
+vocabulary is specific to the question being asked.
+
+The loader also refuses a pack whose **option keywords shadow each other**. Options are matched in
+order, so an earlier option's keyword sitting inside a later one's makes the later unreachable:
+*"no shock indicated"* contains the whole word *shock*. That bug was found once by a coverage
+sweep; now it cannot load.
 
 Locale completeness runs in both directions. The loader already refuses a pack missing a string in
 any declared locale; the suite additionally refuses one where a locale is a byte-for-byte copy of

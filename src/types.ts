@@ -243,6 +243,9 @@ export interface SessionResult {
   numbers: Record<string, number>;
   /** v0.4: values pulled out of the answers, for read-backs and templates. */
   values: Record<string, string>;
+  /** Slots where the caller said, in so many words, that they do not know.
+   * Distinct from an answer that simply did not parse. */
+  unknowns: string[];
   /** v0.3: instruction scripts entered after dispatch, in order. */
   scripts: string[];
   transcript: { role: 'dispatcher' | 'caller'; text: string }[];

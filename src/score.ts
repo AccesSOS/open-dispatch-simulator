@@ -45,6 +45,9 @@ export interface InformationCapture {
   answered: number;
   /** Questions asked as a choice whose answer never parsed, even after clarifying. */
   unparsed: string[];
+  /** Slots where the caller said they do not know — a different thing from an
+   * answer that did not parse, and not something re-asking would fix. */
+  unknown: string[];
   /** answered / asked, 0..1. */
   rate: number;
 }
@@ -317,6 +320,7 @@ export function scoreCall(
       asked: askedTotal,
       answered: answeredTotal,
       unparsed: allUnparsed,
+      unknown: [...result.unknowns],
       rate: askedTotal ? answeredTotal / askedTotal : 0,
     },
     clarifies: d.clarifies,

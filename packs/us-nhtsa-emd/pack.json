@@ -62,8 +62,7 @@
                 "passed out",
                 "nope",
                 "negative",
-                "none",
-                "never"
+                "none"
               ],
               "es": [
                 "no",
@@ -74,7 +73,6 @@
                 "ninguno",
                 "ninguna",
                 "tampoco",
-                "nunca",
                 "en absoluto"
               ]
             }
@@ -120,8 +118,7 @@
                 "not breathing",
                 "nope",
                 "negative",
-                "none",
-                "never"
+                "none"
               ],
               "es": [
                 "no",
@@ -130,7 +127,6 @@
                 "ninguno",
                 "ninguna",
                 "tampoco",
-                "nunca",
                 "en absoluto"
               ]
             }
@@ -205,8 +201,7 @@
                     "out of it",
                     "nope",
                     "negative",
-                    "none",
-                    "never"
+                    "none"
                   ],
                   "es": [
                     "no",
@@ -216,7 +211,6 @@
                     "ninguno",
                     "ninguna",
                     "tampoco",
-                    "nunca",
                     "en absoluto"
                   ]
                 }
@@ -271,8 +265,7 @@
                     "dry",
                     "nope",
                     "negative",
-                    "none",
-                    "never"
+                    "none"
                   ],
                   "es": [
                     "no",
@@ -282,7 +275,6 @@
                     "ninguno",
                     "ninguna",
                     "tampoco",
-                    "nunca",
                     "en absoluto"
                   ]
                 }
@@ -387,8 +379,7 @@
                     "gasping",
                     "nope",
                     "negative",
-                    "none",
-                    "never"
+                    "none"
                   ],
                   "es": [
                     "no",
@@ -398,7 +389,6 @@
                     "ninguno",
                     "ninguna",
                     "tampoco",
-                    "nunca",
                     "en absoluto"
                   ]
                 }

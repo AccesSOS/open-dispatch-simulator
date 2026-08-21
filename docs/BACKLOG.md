@@ -105,7 +105,7 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       → *Done.* `scripts/call.ts` + `npm run call`. Reads stdin so it scripts as well as it
       converses, `--score` prints the call's scorecard, and running out of answers says which
       slot it was still waiting on rather than exiting silently.
-- [ ] **Richer caller-answer matching.** The v0 matcher is whole-word, first-option-wins, and has
+- [x] **Richer caller-answer matching.** The v0 matcher is whole-word, first-option-wins, and has
       known hazards: "no shock" matched "shock" until the options were reordered, Spanish "si"
       also means "if", and "sí, no puede respirar" matches the negative first. Make matching
       negation-aware and add an explicit "unknown / I don't know" outcome distinct from an
@@ -114,6 +114,16 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       OpenISES pack does — reads "I do not know", "not sure" and "no idea" as a firm **no**. The
       reference pack does not list "not", so the same phrase clarifies there instead. Same engine,
       opposite readings of an answer that means neither.
+      → *Done.* "I don't know" resolves to its own `unknowns` outcome in all three locales and is
+      not re-asked; the longer match wins with ties going to the pack, so M10's real "not sure"
+      answer still works. The loader now rejects options that shadow each other — which
+      immediately caught a defect the locale-parity pass had introduced: the generic negative
+      "never" made "never like this" (a real *yes* on the headache card) unreachable in all three
+      locales, invisible to the sweep because the sweep never says those words. Every determinant
+      and response count in the sweep is unchanged. *Not done:* position-aware matching — earliest
+      keyword wins rather than option order — which fixes "sí, no puede respirar" but regresses
+      the Spanish "si" that also means "if". Left alone deliberately; the current order biases to
+      the higher-acuity reading.
 - [ ] **Caller personas for the harness.** Callers do not answer in keywords. Add caller-side
       profiles — panicked, third-party ("I can't see him from here"), non-native speaker,
       indirect — so packs are exercised against messy input rather than clean option words. Pairs

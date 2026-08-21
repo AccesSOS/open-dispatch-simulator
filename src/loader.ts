@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { KIND_REQUIREMENTS, NUMERIC_KINDS } from './extract.js';
 import { lexiconFor } from './lexicon.js';
+import { containsKeyword } from './match.js';
 import type { Condition, ExtractKind, ProtocolPack, Question } from './types.js';
 
 const schemaPath = fileURLToPath(new URL('../schema/pack.schema.json', import.meta.url));
@@ -241,6 +242,42 @@ export function loadPack(data: unknown, packRef = 'inline'): ProtocolPack {
     const last = p.determinants[p.determinants.length - 1];
     if (last && last.when?.length) {
       problems.push(`protocol "${p.id}" has no default determinant (last rule must omit "when")`);
+    }
+  }
+
+  // An option is matched by scanning the options in order and taking the first
+  // whose keyword appears in the answer. So if an earlier option's keyword sits
+  // inside a later one's, the later option can never win with that phrase:
+  // "no shock indicated" contains the whole word "shock", which made the AED
+  // card's no-shock branch unreachable until the options were reordered. That
+  // was found by a coverage sweep; it should have been found at load.
+  const checkShadowing = (
+    where: string,
+    options: { id: string; keywords: Record<string, string[]> }[],
+  ) => {
+    for (const locale of pack.locales) {
+      options.forEach((option, index) => {
+        for (const keyword of option.keywords[locale] ?? []) {
+          for (const earlier of options.slice(0, index)) {
+            const shadow = (earlier.keywords[locale] ?? []).find((k) => containsKeyword(keyword, k));
+            if (shadow !== undefined) {
+              problems.push(
+                `${where} option "${option.id}" keyword "${keyword}" (${locale}) is unreachable: ` +
+                  `the earlier option "${earlier.id}" matches it on "${shadow}". Put the more ` +
+                  `specific option first.`,
+              );
+            }
+          }
+        }
+      });
+    }
+  };
+  for (const q of [...pack.caseEntry, ...pack.protocols.flatMap((p) => p.keyQuestions)]) {
+    if (q.expect) checkShadowing(`question "${q.id}"`, q.expect.options);
+  }
+  for (const script of pack.scripts ?? []) {
+    for (const step of script.steps) {
+      if (step.expect) checkShadowing(`script "${script.id}" step "${step.id}"`, step.expect.options);
     }
   }
 

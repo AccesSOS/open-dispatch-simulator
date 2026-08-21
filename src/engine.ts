@@ -1,7 +1,9 @@
 import { extractValue } from './extract.js';
+import { containsKeyword } from './match.js';
 import { determineNodeId, keyQuestionNodeId, scriptStepNodeId } from './graph.js';
 import { lexiconFor } from './lexicon.js';
 import type {
+  ChoiceOption,
   Condition,
   InstructionScript,
   Lexicon,
@@ -17,13 +19,6 @@ import type {
   Utterance,
 } from './types.js';
 
-/** Keyword matching on word boundaries (Unicode-aware): the keyword "no"
- * matches "no, he isn't" but never "not" or "know"; phrases like
- * "not breathing" match as whole-word sequences. */
-const normalize = (s: string): string =>
-  ' ' + s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() + ' ';
-const containsKeyword = (text: string, keyword: string): boolean =>
-  normalize(text).includes(normalize(keyword));
 
 /** Small deterministic PRNG (mulberry32) so persona behavior is reproducible. */
 const mulberry32 = (seed: number) => (): number => {
@@ -32,6 +27,12 @@ const mulberry32 = (seed: number) => (): number => {
   t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
+
+/** An option match, with the keyword that produced it. */
+interface Match {
+  id: string;
+  keyword: string;
+}
 
 export interface SessionOptions {
   locale?: Locale;
@@ -61,6 +62,7 @@ export class DispatchSession {
   private readonly choices: Record<string, string> = {};
   private readonly numbers: Record<string, number> = {};
   private readonly values: Record<string, string> = {};
+  private readonly unknowns = new Set<string>();
   private readonly transcript: { role: 'dispatcher' | 'caller'; text: string }[] = [];
   private protocol: Protocol | null = null;
   private determinantId: string | null = null;
@@ -113,8 +115,13 @@ export class DispatchSession {
     if (!q) throw new Error('No question is pending');
     this.transcript.push({ role: 'caller', text });
     if (q.expect) {
-      const matched = this.matchOption(q, text);
-      if (!matched && this.clarifies < this.clarifyAttempts) {
+      const resolved = this.resolveAnswer(this.matchOption(q, text), text);
+      const saidUnknown = resolved === null;
+      if (saidUnknown) this.unknowns.add(q.slot);
+      const matched = resolved ?? undefined;
+      // Re-asking someone who just said they don't know is the antipattern every
+      // call-taking guideline warns about; it costs time and gains nothing.
+      if (!matched && !saidUnknown && this.clarifies < this.clarifyAttempts) {
         // A real dispatcher doesn't shrug at an unintelligible yes/no answer:
         // clarify and re-ask, then move on if it still doesn't parse.
         this.clarifies++;
@@ -215,6 +222,7 @@ export class DispatchSession {
       choices: { ...this.choices },
       numbers: { ...this.numbers },
       values: { ...this.values },
+      unknowns: [...this.unknowns],
       scripts: [...this.scriptsEntered],
       transcript: [...this.transcript],
     };
@@ -400,8 +408,11 @@ export class DispatchSession {
     const step = this.currentStep;
     if (!step || step.kind !== 'ask') throw new Error('No instruction step is pending');
     this.transcript.push({ role: 'caller', text });
-    const matched = this.matchStepOption(step, text);
-    if (!matched && this.clarifies < this.clarifyAttempts) {
+    const resolved = this.resolveAnswer(this.matchStepOption(step, text), text);
+    const saidUnknown = resolved === null;
+    if (saidUnknown && step.slot) this.unknowns.add(step.slot);
+    const matched = resolved ?? undefined;
+    if (!matched && !saidUnknown && this.clarifies < this.clarifyAttempts) {
       this.clarifies++;
       this.emit({
         type: 'clarify',
@@ -435,12 +446,8 @@ export class DispatchSession {
     return [this.say('closing')];
   }
 
-  private matchStepOption(step: ScriptStep, text: string): string | undefined {
-    for (const option of step.expect?.options ?? []) {
-      const keywords = option.keywords[this.locale] ?? [];
-      if (keywords.some((k) => containsKeyword(text, k))) return option.id;
-    }
-    return undefined;
+  private matchStepOption(step: ScriptStep, text: string): Match | undefined {
+    return this.matchOptions(step.expect?.options ?? [], text);
   }
 
   /** Render a template from the active locale's catalog. Grounding guard:
@@ -480,12 +487,48 @@ export class DispatchSession {
       : keyQuestionNodeId(this.protocol.id, q);
   }
 
-  private matchOption(q: Question, text: string): string | undefined {
-    for (const option of q.expect?.options ?? []) {
+  /**
+   * "I don't know" is an answer, and it is not "no". It contains the word
+   * "not"; "no sé" contains "no"; "pas sûr" contains "pas". A pack listing
+   * those as negatives would otherwise read a caller who cannot answer as one
+   * who answered in the negative.
+   *
+   * But a pack may also mean it: the OpenISES M10 card offers "not sure" as a
+   * real answer to how the caller knows the person is dead. So the longer match
+   * wins, and a tie goes to the pack — its vocabulary is specific to the
+   * question being asked, and this list is not.
+   */
+  private saysUnknown(text: string): string | undefined {
+    let best: string | undefined;
+    for (const term of this.lexicon.unknownTerms ?? []) {
+      if (containsKeyword(text, term) && (!best || term.length > best.length)) best = term;
+    }
+    return best;
+  }
+
+  /** The option matched, and the keyword that matched it. */
+  private matchOption(q: Question, text: string): Match | undefined {
+    return this.matchOptions(q.expect?.options ?? [], text);
+  }
+
+  private matchOptions(options: ChoiceOption[], text: string): Match | undefined {
+    for (const option of options) {
       const keywords = option.keywords[this.locale] ?? [];
-      if (keywords.some((k) => containsKeyword(text, k))) return option.id;
+      const keyword = keywords.find((k) => containsKeyword(text, k));
+      if (keyword !== undefined) return { id: option.id, keyword };
     }
     return undefined;
+  }
+
+  /**
+   * Reconcile a possible "I don't know" against a possible option match.
+   * Returns the option id to record, or null when the caller said they do not
+   * know, or undefined when nothing parsed at all.
+   */
+  private resolveAnswer(match: Match | undefined, text: string): string | null | undefined {
+    const unknown = this.saysUnknown(text);
+    if (unknown && (!match || unknown.length > match.keyword.length)) return null;
+    return match?.id;
   }
 
   private selectProtocol(complaint: string): Protocol {

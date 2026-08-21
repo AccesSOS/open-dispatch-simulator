@@ -18,6 +18,9 @@ export interface Lexicon {
   ageUnits?: Record<string, number>;
   /** Standalone age words → years ("newborn" → 0). */
   ageTerms?: Record<string, number>;
+  /** Ways a caller says they do not know — checked before the answer options,
+   * because "I do not know" contains the word "not" and "no sé" contains "no". */
+  unknownTerms?: string[];
   /** Words that mark the end (or start) of a street address. */
   streetTypes?: string[];
   /** Words introducing a subunit of an address ("apt", "suite"). */
@@ -54,6 +57,11 @@ const EN: Lexicon = {
     infant: 0.5, baby: 0.5,
     toddler: 2,
   },
+  unknownTerms: [
+    "i don't know", 'i dont know', "don't know", 'dont know', 'do not know',
+    'no idea', 'not sure', 'unsure', 'hard to say', "can't tell", 'cant tell',
+    'cannot tell', 'unknown', 'who knows', 'no way to tell', "i can't say", 'i cant say',
+  ],
   streetTypes: [
     'street', 'st', 'avenue', 'ave', 'av', 'road', 'rd', 'lane', 'ln', 'drive',
     'dr', 'boulevard', 'blvd', 'court', 'ct', 'place', 'pl', 'way', 'terrace',
@@ -83,6 +91,11 @@ const ES: Lexicon = {
     'recién nacido': 0, 'recien nacido': 0, 'recién nacida': 0, 'recien nacida': 0,
     neonato: 0, lactante: 0.5, bebé: 0.5, bebe: 0.5, 'bebé de meses': 0.5,
   },
+  unknownTerms: [
+    'no sé', 'no se', 'ni idea', 'no tengo idea', 'no estoy seguro', 'no estoy segura',
+    'quién sabe', 'quien sabe', 'no sabría decir', 'no sabria decir', 'no puedo saber',
+    'no alcanzo a ver', 'desconocido',
+  ],
   streetTypes: [
     'calle', 'avenida', 'av', 'avda', 'blvd', 'boulevard', 'bulevar', 'paseo',
     'calzada', 'carretera', 'privada', 'andador', 'prolongación', 'prolongacion',
@@ -110,6 +123,10 @@ const FR: Lexicon = {
     'nouveau-né': 0, 'nouveau ne': 0, 'nouveau-nee': 0, 'nouveau-née': 0,
     nouveauné: 0, nourrisson: 0.5, bébé: 0.5, bebe: 0.5,
   },
+  unknownTerms: [
+    'je ne sais pas', 'je sais pas', 'aucune idée', 'aucune idee', 'pas sûr', 'pas sur',
+    'pas sûre', 'difficile à dire', 'difficile a dire', 'je ne peux pas dire', 'inconnu',
+  ],
   streetTypes: [
     'rue', 'avenue', 'av', 'boulevard', 'bd', 'blvd', 'chemin', 'route', 'rte',
     'place', 'impasse', 'allée', 'allee', 'quai', 'cours', 'voie', 'ruelle',

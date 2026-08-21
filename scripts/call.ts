@@ -103,7 +103,10 @@ function finish(): void {
     }
     console.log(
       `  information captured: ${score.information.answered}/${score.information.asked} ` +
-        `(${(score.information.rate * 100).toFixed(0)}%)`,
+        `(${(score.information.rate * 100).toFixed(0)}%)` +
+        (score.information.unknown.length
+          ? `, caller did not know: ${score.information.unknown.join(', ')}`
+          : ''),
     );
   }
   rl.close();
