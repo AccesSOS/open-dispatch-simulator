@@ -5,3 +5,5 @@ packs-private/
 *.log
 .env
 .DS_Store
+# Real-call case files for replay validation — never committed. See docs/REPLAY.md.
+replay-private/

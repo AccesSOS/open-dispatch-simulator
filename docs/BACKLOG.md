@@ -124,6 +124,17 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       keyword wins rather than option order — which fixes "sí, no puede respirar" but regresses
       the Spanish "si" that also means "if". Left alone deliberately; the current order biases to
       the higher-acuity reading.
+- [ ] **Replay harness (observable behavior).** `npm run replay -- replay-private/ --pack <id>`
+      per `docs/REPLAY.md`: read private case files (facts keyed by behavior code, observed
+      question/instruction codes, dispatch moment, implied protocol), map each pack's question
+      slots and instruction lines/script steps to behavior codes via `replay/codes/<pack>.json`
+      (build the maps for all five packs), feed facts as answers through `DispatchSession`
+      ("I don't know" for anything uncoded — never invent), and report ONLY aggregates: question
+      recall/precision (core vs `Q.kq:*`), opening-order agreement (first-3 + Kendall τ),
+      instruction recall/precision, dispatch-timing delta, protocol agreement, and the miss list.
+      Ship 3 synthetic example case files under `test/fixtures/replay/` (clearly fake, for tests
+      only — the real ones are gitignored). Deterministic, keyless, no new deps. Never print a
+      per-call row in committed output.
 - [ ] **Caller personas for the harness.** Callers do not answer in keywords. Add caller-side
       profiles — panicked, third-party ("I can't see him from here"), non-native speaker,
       indirect — so packs are exercised against messy input rather than clean option words. Pairs
