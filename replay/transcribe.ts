@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, extname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * npm run replay:transcribe -- <dir> [--model <ggml.bin>] [--whisper whisper-cli] [--only 18,58]
@@ -23,7 +24,8 @@ if (!dir) {
   console.error('usage: npm run replay:transcribe -- <dir> [--model <ggml.bin>] [--whisper <binary>] [--only 18,58]');
   process.exit(2);
 }
-const model = flag('model') ?? process.env.WHISPER_MODEL ?? join(dir, '..', 'models', 'ggml-small.en.bin');
+const root = fileURLToPath(new URL('..', import.meta.url));
+const model = flag('model') ?? process.env.WHISPER_MODEL ?? join(root, 'replay-private', 'models', 'ggml-small.en.bin');
 const whisper = flag('whisper') ?? process.env.WHISPER_BIN ?? 'whisper-cli';
 const only = flag('only')?.split(',').map((s) => s.trim());
 if (!existsSync(model)) {
