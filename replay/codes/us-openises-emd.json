@@ -1,6 +1,6 @@
 {
   "pack": "us-openises-emd",
-  "notes": "Slot → Q code for case entry, every card's key questions, and every instruction-script ask step; string → I code for dispatch_confirm and post-dispatch lines; steps/scripts → I code inside the I-cards. Every card opens with alert/breathing-normally, mapped to Q.conscious/Q.breathing_quality (the engine asks them again after case entry; the coder codes them once). Q.kq slugs here are the vocabulary case files for this pack must use.",
+  "notes": "Slot \u2192 Q code for case entry, every card's key questions, and every instruction-script ask step; string \u2192 I code for dispatch_confirm and post-dispatch lines; steps/scripts \u2192 I code inside the I-cards. Every card opens with alert/breathing-normally, mapped to Q.conscious/Q.breathing_quality (the engine asks them again after case entry; the coder codes them once). Q.kq slugs here are the vocabulary case files for this pack must use.",
   "slots": {
     "location": "Q.location",
     "callback": "Q.callback",
@@ -330,7 +330,7 @@
     "pd_m5_loosen": "I.other:loosen_clothing",
     "pd_m5_nitro": "I.other:nitroglycerin",
     "pd_gather_meds": "I.gather_meds",
-    "pd_lock_pets": "I.other:lock_pets",
+    "pd_lock_pets": "I.other:secure_pets",
     "pd_callback_changes": "I.watch_and_report",
     "pd_c6_lie_down": "I.positioning",
     "pd_c6_side_vomit": "I.positioning",
@@ -499,7 +499,10 @@
       "I.positioning",
       "I.watch_and_report"
     ],
-    "i8a_childbirth_entry/comfortable": "I.childbirth:position_mother",
+    "i8a_childbirth_entry/comfortable": [
+      "I.childbirth:position_mother",
+      "I.childbirth:breathe"
+    ],
     "i8a_childbirth_entry/resist_push": "I.childbirth:resist_pushing",
     "i8a_childbirth_entry/monitor": "I.watch_and_report",
     "i8a_childbirth_entry/get_phone": "I.other:bring_phone",
@@ -508,10 +511,16 @@
     "i8b_childbirth_delivery/signs": "I.childbirth:report_delivery",
     "i8b_childbirth_delivery/cradle": "I.childbirth:support_head",
     "i8b_childbirth_delivery/complications": "I.childbirth:complications",
-    "i8b_childbirth_delivery/clean": "I.childbirth:clear_baby_airway",
+    "i8b_childbirth_delivery/clean": [
+      "I.childbirth:clear_baby_airway",
+      "I.childbirth:dont_pull_cord"
+    ],
     "i8b_childbirth_delivery/stimulate": "I.childbirth:stimulate_baby",
     "i8b_childbirth_delivery/wrap": "I.childbirth:wrap_baby",
-    "i8b_childbirth_delivery/placenta": "I.childbirth:placenta"
+    "i8b_childbirth_delivery/placenta": "I.childbirth:placenta",
+    "i2d_adult_cpr_compressions/compression_only": "I.other:compressions_only",
+    "i3c_child_cpr_compressions/compression_only": "I.other:compressions_only",
+    "i4c_infant_cpr_compressions/compression_only": "I.other:compressions_only"
   },
   "scripts": {
     "i1_aed": "I.aed",

@@ -6,7 +6,11 @@ import { aggregate, formatReport, replayCase, validateCase, validateCodeMap } fr
 import type { CodeMap, EngineBehavior, ReplayCase } from '../src/replay.js';
 
 /**
- * npm run replay -- <cases-dir> --pack <id> [--json] [--codes <dir>]
+ * npm run replay -- <cases-dir> --pack <id> [--json] [--codes <dir>] [--all]
+ *
+ * --all replays every case file through the chosen pack regardless of the pack the file was
+ * coded against — facts are keyed by behavior code, so a call coded for one pack can be put to
+ * another; card-specific (Q.kq:*) slugs will mostly not line up, core codes will.
  *
  * Replay private case files (docs/REPLAY.md) through a pack and print the
  * aggregate agreement report. The case files never enter the repository;
@@ -98,7 +102,7 @@ for (const file of files) {
     continue;
   }
   const c = data as ReplayCase;
-  if (c.pack !== pack.id) {
+  if (c.pack !== pack.id && !has('all')) {
     otherPack++;
     continue;
   }
