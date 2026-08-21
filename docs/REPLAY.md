@@ -5,7 +5,7 @@ and compare what the engine *did* with what the human dispatcher *did*.
 
 | Study | Compares | Needs | Who |
 | --- | --- | --- | --- |
-| **Observable behavior** (this doc, do first) | Questions asked, instructions given, when dispatch was announced | Publicly released recordings + a human coder | Us, now |
+| **Observable behavior** (this doc, do first) | Questions asked, instructions given, when dispatch was announced | Publicly released recordings + a coder (person or agent, human-spot-checked) | Us, now |
 | **Outcome agreement** | Protocol selected and response level sent | A partner PSAP's own calls with CAD outcomes, on their machines | Partner, later |
 
 The observable study can honestly say *"asked the same questions and gave the same instructions
@@ -14,9 +14,16 @@ as real dispatchers N% of the time"*. It cannot say *"dispatched the same"* — 
 ## The rule (from the README, restated)
 
 Real-call material — audio, transcripts, names, addresses — never enters this repository, the
-public corpus, any hosted model, or the engine's behaviour. Case files live in `replay-private/`
-(gitignored). Only **aggregate** results are published, never a per-call row. Coding is done by a
-person listening; any transcription runs **on-device only** (e.g. whisper.cpp), never a cloud API.
+public corpus, or the engine's behaviour; nothing is trained or tuned on a call. Case files live in
+`replay-private/` (gitignored), use placeholders for anything identifying, and only **aggregate**
+results are published — never a per-call row, an agency name, or a quote.
+
+Who may handle the raw material depends on where it came from:
+
+| Source | Handling |
+| --- | --- |
+| **Publicly released** — public-records releases, investigation reports, court exhibits, the Gary Allen archive | Already public; may be transcribed and coded by people **or by tools, including AI assistants**. A human spot-checks a sample of machine-coded files against the audio (quality, not policy). |
+| **Partner agency's own calls** (outcome study) | Their data, their data-use agreement: processed only on the agency's machines, by the agency or under their supervision, with whatever tooling the agreement allows. |
 
 ## Source
 
@@ -28,7 +35,7 @@ incidents; expect 40–60 codeable EMD calls after screening. Known biases, to b
 result: the collection was curated for *critical or unusual* calls, skews 1993–2012, and is not a
 shift's call mix.
 
-## Coding a call (10–15 min each)
+## Coding a call (10–15 min each by hand; agents follow the same steps)
 
 1. **Screen.** Skip if it starts mid-call, is radio traffic, a non-medical incident, or a
    non-civilian caller. Multi-call recordings: code the first caller only.
