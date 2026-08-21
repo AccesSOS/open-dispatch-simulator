@@ -97,6 +97,7 @@ test('a case file with real-looking details is rejected, with the reasons', () =
     validateCase({ ...base, ...patch, facts: { ...base.facts, ...(patch.facts ?? {}) } }, { packs: protocolsByPack });
   assert.ok(errs({ facts: { 'Q.location': '940 main street' } }).some((e) => /placeholder/.test(e)));
   assert.ok(errs({ facts: { 'Q.callback': '415-555-2368' } }).some((e) => /placeholder/.test(e)));
+  assert.deepEqual(errs({ facts: { 'Q.location': 'unknown' } }), [], 'a caller who did not know the address');
   assert.ok(errs({ facts: { 'Q.age': 'he is Robert, 40' } }).some((e) => /capitalized/.test(e)));
   assert.ok(errs({ facts: { 'Q.caller_name': 'maria' } }).some((e) => /never the name/.test(e)));
   assert.ok(errs({ facts: { 'Q.history': 'lives at 22 oak lane' } }).some((e) => /street/.test(e)));

@@ -208,11 +208,12 @@ export function validateCase(data: unknown, ctx: CaseValidationContext = {}): st
         errors.push(`fact "${code}" must be a non-empty string`);
         continue;
       }
-      if (code === 'Q.location' && value !== PLACEHOLDER_LOCATION) {
-        errors.push(`Q.location must be the placeholder "${PLACEHOLDER_LOCATION}"`);
+      // A caller who did not know the address is "unknown"; anything else must be the placeholder.
+      if (code === 'Q.location' && value !== PLACEHOLDER_LOCATION && value.toLowerCase() !== 'unknown') {
+        errors.push(`Q.location must be the placeholder "${PLACEHOLDER_LOCATION}" (or "unknown")`);
       }
-      if (code === 'Q.callback' && value !== PLACEHOLDER_CALLBACK) {
-        errors.push(`Q.callback must be the placeholder "${PLACEHOLDER_CALLBACK}"`);
+      if (code === 'Q.callback' && value !== PLACEHOLDER_CALLBACK && value.toLowerCase() !== 'unknown') {
+        errors.push(`Q.callback must be the placeholder "${PLACEHOLDER_CALLBACK}" (or "unknown")`);
       }
       if (code === 'Q.caller_name' && value.toLowerCase() !== 'unknown' && value !== 'given') {
         errors.push('Q.caller_name must be "given" or "unknown" — never the name itself');
