@@ -49,7 +49,8 @@ shift's call mix.
    `given` or `unknown`, never the name. A question the dispatcher asked but the caller could not
    answer gets the fact `unknown`.
 5. **Mark the dispatch moment**: the number of questions asked before the dispatcher first said
-   help was on the way (0 if announced immediately).
+   help was on the way (0 if announced immediately; `null` if help was never announced — refused,
+   transferred away, or the caller hung up — which the report counts separately).
 6. **Label the implied card**: which protocol in the target pack this call belongs on
    (e.g. `c1_cardiac_arrest`). Unsure → `unknown`.
 

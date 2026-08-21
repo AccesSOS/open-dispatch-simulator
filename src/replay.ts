@@ -133,7 +133,8 @@ export function scanForIdentifiers(text: string): string[] {
 export interface ReplayObserved {
   questions: string[];
   instructions: string[];
-  dispatchAfterQuestion: number;
+  /** Questions asked before help was first announced; `null` when the dispatcher never announced help. */
+  dispatchAfterQuestion: number | null;
   notes?: string;
 }
 
@@ -233,8 +234,12 @@ export function validateCase(data: unknown, ctx: CaseValidationContext = {}): st
     }
   }
   const d = observed.dispatchAfterQuestion;
-  if (!Number.isInteger(d) || (d as number) < 0) errors.push('"observed.dispatchAfterQuestion" must be a non-negative integer');
-  else if (Array.isArray(questions) && (d as number) > questions.length) {
+  if (d === null) {
+    // The dispatcher never said help was coming — a real outcome (refused, transferred, caller
+    // hung up). Kept out of the timing delta and counted on its own.
+  } else if (!Number.isInteger(d) || (d as number) < 0) {
+    errors.push('"observed.dispatchAfterQuestion" must be a non-negative integer, or null if help was never announced');
+  } else if (Array.isArray(questions) && (d as number) > questions.length) {
     errors.push('"observed.dispatchAfterQuestion" exceeds the number of questions observed');
   }
   if (observed.notes !== undefined) {
@@ -442,6 +447,8 @@ export interface ReplayReport {
   instructions: { all: RecallPrecision; perCode: CodeTally[] };
   dispatchTiming: {
     evaluated: number;
+    /** Cases where the dispatcher never announced help at all. */
+    neverAnnounced: number;
     /** Engine's questions-before-dispatch minus the dispatcher's, averaged. */
     meanDelta: number | null;
     medianDelta: number | null;
@@ -559,7 +566,8 @@ export function aggregate(
     }
   }
 
-  const deltas = cases.map(({ c, b }) => b.questionsBeforeDispatch - c.observed.dispatchAfterQuestion);
+  const timed = cases.filter(({ c }) => c.observed.dispatchAfterQuestion !== null);
+  const deltas = timed.map(({ c, b }) => b.questionsBeforeDispatch - (c.observed.dispatchAfterQuestion as number));
   const buckets: [string, (d: number) => boolean][] = [
     ['≤ −5', (d) => d <= -5],
     ['−4 … −1', (d) => d >= -4 && d <= -1],
@@ -606,6 +614,7 @@ export function aggregate(
     instructions: { all: recallPrecision(iTallies.values()), perCode: [...iTallies.values()].sort(byCode) },
     dispatchTiming: {
       evaluated: deltas.length,
+      neverAnnounced: cases.length - timed.length,
       meanDelta: deltas.length ? deltas.reduce((a, b) => a + b, 0) / deltas.length : null,
       medianDelta: median(deltas),
       engineEarlier: deltas.filter((d) => d < 0).length,
@@ -686,7 +695,8 @@ export function formatReport(r: ReplayReport): string {
   lines.push(
     `Questions before help was announced, engine minus dispatcher: mean ${signed(r.dispatchTiming.meanDelta)}, ` +
       `median ${signed(r.dispatchTiming.medianDelta)} over ${r.dispatchTiming.evaluated} cases — ` +
-      `engine earlier ${r.dispatchTiming.engineEarlier}, same ${r.dispatchTiming.same}, engine later ${r.dispatchTiming.engineLater}.`,
+      `engine earlier ${r.dispatchTiming.engineEarlier}, same ${r.dispatchTiming.same}, engine later ${r.dispatchTiming.engineLater}.` +
+      (r.dispatchTiming.neverAnnounced ? ` The dispatcher never announced help in ${r.dispatchTiming.neverAnnounced} further case(s); the engine always does.` : ''),
   );
   lines.push('');
   lines.push('| Delta | Cases |');

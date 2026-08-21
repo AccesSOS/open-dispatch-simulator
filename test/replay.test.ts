@@ -110,6 +110,9 @@ test('sanity rules: an observed question implies a fact, codes are from the taxo
   assert.ok(withObserved({ instructions: ['I.bogus'] }).some((e) => /not an instruction code/.test(e)));
   assert.ok(withObserved({ instructions: ['I.other:Bad Slug'] }).some((e) => /not an instruction code/.test(e)));
   assert.ok(withObserved({ dispatchAfterQuestion: 99 }).some((e) => /exceeds/.test(e)));
+  assert.ok(withObserved({ dispatchAfterQuestion: -1 }).some((e) => /non-negative/.test(e)));
+  // null = the dispatcher never said help was coming; a real outcome, not a coding error.
+  assert.deepEqual(withObserved({ dispatchAfterQuestion: null }), []);
   assert.ok(withObserved({ questions: ['Q.location', 'Q.location'] }).some((e) => /repeats/.test(e)));
   assert.ok(withObserved({ notes: 'transferred to Mercy hospital' }).some((e) => /notes: capitalized/.test(e)));
   // "unknown" is a fact: the dispatcher asked, the caller could not say.
@@ -183,6 +186,13 @@ test('the report is aggregates only: counts, ratios, and codes — never a fact,
   assert.equal(r.questions.core.observed, 20);
   assert.ok(r.questions.core.recall! > 0.9);
   assert.ok(r.dispatchTiming.engineLater === 3, 'the engine finishes its interrogation before announcing dispatch');
+  assert.equal(r.dispatchTiming.neverAnnounced, 0);
+  const never = aggregate(openises, openisesMap, [
+    ...replayed,
+    { c: { ...fixtures[0]!, observed: { ...fixtures[0]!.observed, dispatchAfterQuestion: null } }, b: replayed[0]!.b },
+  ]);
+  assert.equal(never.dispatchTiming.neverAnnounced, 1);
+  assert.equal(never.dispatchTiming.evaluated, 3);
   assert.equal(r.opening.evaluated, 3);
   assert.ok(r.opening.kendallTau !== null);
   const text = formatReport(r);
