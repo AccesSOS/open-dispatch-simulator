@@ -95,7 +95,20 @@ for (const r of wanted) {
     continue;
   }
   try {
-    const res = await fetch(link, { redirect: 'follow', headers: { 'user-agent': 'open-dispatch-simulator replay (research; contact via repo)' } });
+    // Wayback throttles bursts with connection resets ("fetch failed"); back off and retry
+    // before recording a failure, so a pass survives the throttle instead of failing through.
+    let res: Response | undefined;
+    for (let attempt = 1; ; attempt++) {
+      try {
+        res = await fetch(link, { redirect: 'follow', headers: { 'user-agent': 'open-dispatch-simulator replay (research; contact via repo)' } });
+        break;
+      } catch (e) {
+        if (attempt >= 4) throw e;
+        const wait = 30_000 * attempt;
+        console.log(`… ${id}  ${(e as Error).message}; waiting ${wait / 1000}s (attempt ${attempt}/4)`);
+        await sleep(wait);
+      }
+    }
     if (!res.ok || !res.body) {
       failed++;
       log(id, 'failed', '', res.headers.get('content-type') ?? '', `HTTP ${res.status}`);
