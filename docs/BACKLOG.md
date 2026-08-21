@@ -99,9 +99,12 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       provenance) and `/packs/:id/graph` for visualizers. Loopback-only and unauthenticated by
       design, with the simulation notice on every response; held calls are capped and idle-swept
       so a forgotten client cannot grow the heap.
-- [ ] **Hold a call from the terminal.** `npm run call -- <pack> [--locale es]`: an interactive
+- [x] **Hold a call from the terminal.** `npm run call -- <pack> [--locale es]`: an interactive
       REPL call. The practice/rehearsal use case in its smallest honest form, and the fastest way
       to sanity-check a pack you are writing.
+      → *Done.* `scripts/call.ts` + `npm run call`. Reads stdin so it scripts as well as it
+      converses, `--score` prints the call's scorecard, and running out of answers says which
+      slot it was still waiting on rather than exiting silently.
 - [ ] **Richer caller-answer matching.** The v0 matcher is whole-word, first-option-wins, and has
       known hazards: "no shock" matched "shock" until the options were reordered, Spanish "si"
       also means "if", and "sí, no puede respirar" matches the negative first. Make matching

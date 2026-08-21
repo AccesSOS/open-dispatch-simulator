@@ -37,6 +37,21 @@ npm run coverage # score every pack against the published requirements rubrics
 npm run score    # score every pack's calls against the QA variables
 ```
 
+### Hold a call
+
+```bash
+npm run call -- us-openises-emd --locale es --score
+```
+
+An interactive call in the terminal — the practice use case in its smallest honest form, and the
+fastest way to feel whether a pack you are writing works, since a branch sweep tells you every
+path terminates but not whether the questions land in an order a frightened person could follow.
+It reads stdin, so it scripts as well as it converses:
+
+```bash
+printf '12 Pine St\n555-0100\nchest pain\n58\nyes\nyes\nno\n' | npm run call -- us-nhtsa-emd
+```
+
 ### Live decision-tree demo
 
 ```bash

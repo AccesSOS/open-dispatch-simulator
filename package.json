@@ -24,6 +24,7 @@
     "diff": "node --import tsx scripts/diff.ts",
     "score": "node --import tsx scripts/score.ts",
     "serve": "node --import tsx scripts/serve.ts",
+    "call": "node --import tsx scripts/call.ts",
     "demo": "npm run build && npx http-server . -p 4179 -c-1"
   },
   "repository": {
