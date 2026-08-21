@@ -86,6 +86,14 @@ const STREET_TYPES =
   'hwy|highway|rte|route|cir|circle|pkwy|parkway|trail|alley|square|crescent|close|' +
   'calle|avenida|calzada|carretera|camino|rue|chemin|impasse|allée|allee';
 
+/** Words that precede a street type without naming a street. */
+const GENERIC_BEFORE_STREET = new Set([
+  'the', 'a', 'an', 'this', 'that', 'our', 'my', 'his', 'her', 'their', 'your', 'of', 'on', 'off', 'by',
+  'near', 'to', 'from', 'down', 'up', 'same', 'side', 'county', 'state', 'service', 'dirt', 'gravel',
+  'paved', 'main', 'back', 'front', 'private', 'one', 'two', 'lane', 'access', 'interstate', 'la', 'el',
+  'una', 'un', 'cette', 'une',
+]);
+
 /**
  * Scan one string for anything that looks identifying. Returns reasons, empty
  * when clean. Deliberately strict: a false positive costs a coder a minute; a
@@ -108,8 +116,13 @@ export function scanForIdentifiers(text: string): string[] {
     reasons.push('phone-like digit pattern');
   }
   const streetWithNumber = new RegExp(`\\b\\d+\\s+\\p{L}+(?:\\s+\\p{L}+)?\\s+(?:${STREET_TYPES})\\b`, 'u');
-  const streetNamed = new RegExp(`\\b\\p{L}+\\s+(?:street|avenue|road|boulevard|drive|lane|court|highway|parkway|calle|avenida|rue)\\b`, 'u');
-  if (streetWithNumber.test(withoutPlaceholders) || streetNamed.test(withoutPlaceholders)) {
+  const streetNamed = new RegExp(`\\b(\\p{L}+)\\s+(?:street|avenue|road|boulevard|drive|lane|court|highway|parkway|calle|avenida|rue)\\b`, 'gu');
+  let named = false;
+  for (const m of withoutPlaceholders.matchAll(streetNamed)) {
+    // "the road", "a highway", "county road": a generic word before the street type is not a name.
+    if (!GENERIC_BEFORE_STREET.has(m[1]!)) named = true;
+  }
+  if (streetWithNumber.test(withoutPlaceholders) || named) {
     reasons.push(`street name other than the placeholder "${PLACEHOLDER_LOCATION}"`);
   }
   if (/\b(?:my name is|my name's|this is|i am|i'm|named|call me|mr|mrs|ms|dr|miss)\s+\p{Lu}/u.test(text)) {

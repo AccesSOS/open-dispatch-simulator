@@ -83,6 +83,9 @@ test('identifier scan: phone numbers, streets, capitalized words, name phrases, 
   assert.match(scanForIdentifiers('(415) 555 2368')[0]!, /phone-like/);
   assert.match(scanForIdentifiers('940 main street')[0]!, /street name/);
   assert.match(scanForIdentifiers('we are on elm avenue')[0]!, /street name/);
+  // Generic words before a street type are not street names.
+  assert.deepEqual(scanForIdentifiers('pulled over on the side of the road, on the highway near a county road'), []);
+  assert.deepEqual(scanForIdentifiers('a long dirt road off the main road'), []);
   assert.match(scanForIdentifiers('my name is Robert')[0]!, /personal-name|capitalized/);
   assert.match(scanForIdentifiers('it is Robert, he fell')[0]!, /capitalized word "Robert"/);
   assert.match(scanForIdentifiers('email me at a@b.co')[0]!, /email/);
