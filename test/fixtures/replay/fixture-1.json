@@ -1,0 +1,31 @@
+{
+  "source": "fixture",
+  "sourceId": 1,
+  "coder": "fixture",
+  "codedOn": "2026-08-21",
+  "pack": "us-openises-emd",
+  "impliedProtocol": "c1_cardiac_arrest",
+  "facts": {
+    "Q.location": "12 Pine St",
+    "Q.callback": "555-0100",
+    "Q.what_happened": "my baby isn't breathing",
+    "Q.num_patients": "1",
+    "Q.age": "4 months",
+    "Q.sex": "female",
+    "Q.conscious": "no",
+    "Q.breathing": "no",
+    "Q.breathing_quality": "no",
+    "Q.with_patient": "yes",
+    "Q.kq:knows_cpr": "no",
+    "Q.kq:need_cpr_help": "yes",
+    "Q.kq:can_do_breaths": "yes",
+    "Q.kq:airway_obstacle": "no",
+    "Q.kq:chest_rose": "yes"
+  },
+  "observed": {
+    "questions": ["Q.location", "Q.what_happened", "Q.age", "Q.breathing", "Q.callback", "Q.with_patient"],
+    "instructions": ["I.help_on_way", "I.cpr_compressions", "I.stay_on_line"],
+    "dispatchAfterQuestion": 2,
+    "notes": "synthetic fixture, not a real call. dispatcher skipped the conscious question and began coaching before the callback"
+  }
+}

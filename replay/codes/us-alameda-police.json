@@ -1,0 +1,41 @@
+{
+  "pack": "us-alameda-police",
+  "notes": "Police pack. The medical-call taxonomy fits only the core codes (location, callback, what happened, caller name, scene safety); everything else is Q.kq:*. A medical case file replayed here measures the hand-off behaviour (fire_medical_transfer), not call-taking.",
+  "slots": {
+    "what_happened": "Q.what_happened",
+    "timeframe": "Q.kq:timeframe",
+    "location": "Q.location",
+    "dwelling": "Q.kq:dwelling",
+    "caller_name": "Q.caller_name",
+    "callback": "Q.callback",
+    "suspect_there": "Q.scene_safety",
+    "weapons": "Q.scene_safety",
+    "burg_vehicle": "Q.kq:vehicle",
+    "burg_desc": "Q.kq:suspect_description",
+    "burg_caller_safe": "Q.scene_safety",
+    "rob_desc": "Q.kq:suspect_description",
+    "rob_weapon_kind": "Q.kq:weapon_kind",
+    "rob_vehicle": "Q.kq:vehicle",
+    "rob_direction": "Q.kq:direction",
+    "dv_physical": "Q.kq:physical_or_verbal",
+    "dv_speak_freely": "Q.kq:can_speak_freely",
+    "dv_desc": "Q.kq:suspect_description",
+    "susp_desc": "Q.kq:suspect_description",
+    "susp_doing": "Q.kq:suspect_doing",
+    "susp_vehicle": "Q.kq:vehicle",
+    "acc_injuries": "Q.kq:injured",
+    "acc_vehicles": "Q.kq:vehicles_involved",
+    "acc_blocking": "Q.kq:blocking_traffic",
+    "unk_details": "Q.kq:details",
+    "unk_desc": "Q.kq:suspect_description"
+  },
+  "strings": {
+    "dispatch_confirm": ["I.help_on_way", "I.stay_on_line"],
+    "pd_units_coming": ["I.help_on_way", "I.stay_on_line"],
+    "pd_stay_safe": "I.leave_for_safety",
+    "pd_updates": "I.watch_and_report",
+    "pd_dv_code": "I.other:yes_no_only",
+    "pd_no_confront": "I.other:dont_confront",
+    "pd_ems_transfer": "I.other:transfer_ems"
+  }
+}

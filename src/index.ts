@@ -31,3 +31,18 @@ export type {
 } from './coverage.js';
 export type { CallerScript, CallMetrics, BatchReport, RunOptions, ScriptSweep } from './sim.js';
 export type * from './types.js';
+export {
+  aggregate as replayAggregate,
+  formatReport as formatReplayReport,
+  replayCase,
+  validateCase as validateReplayCase,
+  validateCodeMap as validateReplayCodeMap,
+  scanForIdentifiers,
+  producibleCodes,
+  unknownPhrase,
+  CORE_QUESTION_CODES,
+  INSTRUCTION_CODES,
+  PLACEHOLDER_LOCATION,
+  PLACEHOLDER_CALLBACK,
+} from './replay.js';
+export type { ReplayCase, ReplayObserved, CodeMap, EngineBehavior, ReplayReport, CodeTally, RecallPrecision } from './replay.js';

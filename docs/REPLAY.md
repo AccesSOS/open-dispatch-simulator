@@ -44,6 +44,10 @@ shift's call mix.
    should have asked. A question asked twice is coded once unless re-asked after new information.
 4. **Record the facts** the caller gave, as answers the engine's questions would receive. Use
    placeholders for anything identifying: location = `12 Pine St`, callback = `555-0100`, no names.
+   Write facts and notes **entirely in lowercase** (brand names too) — the validator treats any
+   other capitalized word as a possible name and rejects the file. `Q.caller_name` is recorded as
+   `given` or `unknown`, never the name. A question the dispatcher asked but the caller could not
+   answer gets the fact `unknown`.
 5. **Mark the dispatch moment**: the number of questions asked before the dispatcher first said
    help was on the way (0 if announced immediately).
 6. **Label the implied card**: which protocol in the target pack this call belongs on
@@ -67,7 +71,8 @@ Questions — core (every pack's case entry)
 | `Q.with_patient` | whether caller is with the patient |
 | `Q.scene_safety` | weapons, danger, fire, traffic |
 | `Q.history` | prior condition, meds, pregnancy, diabetes… |
-| `Q.kq:<slug>` | any card-specific key question, e.g. `Q.kq:chest_pain_duration` |
+| `Q.caller_name` | the caller's own name |
+| `Q.kq:<slug>` | any card-specific key question. **Use the slugs in `replay/codes/<pack>.json`** (e.g. `Q.kq:duration`, `Q.kq:sweating`) so the engine's question and the dispatcher's can match; a slug the map does not know lands on the miss list. |
 
 Instructions
 
@@ -91,7 +96,7 @@ Instructions
 | `I.childbirth:<slug>` | any childbirth step |
 | `I.other:<slug>` | anything else, briefly |
 
-### Case file (`replay-private/<archive-id>.json`)
+### Case file (`replay-private/cases/<source>-<id>.json`)
 
 ```json
 {
@@ -113,10 +118,35 @@ Instructions
 ```
 
 Answers are keyed by behavior code; the harness maps each pack's question slots to codes (see
-`replay/codes/<pack>.json`, built with the harness) and answers "I don't know" to anything the
-call never covered — an unanswered question is never invented.
+`replay/codes/<pack>.json`) and answers "I don't know" to anything the call never covered — an
+unanswered question is never invented. `coder` is initials for a person or `agent` for a machine
+coder; `impliedProtocol` is a protocol id of the named pack or `unknown`.
 
-## What the harness reports (`npm run replay -- replay-private/ --pack <id>`)
+`npm run replay:validate -- replay-private/cases` (or the harness itself) rejects a file that:
+names a pack or protocol that does not exist; uses a code outside the taxonomy; has a non-placeholder
+location or callback; contains a phone-like digit run, a street name, a capitalized word outside a
+short allowlist (`I`, `CPR`, `AED`, `EMS`…), an email or URL; records an observed question with no
+fact for it; repeats a question code; or marks dispatch after more questions than were observed.
+
+### Code maps (`replay/codes/<pack>.json`)
+
+One per shipped pack, validated against the pack by `test/replay.test.ts` (every key must exist in
+the pack; every case-entry, key-question and script ask-step slot must be mapped):
+
+- `slots` — question slot → `Q.*` code. Every OpenISES card opens with "alert?" and "breathing
+  normally?"; those map to `Q.conscious` / `Q.breathing_quality` and, like the coder, the harness
+  counts a code once however many slots produced it.
+- `strings` — `dispatch_confirm` and post-dispatch string ids → `I.*` code(s).
+- `steps` / `scripts` — `scriptId/stepId` or a whole script → `I.*` code(s) inside the I-cards.
+
+A slot left out of the map is still a question the caller had to answer (it counts toward dispatch
+timing) but not a behavior (it is excluded from precision) — the report lists any such slot it met,
+and the shipped maps leave none.
+
+## What the harness reports (`npm run replay -- replay-private/cases --pack <id> [--json]`)
+
+`src/replay.ts` does the work; `scripts/replay.ts` is the CLI. Three synthetic, clearly fake case
+files under `test/fixtures/replay/` exercise it in CI — the real ones never leave `replay-private/`.
 
 Per pack, across all case files (never per call in any committed or published output):
 
@@ -127,7 +157,9 @@ Per pack, across all case files (never per call in any committed or published ou
 - **Dispatch timing** — questions-before-dispatch, engine minus dispatcher (a fast-track that
   fires later than the human did is the finding that matters most).
 - **Protocol agreement** — engine's selected protocol vs the coder's `impliedProtocol`.
-- **Miss list** — codes the dispatcher used that the engine never produces on any path: the
-  corpus-gap list, and the most useful output for the advisory circle.
+- **Miss list** — codes the dispatcher used that the engine never produces on any path (they
+  appear nowhere in the pack's code map): the corpus-gap list, and the most useful output for the
+  advisory circle. A code that is in the map but was not reached on these calls is *not* a miss.
+- **Intake** — files seen, not case files, invalid (reasons as counts), for other packs, replayed.
 
 State the archive's biases next to any number, and never name an agency or a call.

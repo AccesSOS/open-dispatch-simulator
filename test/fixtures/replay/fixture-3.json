@@ -1,0 +1,24 @@
+{
+  "source": "fixture",
+  "sourceId": 3,
+  "coder": "fixture",
+  "codedOn": "2026-08-21",
+  "pack": "us-openises-emd",
+  "impliedProtocol": "unknown",
+  "facts": {
+    "Q.location": "12 Pine St",
+    "Q.callback": "555-0100",
+    "Q.what_happened": "she collapsed and she's shaking all over",
+    "Q.age": "unknown",
+    "Q.conscious": "no",
+    "Q.breathing": "unknown",
+    "Q.kq:still_seizing": "yes",
+    "Q.kq:not_a_real_question": "yes"
+  },
+  "observed": {
+    "questions": ["Q.what_happened", "Q.location", "Q.age", "Q.conscious", "Q.breathing", "Q.kq:still_seizing", "Q.kq:not_a_real_question", "Q.callback"],
+    "instructions": ["I.help_on_way", "I.other:nothing_in_mouth", "I.other:not_a_real_instruction", "I.positioning"],
+    "dispatchAfterQuestion": 0,
+    "notes": "synthetic fixture, not a real call. protocol left unknown and two invented codes included so the miss list has something to show"
+  }
+}

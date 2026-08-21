@@ -1,0 +1,31 @@
+{
+  "pack": "mx-cnie-911",
+  "notes": "Spanish-only pack; the harness answers uncovered slots with the es lexicon's 'no sé'. Case files for this pack carry Spanish facts. Mexican calls are a different protocol family from US EMD — keep them in their own study.",
+  "slots": {
+    "ubicacion": "Q.location",
+    "telefono": "Q.callback",
+    "que_sucede": "Q.what_happened",
+    "nombre": "Q.caller_name",
+    "edad": "Q.age",
+    "consciente": "Q.conscious",
+    "respira": "Q.breathing",
+    "inf_dolor": "Q.kq:chest_pain",
+    "inf_brazo": "Q.kq:pain_elsewhere",
+    "inf_sudor": "Q.kq:sweating",
+    "inf_nausea": "Q.kq:nausea",
+    "paro_responde": "Q.conscious",
+    "paro_desde": "Q.kq:duration",
+    "inc_respira_normal": "Q.breathing_quality",
+    "inc_primera_vez": "Q.kq:first_time",
+    "dif_habla": "Q.kq:full_sentences",
+    "conv_sigue": "Q.kq:still_seizing",
+    "conv_primera": "Q.history"
+  },
+  "strings": {
+    "dispatch_confirm": ["I.help_on_way", "I.stay_on_line"],
+    "pd_no_mover": "I.dont_move",
+    "pd_no_colgar": "I.watch_and_report",
+    "pd_de_lado": "I.positioning",
+    "pd_no_sujetar": "I.other:dont_restrain"
+  }
+}

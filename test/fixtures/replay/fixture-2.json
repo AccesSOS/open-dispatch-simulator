@@ -1,0 +1,30 @@
+{
+  "source": "fixture",
+  "sourceId": 2,
+  "coder": "fixture",
+  "codedOn": "2026-08-21",
+  "pack": "us-openises-emd",
+  "impliedProtocol": "m5_chest_pain",
+  "facts": {
+    "Q.location": "12 Pine St",
+    "Q.callback": "555-0100",
+    "Q.what_happened": "my husband is having chest pain",
+    "Q.num_patients": "1",
+    "Q.age": "58",
+    "Q.sex": "male",
+    "Q.conscious": "yes",
+    "Q.breathing": "yes",
+    "Q.breathing_quality": "yes",
+    "Q.caller_name": "given",
+    "Q.history": "he had a heart attack two years ago",
+    "Q.kq:duration": "about twenty minutes",
+    "Q.kq:sweating": "yes",
+    "Q.kq:nausea": "no"
+  },
+  "observed": {
+    "questions": ["Q.location", "Q.callback", "Q.what_happened", "Q.age", "Q.conscious", "Q.breathing", "Q.kq:duration", "Q.history", "Q.kq:sweating", "Q.kq:nausea", "Q.caller_name"],
+    "instructions": ["I.help_on_way", "I.positioning", "I.gather_meds", "I.unlock_door", "I.watch_and_report"],
+    "dispatchAfterQuestion": 6,
+    "notes": "synthetic fixture, not a real call"
+  }
+}

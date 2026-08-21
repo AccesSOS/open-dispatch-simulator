@@ -1,0 +1,23 @@
+{
+  "pack": "us-nhtsa-emd",
+  "notes": "Reference subset: three cards, no scripts. Expect a long miss list — that is the point of running it.",
+  "slots": {
+    "address": "Q.location",
+    "callback": "Q.callback",
+    "complaint": "Q.what_happened",
+    "age": "Q.age",
+    "conscious": "Q.conscious",
+    "breathing": "Q.breathing",
+    "cp_alert": "Q.conscious",
+    "cp_clammy": "Q.kq:sweating",
+    "unc_breathing": "Q.breathing_quality"
+  },
+  "strings": {
+    "dispatch_confirm": ["I.help_on_way", "I.stay_on_line"],
+    "pd_rest": "I.positioning",
+    "pd_nothing_by_mouth": "I.other:nothing_by_mouth",
+    "pd_callback_worse": "I.watch_and_report",
+    "pd_dont_move": "I.dont_move",
+    "pd_watch_breathing": "I.watch_and_report"
+  }
+}
