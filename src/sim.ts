@@ -2,6 +2,7 @@ import { DispatchSession } from './engine.js';
 import type {
   Condition,
   InstructionScript,
+  SessionEvent,
   Locale,
   Persona,
   ProtocolPack,
@@ -37,6 +38,9 @@ export interface CallMetrics {
   completed: boolean;
   /** v0.3: instruction-script steps read, as "<scriptId>#<stepId>". */
   scriptSteps: string[];
+  /** The session's own narration, when `recordEvents` asked for it. Opt-in:
+   * a branch sweep runs tens of thousands of calls and does not want them. */
+  events?: SessionEvent[] | undefined;
 }
 
 export interface BatchReport {
@@ -55,18 +59,22 @@ export interface RunOptions {
   maxTurns?: number;
   /** Dispatcher profile to run this call against (seeded, reproducible). */
   persona?: Persona;
+  /** Keep the session's event stream on the result, for scoring. */
+  recordEvents?: boolean;
 }
 
 export function runCall(pack: ProtocolPack, script: CallerScript, options: RunOptions = {}): CallMetrics {
   const maxTurns = options.maxTurns ?? 100;
   let clarifies = 0;
   const scriptSteps: string[] = [];
+  const events: SessionEvent[] = [];
   const session = new DispatchSession(pack, {
     locale: script.locale,
     ...(options.persona && { persona: options.persona }),
     onEvent: (e) => {
       if (e.type === 'clarify') clarifies++;
       if (e.type === 'script_step') scriptSteps.push(`${e.scriptId}#${e.stepId}`);
+      if (options.recordEvents) events.push(e);
     },
   });
   session.start();
@@ -85,6 +93,7 @@ export function runCall(pack: ProtocolPack, script: CallerScript, options: RunOp
     clarifies,
     completed: session.isDone(),
     scriptSteps,
+    ...(options.recordEvents ? { events } : {}),
   };
 }
 

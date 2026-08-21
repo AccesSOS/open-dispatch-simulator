@@ -22,6 +22,7 @@
     "sim": "node --import tsx scripts/sim.ts",
     "coverage": "node --import tsx scripts/coverage.ts",
     "diff": "node --import tsx scripts/diff.ts",
+    "score": "node --import tsx scripts/score.ts",
     "demo": "npm run build && npx http-server . -p 4179 -c-1"
   },
   "repository": {

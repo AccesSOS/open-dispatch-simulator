@@ -78,13 +78,19 @@ The corpus and engine are strong; what is thin is the number of ways to *get at*
 from the README's own roadmap (call-scoring, richer answer matching, persona traits and
 interpreter relay, a practice UI) plus the access gaps that showed up while building round 1.
 
-- [ ] **Call scoring.** `npm run score`: turn a call from "did it complete" into "was it handled
+- [x] **Call scoring.** `npm run score`: turn a call from "did it complete" into "was it handled
       to protocol". Score a session's event stream against the pack on the QA variables Maine
       §III.4.C names — all-caller questions, protocol selection, complaint-specific questions,
       priority determination, post-dispatch and pre-arrival instructions — with evidence per axis.
       Run it over each pack's branch sweep so it doubles as a pack-quality report: slots asked but
       never parsed, protocols only reachable by fallback, cards that ask nothing. Deterministic,
       keyless. Synthetic transcripts only, as always.
+      → *Done.* `src/score.ts` + `npm run score`, six cited axes, 59k calls scored across the
+      corpus in ~9s. Compliance (dispatcher and pack) is separated from information capture
+      (caller) — conflating them was the first version's bug, along with scoring a card's
+      deliberate fast-track to dispatch as a skipped interrogation. Corpus is clean; the failure
+      paths are proven on deliberately broken packs rather than asserted. It also turned up the
+      "I do not know" reading recorded under answer matching below.
 - [ ] **Serve the dispatcher.** `npm run serve`: a `node:http` JSON API (no new dependencies) so a
       process in any language can hold a call — start a session, post an answer, read the
       utterances and the result. This is what an AI caller, a crash-detection client or an alarm
@@ -97,6 +103,10 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       also means "if", and "sí, no puede respirar" matches the negative first. Make matching
       negation-aware and add an explicit "unknown / I don't know" outcome distinct from an
       unparsed answer. Prove no sweep outcome moves except the ones intended.
+      *Concrete case, found by the scorer:* any pack listing "not" as a negative keyword — the
+      OpenISES pack does — reads "I do not know", "not sure" and "no idea" as a firm **no**. The
+      reference pack does not list "not", so the same phrase clarifies there instead. Same engine,
+      opposite readings of an answer that means neither.
 - [ ] **Caller personas for the harness.** Callers do not answer in keywords. Add caller-side
       profiles — panicked, third-party ("I can't see him from here"), non-native speaker,
       indirect — so packs are exercised against messy input rather than clean option words. Pairs

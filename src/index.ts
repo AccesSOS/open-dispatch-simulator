@@ -15,6 +15,8 @@ export { DEFAULT_LEXICONS, lexiconFor } from './lexicon.js';
 export { runCall, runBatch, sweepScripts, sweepInstructionScripts } from './sim.js';
 export { coverage, loadRubric, loadRubricFromFile, matchTaxonomy, RubricValidationError } from './coverage.js';
 export { diffPacks } from './diff.js';
+export { scoreCall } from './score.js';
+export type { CallScore, ScoreAxis, AxisStatus } from './score.js';
 export type { PackDiffResult, ProtocolPairDiff, CaseEntryDiff, SetDiff, DiffOptions } from './diff.js';
 export type {
   Rubric,

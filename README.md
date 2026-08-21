@@ -34,6 +34,7 @@ npm install
 npm test         # engine + simulator suites (keyless)
 npm run sim      # branch-sweep every pack in every locale, enforce invariants
 npm run coverage # score every pack against the published requirements rubrics
+npm run score    # score every pack's calls against the QA variables
 ```
 
 ### Live decision-tree demo
@@ -135,7 +136,10 @@ protocols, determinants, and response levels. `sweepScripts` enumerates **every 
 choice options per protocol**, and `npm run sim` (also a CI gate) enforces the simulator's core
 invariant: *every call reaches dispatch with a response level*, in every locale. Dispatchers also
 clarify-and-re-ask when a choice answer doesn't parse (`clarifyAttempts`, default 1), and keyword
-matching is Unicode word-boundary aware — "I do not know" is not a "no".
+matching is Unicode word-boundary aware, so "know" never matches the keyword "no". Whether *"I do
+not know"* itself reads as a negative is the pack's call, not the engine's: the reference pack
+does not list "not" as a negative, the OpenISES pack does. Giving "I don't know" an outcome of its
+own, distinct from an answer that simply didn't parse, is on the roadmap.
 
 Locale completeness runs in both directions. The loader already refuses a pack missing a string in
 any declared locale; the suite additionally refuses one where a locale is a byte-for-byte copy of
@@ -198,6 +202,43 @@ QA/QI case review, dispatcher training, record-keeping — are marked program-sc
 against a pack. This is deliberately the **only** comparison we publish; see
 [docs/PRIVATE-PACKS.md](docs/PRIVATE-PACKS.md) for why we never publish similarity claims against
 proprietary systems.
+
+## Scoring a call
+
+`npm run sim` answers *did the call reach dispatch*. That is the floor, not the bar.
+`npm run score` asks whether it was handled **to protocol**, on the six variables Maine's EMDPRS
+§III.4.C requires a licensed EMD centre to track for every reviewed call:
+
+```bash
+npm run score                              # every pack's branch sweep, scored
+npm run score -- --pack us-openises-emd    # one pack
+npm run score -- --json                    # machine-readable
+```
+
+```
+us-openises-emd — 57525 calls scored
+
+  all-caller-questions         57525 pass                             100% pass
+  protocol-selection           57477 pass · 48 partial                100% pass
+  complaint-questions          57525 pass                             100% pass
+  priority                     57525 pass                             100% pass
+  pre-arrival-instructions     19398 pass · 38127 n/a                 100% pass
+  post-dispatch-instructions   57525 pass                             100% pass
+
+  information captured: 604189/935028 answers parsed (65%) — a property of the callers, not of compliance
+```
+
+Two things it deliberately separates. **Compliance** is a property of the dispatcher and the pack:
+a `fail` means a card asked nothing, dispatched nothing, or promised instructions it never gave.
+**Information capture** is a property of the *caller* — someone who answers "I don't know" four
+times has not made the dispatcher non-compliant — and it is the number an AI-caller harness
+actually wants. A card that routes straight to dispatch, as both bundled EMD packs do for a
+patient who isn't breathing, scores `n/a` rather than "skipped the interrogation": that is the
+protocol working, not failing.
+
+Two things it does not claim: it cannot judge whether a determinant was *clinically* right, which
+needs a ground truth no synthetic call has, and it scores a session this engine ran rather than an
+arbitrary transcript.
 
 ## Comparing two packs
 
