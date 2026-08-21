@@ -23,7 +23,7 @@ is a shift's call mix.
 | Validated medical case files | 52 (all `gary-allen`) |
 | Target | ≥ 300 |
 | Sources shipped | 1 |
-| Requests filed / drafted awaiting filing | 1 / 4 |
+| Requests filed / drafted awaiting filing | 2 / 3 |
 
 ## Shipped (case files exist)
 
@@ -59,7 +59,7 @@ accept a ten-call sample if volume is refused.
 | Pinellas County 911 | Ch. 119 F.S.; §365.171(15) — caller name/address/phone excised, remainder public (AG opinions) | Florida's long public-records tradition; county runs its own EMD centre | drafted |
 | Dane County Public Safety Communications | Wis. Stat. §§19.31–19.39; Marsy's Law redactions possible | Published request form and $15/recording fee schedule; 120-day retention | drafted |
 | New Hanover County 911 | N.C. G.S. 132-1.4(c)(4) — call contents public; voice, name, address, phone altered/withheld | Statute explicitly covers 911 contents; portal-based requests. Voice alteration will degrade audio — transcripts still fine | drafted |
-| Phoenix Fire Regional Dispatch Center | A.R.S. §39-121; §39-121.03 non-commercial statement | EMD-running fire dispatch for ~26 jurisdictions; online portal; $16.50/CD | drafted |
+| Phoenix Fire Regional Dispatch Center | A.R.S. §39-121; §39-121.03 non-commercial statement (copying cost only) | EMD-running fire dispatch for ~26 jurisdictions; online portal; $16.50/CD (electronic requested instead). Fire + EMS calls only — police 911 audio sits with Phoenix PD | **filed 2026-08-21** (ref F058027-082126): all 911 audio for July 2026 + CAD log, weekly batches offered |
 
 Considered and set aside: **Texas** — Gov't Code §552.157 makes any recording containing a
 person's *final words* confidential and the §552.108 law-enforcement exception is discretionary,
