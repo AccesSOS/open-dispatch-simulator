@@ -23,7 +23,7 @@ is a shift's call mix.
 | Validated medical case files | 52 (all `gary-allen`) |
 | Target | ≥ 300 |
 | Sources shipped | 1 |
-| Requests drafted, awaiting a human to file | 5 |
+| Requests filed / drafted awaiting filing | 1 / 4 |
 
 ## Shipped (case files exist)
 
@@ -46,7 +46,7 @@ reported to host the library but the site now carries only the podcast (404 on t
 
 ## Pending — drafted, a person files them
 
-The records-request lever. One granted month of medical 911 audio is hundreds of calls — the only
+The records-request lever. One granted month of 911 audio from a mid-size PSAP is thousands of calls — the only
 route to 300 that does not depend on what someone else happened to publish. Drafts are in
 `replay-private/requests/` (they carry the org's contact details); statute basis verified
 2026-08-21. Retention windows are short (Phoenix 6 months, Dane 120 days, some Florida counties
@@ -55,7 +55,7 @@ accept a ten-call sample if volume is refused.
 
 | Agency | State basis | Why this one | Status |
 | --- | --- | --- | --- |
-| Cincinnati Emergency Communications Center (via CPD Records) | Ohio R.C. 149.43; *Cincinnati Enquirer v. Hamilton County*, 1996-Ohio-214 — 911 tapes are public records per se; *Enquirer v. Sage*, 2015 | Strongest statute in the country; large urban PSAP with EMD | drafted |
+| Cincinnati Emergency Communications Center (via CPD Records) | Ohio R.C. 149.43; *Cincinnati Enquirer v. Hamilton County*, 1996-Ohio-214 — 911 tapes are public records per se; *Enquirer v. Sage*, 2015; fees limited to copy cost | Strongest statute in the country; large urban PSAP with EMD | **filed 2026-08-21** (ref P491325-082126): all 911 audio for July 2026 + CAD log, weekly batches offered |
 | Pinellas County 911 | Ch. 119 F.S.; §365.171(15) — caller name/address/phone excised, remainder public (AG opinions) | Florida's long public-records tradition; county runs its own EMD centre | drafted |
 | Dane County Public Safety Communications | Wis. Stat. §§19.31–19.39; Marsy's Law redactions possible | Published request form and $15/recording fee schedule; 120-day retention | drafted |
 | New Hanover County 911 | N.C. G.S. 132-1.4(c)(4) — call contents public; voice, name, address, phone altered/withheld | Statute explicitly covers 911 contents; portal-based requests. Voice alteration will degrade audio — transcripts still fine | drafted |
