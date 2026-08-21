@@ -12,7 +12,8 @@ Thanks for helping make emergency-call technology safer and more accessible.
    proprietary protocol content** (MPDS®/ProQA®, PowerPhone, or any licensed system) — such PRs
    will be closed.
 3. **Synthetic data only.** Never include real emergency calls, transcripts, or personal data in
-   code, packs, tests, or issues.
+   code, packs, tests, or issues. (Partner agencies may replay their own calls privately for
+   validation — see the README's data policy — but nothing from such a set is ever contributed.)
 4. **Every locale ships complete.** The loader enforces that every string exists in every declared
    locale — translations are part of a pack, not an afterthought. Machine translation is
    acceptable for a draft PR if flagged for native-speaker review. Completeness covers what the

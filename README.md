@@ -321,7 +321,13 @@ recorded in [docs/PROTOCOL-SOURCES.md](docs/PROTOCOL-SOURCES.md).
   and must not be contributed; agencies that license them may encode them as *private* packs and
   load them locally — see [docs/PRIVATE-PACKS.md](docs/PRIVATE-PACKS.md) for the mechanics and
   the permissions you need first.
-- **Synthetic data only.** No real emergency calls, transcripts, or personal data — ever.
+- **Real calls never enter this project.** No real emergency calls, transcripts, or personal data
+  in the repository, the public corpus, any hosted model, or the engine's behaviour — the engine
+  is grounded in protocol documents, not in recordings. The one exception is *replay validation*:
+  a partner agency may run its own (redacted) historical calls through the engine, on its own
+  machines, to measure whether the engine reaches the same protocol and response level its
+  dispatchers did. Such a set is held only by named people under a written data plan with that
+  agency, and only aggregate results are ever published.
 - The bundled [`packs/us-nhtsa-emd`](packs/us-nhtsa-emd/pack.json) is a heavily simplified
   reference subset that exists to exercise the engine, not a usable medical protocol.
 - [`packs/us-openises-emd`](packs/us-openises-emd/pack.json) is the flagship **source-faithful**
