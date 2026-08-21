@@ -26,7 +26,11 @@
     "serve": "node --import tsx scripts/serve.ts",
     "call": "node --import tsx scripts/call.ts",
     "demo": "npm run build && npx http-server . -p 4179 -c-1",
-    "replay": "node --import tsx scripts/replay.ts"
+    "replay": "node --import tsx scripts/replay.ts",
+    "replay:fetch": "node --import tsx replay/fetch.ts",
+    "replay:transcribe": "node --import tsx replay/transcribe.ts",
+    "replay:validate": "node --import tsx replay/validate.ts",
+    "replay:qa": "node --import tsx replay/qa.ts"
   },
   "repository": {
     "type": "git",
