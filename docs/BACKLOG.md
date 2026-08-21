@@ -147,3 +147,11 @@ interpreter relay, a practice UI) plus the access gaps that showed up while buil
       profiles — panicked, third-party ("I can't see him from here"), non-native speaker,
       indirect — so packs are exercised against messy input rather than clean option words. Pairs
       with interpreter-relay simulation from the roadmap.
+- [ ] **Corpus gaps from replay round 1** ([REPLAY-RESULTS.md](REPLAY-RESULTS.md), 52 publicly
+      released calls, single-coder). In order of disagreement mass: route "unresponsive / can't
+      wake him / barely breathing" to C1 (7 of 15 coded arrests fell to the unknown-man-down card);
+      a caller-proximity and an others-present question (missed on 21 and 20 calls, both gate
+      T-CPR); a general unlock-the-door / meet-the-crew post-dispatch line (24 calls, matched on 9);
+      the I8 cord-tying step. Separately for the advisory circle, not a patch: the engine announces
+      dispatch a median 9 questions after real dispatchers did. None of this is tuned on a call —
+      the findings name card content and keywords; the fixes come from the protocol documents.
