@@ -23,6 +23,9 @@ jobs:
       - run: npm run validate:packs
       - run: npm run sim
       - run: npm run coverage
+      # --strict fails the build on a structural finding: a card that asks
+      # nothing, dispatches nothing, or promises instructions it never gives.
+      - run: npm run score -- --strict
       - run: npm run build
 
   # The whole point of this project is that packs are grounded and licensed.
