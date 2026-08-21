@@ -1,5 +1,7 @@
 # Backlog
 
+Round 1 is complete — the record is kept below for the decisions in it. Round 2 is at the bottom.
+
 Priority order. One item per unit of work; each completed item is checked off with a one-line
 result note and its commit hash. `[BLOCKED: reason]` marks an item that cannot proceed without
 external input (a permission reply, a decision from Kevin, a records request).
@@ -69,3 +71,33 @@ external input (a permission reply, a decision from Kevin, a records request).
       brought to parity across the corpus (1369 option/locale sets, appended so the sweep's
       answers are unchanged — every determinant and response count is byte-identical before and
       after). `test/locales.test.ts` now enforces both directions corpus-wide.
+
+## Round 2 — more use cases
+
+The corpus and engine are strong; what is thin is the number of ways to *get at* them. These come
+from the README's own roadmap (call-scoring, richer answer matching, persona traits and
+interpreter relay, a practice UI) plus the access gaps that showed up while building round 1.
+
+- [ ] **Call scoring.** `npm run score`: turn a call from "did it complete" into "was it handled
+      to protocol". Score a session's event stream against the pack on the QA variables Maine
+      §III.4.C names — all-caller questions, protocol selection, complaint-specific questions,
+      priority determination, post-dispatch and pre-arrival instructions — with evidence per axis.
+      Run it over each pack's branch sweep so it doubles as a pack-quality report: slots asked but
+      never parsed, protocols only reachable by fallback, cards that ask nothing. Deterministic,
+      keyless. Synthetic transcripts only, as always.
+- [ ] **Serve the dispatcher.** `npm run serve`: a `node:http` JSON API (no new dependencies) so a
+      process in any language can hold a call — start a session, post an answer, read the
+      utterances and the result. This is what an AI caller, a crash-detection client or an alarm
+      integration needs to test against a realistic dispatcher without linking the library.
+- [ ] **Hold a call from the terminal.** `npm run call -- <pack> [--locale es]`: an interactive
+      REPL call. The practice/rehearsal use case in its smallest honest form, and the fastest way
+      to sanity-check a pack you are writing.
+- [ ] **Richer caller-answer matching.** The v0 matcher is whole-word, first-option-wins, and has
+      known hazards: "no shock" matched "shock" until the options were reordered, Spanish "si"
+      also means "if", and "sí, no puede respirar" matches the negative first. Make matching
+      negation-aware and add an explicit "unknown / I don't know" outcome distinct from an
+      unparsed answer. Prove no sweep outcome moves except the ones intended.
+- [ ] **Caller personas for the harness.** Callers do not answer in keywords. Add caller-side
+      profiles — panicked, third-party ("I can't see him from here"), non-native speaker,
+      indirect — so packs are exercised against messy input rather than clean option words. Pairs
+      with interpreter-relay simulation from the roadmap.
